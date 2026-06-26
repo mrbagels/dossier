@@ -2,7 +2,7 @@
 
 # Dossier
 
-### Turn a JSON file into a polished web page — one self-contained `.html` file your team and your AI agents can both read.
+### Stop asking your AI for a Markdown file. Have it build you a Dossier — a self-contained, interactive HTML document for planning, documenting, and deciding *with* AI.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
@@ -12,30 +12,48 @@
 
 </div>
 
-You write a small JSON file. Dossier gives you back **one self-contained `.html` page** — a
-report, plan, spec, or review that looks great in any browser, that you can email as a
-single file or drop straight into your wiki. And because the page carries its own
-structured data inside it, **an AI agent can read it straight back** — no scraping.
-
-No build pipeline. No server. No external files, fonts, or scripts to load. Just one
-portable HTML file (plus a Markdown copy) that works offline.
+When you ask an AI assistant to "write up a plan," "summarize this," or "lay out the
+options," it dumps a wall of Markdown. **Dossier replaces that.** Your agent authors a
+Dossier instead and hands you **one self-contained, interactive HTML page** — something you
+can actually navigate, search, mark up, and hand *back* to the AI to act on.
 
 ```
-   my-doc.dossier.json  ──►  dossier build  ──►  my-doc.html      (+ my-doc.md)
-                                                  one file · opens anywhere · works offline
+  "write me a markdown file"   →   a flat .md you skim once and lose
+  "make me a dossier"          →   one interactive .html: navigable, markable, agent-readable
 ```
 
-## Install
+It's built for the back-and-forth that real planning needs:
 
-One line, any platform — you just need [Node](https://nodejs.org) 18+:
+- **Your agent writes it.** It lays out plans, specs, research, and options — with as much
+  depth as the work needs — as a structured document, not a text dump. You don't hand-write anything.
+- **You work in it.** Navigate it, search it, expand the details that matter, **tick the
+  options you want, and leave notes** — right in the page.
+- **You hand it back.** Export your decisions as JSON; the agent implements them. The whole
+  document carries its own structured data inside it, so the AI reads it back perfectly — no
+  scraping, no lossy copy-paste.
+
+One file. No server, no external assets, works offline. Open it, email it, or embed it in
+your wiki.
+
+## Get started
+
+The point of Dossier is to let your **agent** drive it. Install the CLI and the skill once:
 
 ```bash
-npm install -g github:mrbagels/dossier
+npm install -g github:mrbagels/dossier                 # one line, any platform (Node 18+)
+ln -s "$(pwd)/dossier/skill" ~/.claude/skills/dossier  # if cloned; see "Use it from an agent"
 ```
 
-Prefer not to install? Run it on demand: `npx github:mrbagels/dossier build my-doc.dossier.json`
+Then just ask your assistant:
 
-## Quick start
+> *"Make me a dossier planning the Q3 migration."*
+> *"Turn these five options into a review board I can triage."*
+> *"Write this up as a dossier instead of a markdown file."*
+
+It authors a `*.dossier.json` and runs `dossier build` — you get `my-doc.html` (+ `.md`).
+[More on the skill ↓](#use-it-from-an-agent)
+
+**Driving it yourself?** Same tool, by hand:
 
 ```bash
 dossier init my-doc                  # creates my-doc.dossier.json from a starter
@@ -44,21 +62,15 @@ dossier build my-doc.dossier.json    # writes my-doc.html  (+ my-doc.md)
 open my-doc.html                     # macOS  (Linux: xdg-open · Windows: start)
 ```
 
-Open the page and try dark mode, the search box, `Cmd/Ctrl-K`, and the interactive review
-board at the bottom.
-
-**Or let an AI agent build one for you.** Dossier ships a [Claude Code](https://claude.com/claude-code)
-skill, so you can just say *"make a dossier summarizing this"* — [details below](#use-it-from-an-agent).
-
 <div align="center">
 
 ---
 
 **Documentation**
 
-[How it works](#how-it-works) · [Authoring](#authoring) · [Block types](#block-types) ·
-[Review / triage](#review--triage) · [The skill](#use-it-from-an-agent) · [React](#react) ·
-[Embedding](#embedding) · [Development](#development) · [Contributing](#contributing)
+[How it works](#how-it-works) · [Use it from an agent](#use-it-from-an-agent) ·
+[Authoring](#authoring) · [Block types](#block-types) · [Review / triage](#review--triage) ·
+[React](#react) · [Embedding](#embedding) · [Development](#development) · [Contributing](#contributing)
 
 ---
 
@@ -66,9 +78,10 @@ skill, so you can just say *"make a dossier summarizing this"* — [details belo
 
 ## How it works
 
-The page you open is a **projection of the JSON you wrote** — the full model is embedded
-back into the file as a `#dossier-model` data island, which is exactly what an agent reads.
-Everything else is inlined at build time so the result needs nothing at view time:
+A Dossier is generated from one JSON document model (which the agent writes). The page you
+open is a **projection of that model** — the full model is embedded back into the file as a
+`#dossier-model` data island, which is exactly what an agent reads. Everything else is
+inlined at build time, so the result needs nothing at view time:
 
 ```
 my-doc.dossier.json ──► enrich ──► render ──► self-contained .html  (+ .md, + agent digest)
@@ -82,17 +95,32 @@ my-doc.dossier.json ──► enrich ──► render ──► self-contained .
   (diagrams), and React (the optional port) run only at build time — none ship to the viewer.
 - **One design system.** Tokens, the small inlined client runtime, and the HTML shell are
   shared by both renderers (`renderShell()` is the single source of truth).
-- **It round-trips.** Edit the JSON, rebuild — the HTML stays in sync, and the island
-  always deserializes back to the exact model.
+- **It round-trips.** The agent edits the JSON and rebuilds; the HTML stays in sync, and the
+  island always deserializes back to the exact model — so the human-and-agent loop is lossless.
 
-Each page comes with a sticky table of contents + scroll-spy, in-page search, a command
+Every page comes with a sticky table of contents + scroll-spy, in-page search, a command
 palette, light/dark theme, reading progress, per-block copy, heading anchors, collapsible
 sections, glossary tooltips, and one-click export to Markdown / JSON / agent-digest — all
 inlined, all offline, fully responsive down to mobile.
 
+## Use it from an agent
+
+Dossier ships a [Claude Code](https://claude.com/claude-code) skill in [`skill/`](skill/) so
+an agent reaches for it automatically whenever you ask for a plan, write-up, report, or
+"options to decide on." Install it by linking it into your skills directory:
+
+```bash
+ln -s "$(pwd)/skill" ~/.claude/skills/dossier
+```
+
+It bundles a [block cheatsheet](skill/references/blocks.md) and a
+[starter template](skill/references/starter.dossier.json), and tells the agent to author a
+`*.dossier.json` and run `dossier build`. From then on, "make me a dossier…" is all you need.
+
 ## Authoring
 
-A dossier is `{ dossierVersion, kind, meta, blocks[] }`:
+You normally let the agent write this, but the model is simple and worth knowing. A dossier
+is `{ dossierVersion, kind, meta, blocks[] }`:
 
 ```json
 {
@@ -116,8 +144,7 @@ A dossier is `{ dossierVersion, kind, meta, blocks[] }`:
   accept inline markdown: `**bold**`, `` `code` ``, `[label](url)`, `[[slug]]`
   cross-document links, and `[[Term]]` glossary tooltips.
 
-The full contract is [`schema/dossier.schema.json`](schema/dossier.schema.json). The
-`dossier init` starter is a working example to edit.
+Full contract: [`schema/dossier.schema.json`](schema/dossier.schema.json).
 
 ## Block types
 
@@ -133,34 +160,19 @@ The full contract is [`schema/dossier.schema.json`](schema/dossier.schema.json).
 
 ## Review / triage
 
-For "here are N options — decide which to implement," use one `review-board` block. Each
-candidate is an **expandable row**: collapsed it's scannable (title, summary, chips,
-status, a select checkbox); expanded it reveals the full technical reference (`body`
-markdown and/or nested `blocks` — load as much detail as you want) plus a notes field.
+This is where deciding *with* AI happens. Use one `review-board` block for "here are the
+options — let's decide." Each candidate is an **expandable row**: collapsed it's scannable
+(title, summary, chips, status, a select checkbox); expanded it reveals the full technical
+reference the agent loaded (`body` markdown and/or nested `blocks`) plus a notes field.
 
-The reader filters and searches, ticks decisions, writes notes, and **exports a decisions
-JSON** (and can re-import to resume). An implementing agent then reads the rich reference
-from the model plus your decisions — closing the human-to-agent loop.
-
-## Use it from an agent
-
-Dossier ships a [Claude Code](https://claude.com/claude-code) skill in [`skill/`](skill/)
-so an agent reaches for it whenever you ask for a doc, plan, report, or review. Install it
-by linking it into your skills directory:
-
-```bash
-ln -s "$(pwd)/skill" ~/.claude/skills/dossier
-```
-
-It bundles a [block cheatsheet](skill/references/blocks.md) and a
-[starter template](skill/references/starter.dossier.json), and tells the agent to author a
-`*.dossier.json` and run `dossier build`. Then just ask: *"make a dossier summarizing X"*
-or *"turn these options into a review board I can triage."*
+You filter, search, **tick what to do, and write notes** — then **export a decisions JSON**
+(and can re-import to resume). The agent reads the rich reference from the model plus your
+decisions and implements them. That's the human-to-agent loop, in one file.
 
 ## React
 
-Dossier also ships as typed React/TSX components ([`react/`](react/), `@dossier/react`),
-for teams that want to render the same design from a React/Next app.
+Dossier also ships as typed React/TSX components ([`react/`](react/), `@dossier/react`), for
+teams that want to render the same design from a React/Next app.
 
 ```ts
 import { renderDossier } from "@dossier/react";
@@ -184,9 +196,9 @@ Every page is a complete, style-isolated HTML document, so it embeds anywhere:
 <iframe src="my-doc.html" style="width:100%;height:80vh;border:0"></iframe>
 ```
 
-Cross-link dossiers with `[[other-slug]]` — a relative file link when they sit together,
-or an absolute URL when you set `meta.baseUrl` for a hosted site. Dossier is a *companion*
-to your docs site, not a replacement for it.
+Cross-link dossiers with `[[other-slug]]` — a relative file link when they sit together, or
+an absolute URL when you set `meta.baseUrl` for a hosted site. Dossier is a *companion* to
+your docs site, not a replacement for it.
 
 ## Development
 
