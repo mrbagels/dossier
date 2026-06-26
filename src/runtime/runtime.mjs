@@ -6,10 +6,11 @@ export const RUNTIME = `
 (function(){
   var $=function(s,r){return (r||document).querySelector(s)};
   var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
-  var model={},mdSrc="",slug="brief";
+  var model={},mdSrc="",digestSrc="",slug="dossier";
   try{model=JSON.parse($("#dossier-model").textContent);}catch(e){}
   mdSrc=(($("#dossier-markdown")||{}).textContent||"");
-  slug=(model.meta&&model.meta.slug)||"brief";
+  digestSrc=(($("#dossier-digest")||{}).textContent||"");
+  slug=(model.meta&&model.meta.slug)||"dossier";
   var store="ds:"+slug;
 
   function toast(msg){var t=$("[data-toast]");if(!t)return;t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},1600);}
@@ -43,7 +44,7 @@ export const RUNTIME = `
   if(search){search.addEventListener("input",function(){var q=search.value.trim().toLowerCase();$$(".ds-content > .ds-block").forEach(function(blk){var hit=!q||blk.innerText.toLowerCase().indexOf(q)>=0;blk.style.display=hit?"":"none";});});}
 
   function viewSource(){var m=$("[data-source-modal]");if(!m)return;$("[data-source-text]").value=mdSrc;m.hidden=false;}
-  $$("[data-action]").forEach(function(b){b.addEventListener("click",function(){var a=b.getAttribute("data-action");if(a==="copy-md")copy(mdSrc,"Markdown copied");else if(a==="download-md")download(slug+".md",mdSrc,"text/markdown");else if(a==="download-json")download(slug+".json",JSON.stringify(model,null,2),"application/json");else if(a==="view-source")viewSource();});});
+  $$("[data-action]").forEach(function(b){b.addEventListener("click",function(){var a=b.getAttribute("data-action");if(a==="copy-md")copy(mdSrc,"Markdown copied");else if(a==="copy-digest")copy(digestSrc,"Agent digest copied");else if(a==="download-md")download(slug+".md",mdSrc,"text/markdown");else if(a==="download-json")download(slug+".json",JSON.stringify(model,null,2),"application/json");else if(a==="view-source")viewSource();});});
   var sc=$("[data-source-close]");if(sc)sc.addEventListener("click",function(){$("[data-source-modal]").hidden=true;});
 
   var pal=$("[data-palette]"),palIn=$("[data-palette-input]"),palList=$("[data-palette-list]");

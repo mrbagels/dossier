@@ -388,4 +388,20 @@ tbody tr:hover td{color:var(--ds-ink)}
   .ds-palette{padding-top:9vh}
   .ds-flowstep{grid-template-columns:26px 1fr;gap:13px}
 }
+
+/* print / PDF */
+@media print{
+  :root{--ds-bg:#fff;--ds-bg-2:#fff;--ds-ink:#111;--ds-ink-2:#333;--ds-ink-3:#666;--ds-line:#ddd;--ds-line-2:#ccc}
+  html{font-size:11pt}
+  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy{display:none!important}
+  .ds-layout{display:block}
+  .ds-content{max-width:none}
+  .ds-shell{width:100%}
+  .ds-section[data-collapsed="1"] .ds-section-body{display:grid!important}
+  .ds-ritem-wrap{grid-template-rows:1fr!important}
+  .ds-section,.ds-block,.ds-ritem,.ds-card,.ds-stat,.ds-chart,.ds-figure,table,pre{break-inside:avoid}
+  h1,h2,h3,h4{break-after:avoid}
+  a{color:inherit;text-decoration:none}
+  .ds-reveal{opacity:1!important;transform:none!important}
+}
 `;

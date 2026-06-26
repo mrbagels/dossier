@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { generateFile, validateModel } from "../src/index.mjs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import { generateFile, validateModel, registerBlock, esc, inlineMd, slugify } from "../src/index.mjs";
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
 // pull out --flags; rest are positional
-const VALUE_FLAGS = new Set(["kind", "out"]);
+const VALUE_FLAGS = new Set(["kind", "out", "plugin"]);
 const flags = {};
 const args = [];
 const rest = argv.slice(1);
@@ -41,6 +43,17 @@ const USAGE = [
 ].join("\n");
 
 if (cmd === "build" && args.length) {
+  if (flags.plugin) {
+    for (const p of String(flags.plugin).split(",").map((s) => s.trim()).filter(Boolean)) {
+      try {
+        const mod = await import(pathToFileURL(resolve(p)).href);
+        if (typeof mod.default === "function") mod.default({ registerBlock, esc, inlineMd, slugify });
+      } catch (e) {
+        console.error("✗ plugin " + p + ": " + e.message);
+        process.exitCode = 1;
+      }
+    }
+  }
   for (const f of args) {
     try {
       const r = await generateFile(f, { validate: flags["no-validate"] ? false : true });

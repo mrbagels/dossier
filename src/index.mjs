@@ -4,7 +4,8 @@ import { generate } from "./generate.mjs";
 import { validateModel } from "./validate.mjs";
 
 export { generate, validateModel };
-export { registerBlock } from "./generate.mjs";
+// Plugin authoring surface.
+export { registerBlock, esc, inlineMd, slugify, chartSvg, knownBlockTypes } from "./generate.mjs";
 
 export async function generateFile(path, opts = {}) {
   const model = JSON.parse(readFileSync(path, "utf8"));

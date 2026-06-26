@@ -659,6 +659,7 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
 <button class="ds-btn" type="button" data-theme-toggle aria-label="Toggle theme">◐</button>
 <details class="ds-menu"><summary>Export</summary><div class="ds-menu-list">
 <button class="ds-btn" type="button" data-action="copy-md">Copy Markdown</button>
+<button class="ds-btn" type="button" data-action="copy-digest">Copy for AI (digest)</button>
 <button class="ds-btn" type="button" data-action="download-md">Download Markdown</button>
 <button class="ds-btn" type="button" data-action="download-json">Download JSON</button>
 <button class="ds-btn" type="button" data-action="view-source">View source</button>
@@ -698,5 +699,5 @@ function knownBlockTypes() {
 }
 
 // Helpers reused by the React port (single source of truth).
-export { slugify, inlineMd, toMarkdown, agentDigest, collectGlossary, collectFootnotes, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes, chartSvg };
+export { esc, slugify, inlineMd, toMarkdown, agentDigest, collectGlossary, collectFootnotes, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes, chartSvg };
 // renderShell is exported at its definition (above).
