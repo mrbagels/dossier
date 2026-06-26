@@ -565,6 +565,15 @@ ${toc.length ? `<aside class="ds-toc"><div class="ds-search"><input type="search
 </html>`;
 }
 
+// Plugin system: register a custom block renderer `(block, ctx) => htmlString`.
+// Registered types become known to the renderer and the validator automatically.
+function registerBlock(type, fn) {
+  renderers[type] = fn;
+}
+function knownBlockTypes() {
+  return Object.keys(renderers);
+}
+
 // Helpers reused by the React port (single source of truth).
-export { slugify, inlineMd, toMarkdown, agentDigest, collectGlossary, buildToc, assignIds, enrich, renderBlock };
+export { slugify, inlineMd, toMarkdown, agentDigest, collectGlossary, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes };
 // renderShell is exported at its definition (above).
