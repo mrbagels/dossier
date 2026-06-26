@@ -6,6 +6,7 @@
 
 export { renderDossier } from "./render";
 export { Block, setCtx } from "./blocks";
+export { DossierDocument } from "./document";
 
 export type {
   DossierModel,

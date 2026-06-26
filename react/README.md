@@ -18,17 +18,22 @@ Graphviz), so the output matches the Node generator. CLI:
 npx tsx src/cli.tsx ../examples/sample.dossier.json   # -> *.react.html
 ```
 
-## Use blocks live in a React app
+## Use it live in a React app
 
 ```tsx
-import { Block, setCtx } from "@dossier/react";
+import { DossierDocument, setCtx } from "@dossier/react";
 
-setCtx({ glossary: new Map(), baseUrl: "" });
-<Block b={model.blocks[0]} />
+setCtx({ glossary: new Map(), baseUrl: "" });   // resolves [[Term]] / [[slug]] in text
+<DossierDocument model={model} animate />        // whole document; Motion entrance on scroll when hydrated
 ```
 
-Import the core stylesheet (`src/theme/tokens.css.mjs` exports the `CSS` string) once at
-your app root for the `ds-` classes.
+Or render a single block with `<Block b={model.blocks[0]} />`. Import the core stylesheet
+(`src/theme/tokens.css.mjs` exports the `CSS` string) once at your app root for the
+`ds-` classes.
+
+`DossierDocument animate` uses [Motion](https://motion.dev) and is meant for **hydrated**
+usage; it honors `prefers-reduced-motion`. For a static, no-JS file, use `renderDossier()`
+or the Node generator.
 
 ## Extending with live interactivity (Base UI / Motion)
 
@@ -49,7 +54,8 @@ runtime benefit (there is no client React at view time).
 
 | Export | Description |
 |---|---|
-| `renderDossier(model)` | SSR → `{ html, md, digest }` (self-contained artifact). |
+| `renderDossier(model)` | SSR → `{ html, md, digest }` (self-contained file). |
+| `DossierDocument` | Live document component; `animate` adds a Motion scroll entrance (hydrated). |
 | `Block` | Component dispatcher over all 21 block types. |
 | `setCtx({ glossary, baseUrl })` | Inline-markdown resolution context (call before rendering). |
 | `DossierModel`, `BlockModel`, `ReviewCandidate`, … | Types. |

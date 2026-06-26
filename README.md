@@ -2,126 +2,95 @@
 
 # Dossier
 
-**One JSON file in, a beautiful, self-contained, agent-readable HTML document out.**
+### Turn a JSON file into a polished web page — one self-contained `.html` file your team and your AI agents can both read.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
-[![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#architecture)
-[![Output](https://img.shields.io/badge/output-self--contained-7048e8.svg)](#architecture)
-[![Version](https://img.shields.io/badge/version-0.1.0-7048e8.svg)](#)
+[![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#how-it-works)
+[![Output](https://img.shields.io/badge/output-single%20.html%20file-7048e8.svg)](#how-it-works)
+[![Version](https://img.shields.io/badge/version-0.1.2-7048e8.svg)](#)
 
 </div>
 
-Dossier renders a single JSON document model into a polished, **fully self-contained**
-HTML artifact (plus a Markdown export). The visible page is a projection of an embedded
-`#dossier-model` JSON island, so **humans get a themed, interactive document** and
-**agents read one structured block** instead of scraping the DOM. No server, no external
-assets, works offline — email it, commit it, or `<iframe>` it into your wiki.
+You write a small JSON file. Dossier gives you back **one self-contained `.html` page** — a
+report, plan, spec, or review that looks great in any browser, that you can email as a
+single file or drop straight into your wiki. And because the page carries its own
+structured data inside it, **an AI agent can read it straight back** — no scraping.
+
+No build pipeline. No server. No external files, fonts, or scripts to load. Just one
+portable HTML file (plus a Markdown copy) that works offline.
 
 ```
-   doc.dossier.json  ──►  dossier build  ──►  doc.html   (+ doc.md)
-                                              ├─ themed, interactive, responsive
-                                              ├─ #dossier-model island (agents read this)
-                                              └─ zero external assets (works offline)
+   my-doc.dossier.json  ──►  dossier build  ──►  my-doc.html      (+ my-doc.md)
+                                                  one file · opens anywhere · works offline
 ```
-
----
-
-## Table of contents
-
-- [Why Dossier](#why-dossier)
-- [Features](#features)
-- [Install](#install)
-- [Quick start](#quick-start)
-- [Use it from an agent (the skill)](#use-it-from-an-agent-the-skill)
-- [Authoring a dossier](#authoring-a-dossier)
-- [The review / triage surface](#the-review--triage-surface)
-- [Architecture](#architecture)
-- [React](#react)
-- [Embedding](#embedding)
-- [Development](#development)
-- [Requirements](#requirements)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Why Dossier
-
-LLMs and humans both produce a lot of structured documents — research reports, plans,
-specs, decision records, runbooks, reviews. Plain Markdown is hard to navigate and
-plain HTML is hard for an agent to read back. Dossier gives you **both at once**:
-
-- **For humans** — a clean, modern, editorial/SaaS reading surface with navigation,
-  search, theming, and one-click export.
-- **For agents** — the complete structured model lives in `#dossier-model`. Read one
-  block; no scraping. Markdown and an "agent digest" export are derived from the same model.
-- **For your stack** — one portable file. Link it, embed it, version it. It is a
-  *companion* to your docs site, not a replacement.
-
-## Features
-
-| | |
-|---|---|
-| **Self-contained** | One HTML file. CSS, JS, highlighted code, and diagrams are all inlined. No network at view time. |
-| **Agent-readable** | Source-of-truth JSON embedded as `#dossier-model`; lossless Markdown + JSON + digest export. |
-| **21 block types** | Hero, sections, two-col, cards, stats, flow, timeline, tables, callouts, code, tabs, FAQ, references, decision matrix, risk register, action items, assumptions, glossary, diagrams, prose, and an interactive review board. |
-| **Editorial design** | Near-monochrome with one accent, serif display headline, light + dark, first-class responsive/mobile. |
-| **Syntax highlighting** | [Shiki](https://shiki.style) at build time — dual light/dark via CSS variables, zero client JS. |
-| **Diagrams** | Graphviz DOT to inline SVG at build time (browserless WASM). |
-| **Interactive reader** | Sticky TOC + scroll-spy, in-page search, command palette, reading progress, per-block copy, heading anchors, collapsible sections, back-to-top, glossary tooltips. |
-| **Decision loop** | The `review-board` block: select + annotate items, export decisions JSON, re-import to resume. |
-| **Two renderers** | A zero-dependency Node generator and a typed React/TSX SSR port — same design, one source of truth. |
 
 ## Install
 
-One line, any platform — needs [Node](https://nodejs.org) 18+:
+One line, any platform — you just need [Node](https://nodejs.org) 18+:
 
 ```bash
-npm install -g github:mrbagels/dossier      # adds the `dossier` command everywhere
+npm install -g github:mrbagels/dossier
 ```
 
-No install? Run it on demand with npx:
-
-```bash
-npx github:mrbagels/dossier build my-doc.dossier.json
-```
+Prefer not to install? Run it on demand: `npx github:mrbagels/dossier build my-doc.dossier.json`
 
 ## Quick start
 
 ```bash
-dossier init my-doc                  # scaffold my-doc.dossier.json from the starter
-# ...edit my-doc.dossier.json...
-dossier build my-doc.dossier.json    # writes my-doc.html (+ .md)
-open my-doc.html                     # macOS  (Linux: xdg-open, Windows: start)
+dossier init my-doc                  # creates my-doc.dossier.json from a starter
+#    ...edit my-doc.dossier.json...
+dossier build my-doc.dossier.json    # writes my-doc.html  (+ my-doc.md)
+open my-doc.html                     # macOS  (Linux: xdg-open · Windows: start)
 ```
 
-Open the HTML and try dark mode, `Cmd/Ctrl-K`, the search box, and the review board.
+Open the page and try dark mode, the search box, `Cmd/Ctrl-K`, and the interactive review
+board at the bottom.
 
-Hacking on Dossier itself? Clone and link:
+**Or let an AI agent build one for you.** Dossier ships a [Claude Code](https://claude.com/claude-code)
+skill, so you can just say *"make a dossier summarizing this"* — [details below](#use-it-from-an-agent).
 
-```bash
-git clone https://github.com/mrbagels/dossier.git && cd dossier
-npm install && npm link
-dossier build examples/sample.dossier.json && open examples/dossier-overview.html
+<div align="center">
+
+---
+
+**Documentation**
+
+[How it works](#how-it-works) · [Authoring](#authoring) · [Block types](#block-types) ·
+[Review / triage](#review--triage) · [The skill](#use-it-from-an-agent) · [React](#react) ·
+[Embedding](#embedding) · [Development](#development) · [Contributing](#contributing)
+
+---
+
+</div>
+
+## How it works
+
+The page you open is a **projection of the JSON you wrote** — the full model is embedded
+back into the file as a `#dossier-model` data island, which is exactly what an agent reads.
+Everything else is inlined at build time so the result needs nothing at view time:
+
+```
+my-doc.dossier.json ──► enrich ──► render ──► self-contained .html  (+ .md, + agent digest)
+                         │                     │
+                         │                     └─ <script id="dossier-model"> ← the source model
+                         ├─ Shiki: code → highlighted HTML (light/dark via CSS variables)
+                         └─ Graphviz WASM: DOT → inline SVG
 ```
 
-## Use it from an agent (the skill)
+- **Zero runtime dependencies in the output.** Shiki (highlighting), Graphviz-WASM
+  (diagrams), and React (the optional port) run only at build time — none ship to the viewer.
+- **One design system.** Tokens, the small inlined client runtime, and the HTML shell are
+  shared by both renderers (`renderShell()` is the single source of truth).
+- **It round-trips.** Edit the JSON, rebuild — the HTML stays in sync, and the island
+  always deserializes back to the exact model.
 
-Dossier ships a [Claude Code](https://claude.com/claude-code) skill in
-[`skill/`](skill/) so an agent reaches for it whenever you ask for a doc, plan, report,
-or decision/review surface.
+Each page comes with a sticky table of contents + scroll-spy, in-page search, a command
+palette, light/dark theme, reading progress, per-block copy, heading anchors, collapsible
+sections, glossary tooltips, and one-click export to Markdown / JSON / agent-digest — all
+inlined, all offline, fully responsive down to mobile.
 
-Install it by linking the skill into your skills directory:
-
-```bash
-ln -s "$(pwd)/skill" ~/.claude/skills/dossier
-```
-
-The skill bundles a full [block cheatsheet](skill/references/blocks.md) and a
-[starter template](skill/references/starter.dossier.json), and instructs the agent to
-author a `*.dossier.json` and run `dossier build`. Then just ask: *"make a dossier
-summarizing X"* or *"turn these options into a review board I can triage."*
-
-## Authoring a dossier
+## Authoring
 
 A dossier is `{ dossierVersion, kind, meta, blocks[] }`:
 
@@ -139,99 +108,114 @@ A dossier is `{ dossierVersion, kind, meta, blocks[] }`:
 }
 ```
 
-- **`kind`**: `reader | review-board | dossier | adr | runbook | research | comparison` — selects defaults.
-- **`meta`**: `title` (required), `slug`, `eyebrow`, `lede`, `crumbs`, `status`, `owner`,
-  `updated`, `version`, `tags`, `baseUrl`, `theme` (token overrides), `lifecycle`, `changelog`.
-- **`blocks`**: ordered; `section`, `two-col`, and `tabs` nest. Text fields take inline
-  markdown (`**bold**`, `` `code` ``, `[label](url)`, `[[slug]]` cross-links, `[[Term]]` glossary).
+- **`kind`** — `reader | review-board | dossier | adr | runbook | research | comparison`; selects sensible defaults.
+- **`meta`** — `title` (required), `slug`, `eyebrow`, `lede`, `crumbs`, `status`, `owner`,
+  `updated`, `version`, `tags`, `baseUrl` (for hosted cross-links), `theme` (token
+  overrides), `lifecycle` (status banner), `changelog`.
+- **`blocks`** — ordered; `section`, `two-col`, and `tabs` nest other blocks. Text fields
+  accept inline markdown: `**bold**`, `` `code` ``, `[label](url)`, `[[slug]]`
+  cross-document links, and `[[Term]]` glossary tooltips.
 
-The complete contract is in [`schema/dossier.schema.json`](schema/dossier.schema.json);
-every block type is documented with examples in [`skill/references/blocks.md`](skill/references/blocks.md).
+The full contract is [`schema/dossier.schema.json`](schema/dossier.schema.json). The
+`dossier init` starter is a working example to edit.
 
-## The review / triage surface
+## Block types
+
+21 in total — every one documented with a copy-paste JSON example in
+[`skill/references/blocks.md`](skill/references/blocks.md):
+
+| Group | Blocks |
+|---|---|
+| **Structure** | `hero`, `section`, `two-col`, `tabs`, `prose` |
+| **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
+| **Reference** | `table`, `code` (Shiki), `diagram` (DOT→SVG), `references`, `faq`, `glossary` |
+| **Decisions** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board` |
+
+## Review / triage
 
 For "here are N options — decide which to implement," use one `review-board` block. Each
 candidate is an **expandable row**: collapsed it's scannable (title, summary, chips,
 status, a select checkbox); expanded it reveals the full technical reference (`body`
 markdown and/or nested `blocks` — load as much detail as you want) plus a notes field.
 
-The reader filters/searches, ticks decisions, writes notes, and **exports a decisions
+The reader filters and searches, ticks decisions, writes notes, and **exports a decisions
 JSON** (and can re-import to resume). An implementing agent then reads the rich reference
-from the model plus your decisions — closing the human to agent loop.
+from the model plus your decisions — closing the human-to-agent loop.
 
-## Architecture
+## Use it from an agent
 
-The visible HTML is a *projection* of the embedded model. The build inlines everything:
+Dossier ships a [Claude Code](https://claude.com/claude-code) skill in [`skill/`](skill/)
+so an agent reaches for it whenever you ask for a doc, plan, report, or review. Install it
+by linking it into your skills directory:
 
-```
-dossier.json ──► enrich ──► render ──► self-contained .html  (+ .md, + agent digest)
-                  │                     │
-                  │                     └─ <script id="dossier-model"> ← the source model (agents read this)
-                  ├─ Shiki: code → highlighted HTML (light/dark via CSS vars)
-                  └─ Graphviz WASM: DOT → inline SVG
+```bash
+ln -s "$(pwd)/skill" ~/.claude/skills/dossier
 ```
 
-- **Zero runtime dependencies in the artifact.** Shiki, Graphviz-WASM, and (for the
-  React port) React are **build-time only** — none ship to the viewer.
-- **One design system.** Tokens, the inlined client runtime, and the HTML shell are
-  shared by both renderers (`renderShell()` is the single source of truth).
-- **Round-trips.** Edit the JSON, rebuild; the HTML stays in sync. The island always
-  deserializes back to the exact model.
+It bundles a [block cheatsheet](skill/references/blocks.md) and a
+[starter template](skill/references/starter.dossier.json), and tells the agent to author a
+`*.dossier.json` and run `dossier build`. Then just ask: *"make a dossier summarizing X"*
+or *"turn these options into a review board I can triage."*
 
 ## React
 
-For React/Next codebases, the same design renders via typed TSX components
-([`react/`](react/)):
-
-```bash
-cd react && npm install
-npx tsx src/cli.tsx ../examples/sample.dossier.json   # -> *.react.html
-```
+Dossier also ships as typed React/TSX components ([`react/`](react/), `@dossier/react`),
+for teams that want to render the same design from a React/Next app.
 
 ```ts
 import { renderDossier } from "@dossier/react";
-const { html, md } = await renderDossier(model);
+const { html, md } = await renderDossier(model);   // -> the same self-contained file
 ```
 
-The `<Block>` dispatcher covers all 21 block types and reuses the core's CSS, runtime,
-and enrichment, so the output matches the Node generator.
+```tsx
+// or render blocks live inside an app (optional Motion entrance animation when hydrated)
+import { DossierDocument } from "@dossier/react";
+<DossierDocument model={model} animate />
+```
+
+The `<Block>` dispatcher covers all 21 block types and reuses the core's CSS, runtime, and
+enrichment, so SSR output matches the Node generator. See [`react/README.md`](react/README.md).
 
 ## Embedding
 
-Every artifact is a complete, style-isolated HTML document, so it embeds anywhere:
+Every page is a complete, style-isolated HTML document, so it embeds anywhere:
 
 ```html
 <iframe src="my-doc.html" style="width:100%;height:80vh;border:0"></iframe>
 ```
 
-Cross-link dossiers with `[[other-slug]]` — resolves to a relative file when co-located,
-or to an absolute URL when you set `meta.baseUrl` for a hosted site.
+Cross-link dossiers with `[[other-slug]]` — a relative file link when they sit together,
+or an absolute URL when you set `meta.baseUrl` for a hosted site. Dossier is a *companion*
+to your docs site, not a replacement for it.
 
 ## Development
 
 ```
 src/            zero-dependency Node generator (generate.mjs, theme, runtime, renderers)
-react/          typed React/TSX SSR port
+react/          typed React/TSX port (SSR + live components)
 schema/         dossier.schema.json — the document contract
-skill/          Claude Code skill (SKILL.md + references)
+skill/          Claude Code skill (SKILL.md + references + starter)
 examples/       sample.dossier.json
-docs/DESIGN.md  design system + decisions
+docs/DESIGN.md  the design system + decisions
 ```
 
 ```bash
-dossier build examples/sample.dossier.json   # JS generator
-cd react && npx tsx src/cli.tsx ../examples/sample.dossier.json && npx tsc --noEmit
+git clone https://github.com/mrbagels/dossier.git && cd dossier
+npm install && npm link
+dossier build examples/sample.dossier.json && open examples/dossier-overview.html
+
+cd react && npm install
+npx tsx src/cli.tsx ../examples/sample.dossier.json && npx tsc --noEmit
 ```
 
 ## Requirements
 
-Node.js >= 18. That's it — the generated artifacts need only a browser.
+Node.js >= 18 to build. The generated pages need only a browser.
 
 ## Contributing
 
-Issues and PRs welcome. Keep the artifact self-contained (no view-time network), keep one
-accent in the design, and add new block types to both renderers + the schema + the
-cheatsheet.
+Issues and PRs welcome. Keep the output self-contained (no view-time network), keep one
+accent in the design, and add new block types to both renderers + the schema + the cheatsheet.
 
 ## License
 
