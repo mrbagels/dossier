@@ -31,11 +31,12 @@ navigation, or a decision loop.
 
 ## Setup (once)
 
-The `dossier` CLI must be on PATH. From the cloned repo:
+Install the `dossier` CLI — one line, any platform (needs Node 18+):
 ```
-npm install          # build-time deps: shiki (highlighting), graphviz-wasm (diagrams)
-npm link             # exposes `dossier` on PATH  (or: npm install -g .)
+npm install -g github:mrbagels/dossier
 ```
+Or run without installing: `npx github:mrbagels/dossier build <file>`. To scaffold a new
+document: `dossier init <name>` writes `<name>.dossier.json` from the starter.
 
 ## Workflow
 

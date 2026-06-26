@@ -31,6 +31,7 @@ assets, works offline — email it, commit it, or `<iframe>` it into your wiki.
 
 - [Why Dossier](#why-dossier)
 - [Features](#features)
+- [Install](#install)
 - [Quick start](#quick-start)
 - [Use it from an agent (the skill)](#use-it-from-an-agent-the-skill)
 - [Authoring a dossier](#authoring-a-dossier)
@@ -70,28 +71,37 @@ plain HTML is hard for an agent to read back. Dossier gives you **both at once**
 | **Decision loop** | The `review-board` block: select + annotate items, export decisions JSON, re-import to resume. |
 | **Two renderers** | A zero-dependency Node generator and a typed React/TSX SSR port — same design, one source of truth. |
 
+## Install
+
+One line, any platform — needs [Node](https://nodejs.org) 18+:
+
+```bash
+npm install -g github:mrbagels/dossier      # adds the `dossier` command everywhere
+```
+
+No install? Run it on demand with npx:
+
+```bash
+npx github:mrbagels/dossier build my-doc.dossier.json
+```
+
 ## Quick start
 
 ```bash
-git clone https://github.com/mrbagels/dossier.git
-cd dossier
-npm install        # build-time deps: shiki, @hpcc-js/wasm-graphviz
-npm link           # puts `dossier` on your PATH (or: npm install -g .)
-
-# render the included example
-dossier build examples/sample.dossier.json
-open examples/dossier-overview.html
+dossier init my-doc                  # scaffold my-doc.dossier.json from the starter
+# ...edit my-doc.dossier.json...
+dossier build my-doc.dossier.json    # writes my-doc.html (+ .md)
+open my-doc.html                     # macOS  (Linux: xdg-open, Windows: start)
 ```
 
-That writes `dossier-overview.html` and `dossier-overview.md` next to the JSON. Open the
-HTML and try dark mode, `Cmd/Ctrl-K`, the search box, and the review board at the bottom.
+Open the HTML and try dark mode, `Cmd/Ctrl-K`, the search box, and the review board.
 
-To author your own, copy the starter and edit it:
+Hacking on Dossier itself? Clone and link:
 
 ```bash
-cp skill/references/starter.dossier.json my-doc.dossier.json
-# edit my-doc.dossier.json ...
-dossier build my-doc.dossier.json && open my-doc.html
+git clone https://github.com/mrbagels/dossier.git && cd dossier
+npm install && npm link
+dossier build examples/sample.dossier.json && open examples/dossier-overview.html
 ```
 
 ## Use it from an agent (the skill)

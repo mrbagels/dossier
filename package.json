@@ -15,7 +15,10 @@
     "bin",
     "src",
     "schema",
-    "README.md"
+    "skill",
+    "examples",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=18"
