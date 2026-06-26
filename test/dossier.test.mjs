@@ -38,6 +38,15 @@ test("every block in the sample renders (no 'unsupported')", async () => {
   assert.ok(!/Unsupported block type/.test(html));
 });
 
+test("plugins: a registered block validates and renders", async () => {
+  const { registerBlock } = await import("../src/index.mjs");
+  registerBlock("badge-test", (b) => `<section class="ds-block" data-block="badge-test">${b.label || ""}</section>`);
+  const model = { dossierVersion: "1.0", meta: { title: "x" }, blocks: [{ type: "badge-test", label: "hi" }] };
+  assert.equal(validateModel(model).ok, true, "registered type passes validation");
+  const { html } = await generate(structuredClone(model), {});
+  assert.ok(/data-block="badge-test"/.test(html), "registered block renders");
+});
+
 test("diff detects added and changed blocks", () => {
   const a = { meta: { title: "A" }, blocks: [{ id: "x", type: "callout", body: "1" }] };
   const b = { meta: { title: "A" }, blocks: [{ id: "x", type: "callout", body: "2" }, { id: "y", type: "callout", body: "new" }] };

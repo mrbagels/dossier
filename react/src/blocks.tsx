@@ -1,5 +1,12 @@
 import React from "react";
-import { inlineMd, slugify, chartSvg } from "../../src/generate.mjs";
+import { inlineMd, slugify, chartSvg, renderBlock, knownBlockTypes } from "../../src/generate.mjs";
+
+// React-side plugin registry — register a component for a custom block type so it renders
+// natively in the React port (parity with the Node generator's registerBlock).
+const componentRegistry = new Map<string, React.FC<{ b: any }>>();
+export function registerComponent(type: string, Component: React.FC<{ b: any }>) {
+  componentRegistry.set(type, Component);
+}
 import type { Block as B, ReviewCandidate } from "./types.js";
 
 // Render context (glossary + baseUrl) for inline-markdown resolution. Set once per render.
@@ -469,11 +476,17 @@ export const Block: React.FC<{ b: B }> = ({ b }) => {
     case "footnotes": return <Footnotes b={b} />;
     case "chart": return <Chart b={b} />;
     case "receipt": return <Receipt b={b} />;
-    default:
+    default: {
+      // Plugin parity: a registered React component renders natively; otherwise, if the
+      // Node generator knows the type (a string-renderer plugin), inject its HTML.
+      const Custom = componentRegistry.get(b.type);
+      if (Custom) return <Custom b={b} />;
+      if (knownBlockTypes().includes(b.type)) return <div className="ds-pluginblock" dangerouslySetInnerHTML={raw(renderBlock(b, CTX))} />;
       return (
         <Wrap type={b.type} id={b.id}>
           <div className="ds-callout tone-warn">Unsupported block type: <code>{b.type}</code></div>
         </Wrap>
       );
+    }
   }
 };

@@ -5,7 +5,7 @@
 // setCtx({ glossary, baseUrl })                   — set inline-markdown resolution context.
 
 export { renderDossier } from "./render";
-export { Block, setCtx } from "./blocks";
+export { Block, setCtx, registerComponent } from "./blocks";
 export { DossierDocument } from "./document";
 
 export type {

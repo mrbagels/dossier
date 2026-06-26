@@ -56,6 +56,7 @@ runtime benefit (there is no client React at view time).
 |---|---|
 | `renderDossier(model)` | SSR → `{ html, md, digest }` (self-contained file). |
 | `DossierDocument` | Live document component; `animate` adds a Motion scroll entrance (hydrated). |
-| `Block` | Component dispatcher over all 21 block types. |
+| `Block` | Component dispatcher over all built-in block types. |
+| `registerComponent(type, Comp)` | Register a React component for a custom block type — plugin parity with the Node generator's `registerBlock`. Unregistered-but-known types fall back to the Node string renderer. |
 | `setCtx({ glossary, baseUrl })` | Inline-markdown resolution context (call before rendering). |
 | `DossierModel`, `BlockModel`, `ReviewCandidate`, … | Types. |

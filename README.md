@@ -218,6 +218,10 @@ export default function ({ registerBlock, esc }) {
 }
 ```
 
+The same plugin can also `registerComponent(type, Component)` for the React port, so a
+single plugin reaches **full parity** across both renderers (and the Node renderer is used
+as a fallback otherwise). See [`examples/plugins/badge-row.plugin.mjs`](examples/plugins/badge-row.plugin.mjs).
+
 The full CLI:
 
 | Command | What it does |

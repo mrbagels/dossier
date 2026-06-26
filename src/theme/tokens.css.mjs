@@ -228,6 +228,10 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-receipt-sources{margin-top:12px;padding-top:12px;border-top:1px solid var(--ds-line)}
 .ds-receipt-sources ul{margin:6px 0 0;padding-left:20px;color:var(--ds-ink-2)}
 
+/* plugin block fallback (Node string renderer injected into the React port) */
+.ds-content>.ds-pluginblock{margin-top:34px}
+.ds-content>.ds-pluginblock:first-child{margin-top:0}
+
 /* tabs */
 .ds-tabbar{display:flex;gap:22px;border-bottom:1px solid var(--ds-line);margin-bottom:20px;overflow-x:auto}
 .ds-tab{border:0;background:transparent;padding:0 0 11px;color:var(--ds-ink-3);font-size:14px;font-weight:560;border-bottom:1.5px solid transparent;margin-bottom:-1px;cursor:pointer;white-space:nowrap}

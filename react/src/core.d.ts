@@ -1,5 +1,6 @@
 // Ambient declarations for the zero-dep core modules imported from the React port.
 declare module "*/generate.mjs" {
+  export const esc: (s: any) => string;
   export const slugify: (s: string) => string;
   export const inlineMd: (s: string, ctx: any) => string;
   export const toMarkdown: (model: any) => string;
