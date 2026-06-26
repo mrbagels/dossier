@@ -39,6 +39,7 @@ const USAGE = [
   "  dossier serve <file.dossier.json>        build + live-reload dev server (--open, --port)",
   "  dossier validate <file.dossier.json> ... check a model without rendering",
   "  dossier diff <old.json> <new.json>      structural diff between two versions",
+  "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
   "Flags: --no-validate (build without validating)",
@@ -86,6 +87,9 @@ if (cmd === "build" && args.length) {
 } else if (cmd === "serve" && args.length) {
   const { serve } = await import("../src/serve.mjs");
   await serve(args[0], { port: flags.port, open: !!flags.open });
+} else if (cmd === "mcp") {
+  const { main } = await import("../mcp/server.mjs");
+  await main();
 } else if (cmd === "validate" && args.length) {
   for (const f of args) {
     try {

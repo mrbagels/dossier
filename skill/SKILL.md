@@ -54,6 +54,14 @@ document: `dossier init <name>` writes `<name>.dossier.json` from the starter.
 The generator validates and lints; malformed JSON fails loudly. Re-run after edits — the
 HTML stays in sync with the JSON (round-trip).
 
+Other commands: `dossier validate <file>` (check without rendering), `dossier serve <file>
+--open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
+`dossier init <name> --kind adr|runbook|postmortem|review-board`, and `--plugin <file>` to
+add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
+render/validate/read-decisions as MCP tools. Block types beyond the basics — `figure`,
+`math`, `chart`, `footnotes` (with inline `[^id]`), and `receipt` (provenance) — are in
+`references/blocks.md`.
+
 ### React variant (optional)
 
 For React/Next codebases, the same design renders via typed TSX components:

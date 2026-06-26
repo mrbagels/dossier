@@ -8,7 +8,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
 [![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#how-it-works)
 [![Output](https://img.shields.io/badge/output-single%20.html%20file-7048e8.svg)](#how-it-works)
-[![Version](https://img.shields.io/badge/version-0.1.2-7048e8.svg)](#)
+[![Version](https://img.shields.io/badge/version-0.2.0-7048e8.svg)](#)
 
 </div>
 
@@ -117,6 +117,18 @@ It bundles a [block cheatsheet](skill/references/blocks.md) and a
 [starter template](skill/references/starter.dossier.json), and tells the agent to author a
 `*.dossier.json` and run `dossier build`. From then on, "make me a dossier…" is all you need.
 
+### Any agent, via MCP
+
+`dossier mcp` runs a [Model Context Protocol](https://modelcontextprotocol.io) server over
+stdio, so **any** MCP-capable agent can drive Dossier — including the full human-and-agent
+loop. Tools: `dossier_render`, `dossier_validate`, `dossier_read_decisions` (read back the
+options a human selected on a review board), `dossier_get_schema`, `dossier_get_starter`.
+
+```jsonc
+// e.g. an MCP client config
+{ "mcpServers": { "dossier": { "command": "dossier", "args": ["mcp"] } } }
+```
+
 ## Authoring
 
 You normally let the agent write this, but the model is simple and worth knowing. A dossier
@@ -148,15 +160,16 @@ Full contract: [`schema/dossier.schema.json`](schema/dossier.schema.json).
 
 ## Block types
 
-21 in total — every one documented with a copy-paste JSON example in
-[`skill/references/blocks.md`](skill/references/blocks.md):
+26 built-in (plus your own — see [plugins](#plugins--cli)) — each documented with a
+copy-paste JSON example in [`skill/references/blocks.md`](skill/references/blocks.md):
 
 | Group | Blocks |
 |---|---|
 | **Structure** | `hero`, `section`, `two-col`, `tabs`, `prose` |
 | **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
 | **Reference** | `table`, `code` (Shiki), `diagram` (DOT→SVG), `references`, `faq`, `glossary` |
-| **Decisions** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board` |
+| **Media & data** | `figure` (inlined), `math` (KaTeX→MathML), `chart` (bar/line/area SVG), `footnotes` |
+| **Decisions & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `receipt` |
 
 ## Review / triage
 
@@ -187,6 +200,34 @@ import { DossierDocument } from "@dossier/react";
 
 The `<Block>` dispatcher covers all 21 block types and reuses the core's CSS, runtime, and
 enrichment, so SSR output matches the Node generator. See [`react/README.md`](react/README.md).
+
+## Plugins & CLI
+
+Add custom block types without forking — a plugin registers a renderer:
+
+```bash
+dossier build my.dossier.json --plugin ./my-plugin.mjs
+```
+```js
+// my-plugin.mjs — default-export receives the authoring API
+export default function ({ registerBlock, esc }) {
+  registerBlock("badge-row", (b) =>
+    `<section class="ds-block" data-block="badge-row"><div class="ds-chips">` +
+    (b.badges || []).map((x) => `<span class="ds-chip">${esc(x)}</span>`).join("") +
+    `</div></section>`);
+}
+```
+
+The full CLI:
+
+| Command | What it does |
+|---|---|
+| `dossier init [name] --kind <kind>` | scaffold from a starter (`dossier`, `adr`, `runbook`, `postmortem`, `review-board`) |
+| `dossier build <file> [--watch] [--plugin a,b]` | validate + render to `<slug>.html` (+ `.md`) |
+| `dossier serve <file> [--open] [--port]` | build + live-reload dev server |
+| `dossier validate <file>` | check a model without rendering |
+| `dossier diff <old> <new>` | structural diff between two versions |
+| `dossier mcp` | run the MCP server (stdio) |
 
 ## Embedding
 

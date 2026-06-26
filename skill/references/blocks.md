@@ -147,6 +147,15 @@ Reference a note inline with `[^src]`. Place the `footnotes` block near the end.
 ```
 `chartType`: `bar | line | area`. Bars/lines use the accent color and adapt to the theme.
 
+## receipt — provenance panel (trust for agent-authored docs)
+```json
+{ "type": "receipt", "generatedBy": "research agent", "model": "claude-opus-4-8",
+  "date": "2026-06-26", "confidence": "medium", "tools": ["web search"],
+  "sources": [ { "label": "Spec", "url": "https://…" } ],
+  "notes": "What was assumed or what failed." }
+```
+Pair with footnote citations (`[^id]`) for grounded, auditable documents.
+
 ## review-board — interactive triage / decision surface
 Each candidate is an expandable row: collapsed shows title/summary/chips/status/select;
 expanded shows the full reference (`body` markdown and/or nested `blocks`) + a notes

@@ -1,6 +1,6 @@
 {
   "name": "dossier",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generate polished, self-contained, agent-readable HTML briefs (plus Markdown) from a single JSON document model. Zero runtime dependencies.",
   "type": "module",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "bin",
     "src",
     "schema",
+    "mcp",
     "skill",
     "examples",
     "README.md",
@@ -40,6 +41,7 @@
   ],
   "dependencies": {
     "@hpcc-js/wasm-graphviz": "^1.22.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "katex": "^0.17.0",
     "shiki": "^4.3.0"
   }
