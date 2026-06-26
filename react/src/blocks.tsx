@@ -1,0 +1,406 @@
+import React from "react";
+import { inlineMd, slugify } from "../../src/generate.mjs";
+import type { Block as B, ReviewCandidate } from "./types.js";
+
+// Render context (glossary + baseUrl) for inline-markdown resolution. Set once per render.
+let CTX: any = { glossary: new Map<string, string>(), baseUrl: "" };
+export function setCtx(ctx: any) {
+  CTX = ctx;
+}
+const md = (t?: string) => ({ __html: inlineMd(t ?? "", CTX) });
+const raw = (h?: string) => ({ __html: h ?? "" });
+
+const Wrap: React.FC<{ type: string; id?: string; children: React.ReactNode }> = ({ type, id, children }) => (
+  <section className="ds-block" data-block={type} data-id={id}>
+    <button className="ds-copy" type="button" data-copy aria-label="Copy block">Copy</button>
+    {children}
+  </section>
+);
+
+const Hero: React.FC<{ b: B }> = ({ b }) => (
+  <section className="ds-hero ds-block" data-block="hero" data-id={b.id}>
+    {b.eyebrow && <p className="ds-eyebrow">{b.eyebrow}</p>}
+    <h1 id={b.id}>{b.title}</h1>
+    {b.lede && <p className="ds-lede" dangerouslySetInnerHTML={md(b.lede)} />}
+    {b.pills?.length > 0 && (
+      <div className="ds-pillrow">
+        {b.pills.map((p: string, i: number) => <span className="ds-pill" key={i}>{p}</span>)}
+      </div>
+    )}
+    {b.sideCards?.length > 0 && (
+      <div className="ds-meta">
+        {b.sideCards.map((c: any, i: number) => (
+          <div className="ds-meta-item" key={i}>
+            <span className="ds-label">{c.label}</span>
+            <span className="ds-val">{c.value}</span>
+          </div>
+        ))}
+      </div>
+    )}
+  </section>
+);
+
+const Section: React.FC<{ b: B }> = ({ b }) => (
+  <section className={`${b.framed === false ? "ds-section unframed" : "ds-section"} ds-block`} data-block="section" data-id={b.id} {...(b.collapsed ? { "data-collapsed": "1" } : {})}>
+    <div className="ds-section-head">
+      <div className="ds-section-titles">
+        <h2 id={b.id}>{b.title}</h2>
+        {b.subtitle && <p className="ds-muted" dangerouslySetInnerHTML={md(b.subtitle)} />}
+      </div>
+      <button className="ds-toggle" type="button" data-toggle aria-label="Collapse section">–</button>
+    </div>
+    <div className="ds-section-body">
+      {(b.blocks || []).map((c: B, i: number) => <Block b={c} key={c.id || i} />)}
+    </div>
+  </section>
+);
+
+const Heading: React.FC<{ id?: string; text?: string }> = ({ id, text }) => (text ? <h3 id={id}>{text}</h3> : null);
+
+const TwoCol: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="two-col" id={b.id}>
+    <div className="ds-twocol">
+      <div>{(b.left || []).map((c: B, i: number) => <Block b={c} key={c.id || i} />)}</div>
+      <div>{(b.right || []).map((c: B, i: number) => <Block b={c} key={c.id || i} />)}</div>
+    </div>
+  </Wrap>
+);
+
+const SummaryCards: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="summary-cards" id={b.id}>
+    <div className="ds-cardgrid">
+      {(b.cards || []).map((c: any, i: number) => (
+        <article className={`ds-card${c.tone ? " tone-" + c.tone : ""}`} key={i}>
+          <h3>{c.title}</h3>
+          <p dangerouslySetInnerHTML={md(c.body)} />
+        </article>
+      ))}
+    </div>
+  </Wrap>
+);
+
+const StatStrip: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="stat-strip" id={b.id}>
+    <div className="ds-statgrid">
+      {(b.stats || []).map((s: any, i: number) => (
+        <div className="ds-stat" key={i}><strong>{s.value}</strong><span>{s.label}</span></div>
+      ))}
+    </div>
+  </Wrap>
+);
+
+const Flow: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="flow" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <div className="ds-flow">
+      {(b.steps || []).map((s: any, i: number) => (
+        <div className="ds-flowstep" key={i}>
+          <div className="ds-flowstep-body"><strong>{s.title}</strong><span dangerouslySetInnerHTML={md(s.body)} /></div>
+        </div>
+      ))}
+    </div>
+  </Wrap>
+);
+
+const Timeline: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="timeline" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <div className="ds-timeline">
+      {(b.phases || []).map((p: any, i: number) => (
+        <div className="ds-phase" key={i}>
+          <div className="ds-phase-id">
+            {p.label}
+            {p.status && <span className={`ds-status s-${p.status}`}>{p.status}</span>}
+            {p.date && <span className="ds-date">{p.date}</span>}
+          </div>
+          <div dangerouslySetInnerHTML={md(p.body)} />
+        </div>
+      ))}
+    </div>
+  </Wrap>
+);
+
+const Table: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="table" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <div className="ds-tablewrap">
+      <table>
+        <thead><tr>{(b.columns || []).map((c: string, i: number) => <th key={i}>{c}</th>)}</tr></thead>
+        <tbody>
+          {(b.rows || []).map((r: string[], i: number) => (
+            <tr key={i}>{r.map((c: string, j: number) => <td key={j} dangerouslySetInnerHTML={md(c)} />)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Wrap>
+);
+
+const Callout: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="callout" id={b.id}>
+    <div className={`ds-callout tone-${b.tone || "info"}`}>
+      {b.title && <strong>{b.title} </strong>}
+      <span dangerouslySetInnerHTML={md(b.body)} />
+    </div>
+  </Wrap>
+);
+
+const Code: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="code" id={b.id}>
+    <div className="ds-code">
+      <div className="ds-code-bar">
+        <span className="ds-lang">{b.filename || b.lang || "code"}</span>
+        <button className="ds-code-copy" type="button" data-code-copy>Copy</button>
+      </div>
+      {b._hl ? <div dangerouslySetInnerHTML={raw(b._hl)} /> : <pre><code>{b.code}</code></pre>}
+    </div>
+  </Wrap>
+);
+
+const Tabs: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="tabs" id={b.id}>
+    <div className="ds-tabs">
+      <div className="ds-tabbar">
+        {(b.tabs || []).map((t: any, i: number) => (
+          <button className={`ds-tab${i === 0 ? " active" : ""}`} type="button" data-tab={i} key={i}>{t.label}</button>
+        ))}
+      </div>
+      {(b.tabs || []).map((t: any, i: number) => (
+        <div className={`ds-pane${i === 0 ? " active" : ""}`} data-pane={i} key={i}>
+          {(t.blocks || []).map((c: B, j: number) => <Block b={c} key={c.id || j} />)}
+        </div>
+      ))}
+    </div>
+  </Wrap>
+);
+
+const Faq: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="faq" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    {(b.items || []).map((it: any, i: number) => (
+      <details className="ds-faq" key={i}>
+        <summary>{it.q}</summary>
+        <p dangerouslySetInnerHTML={md(it.a)} />
+      </details>
+    ))}
+  </Wrap>
+);
+
+const References: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="references" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <div className="ds-tablewrap">
+      <table>
+        <thead><tr><th>Source</th><th>Signal</th><th>Use</th></tr></thead>
+        <tbody>
+          {(b.items || []).map((r: any, i: number) => (
+            <tr key={i}>
+              <td>{r.url ? <a href={r.url}>{r.label}</a> : r.label}</td>
+              <td dangerouslySetInnerHTML={md(r.signal)} />
+              <td dangerouslySetInnerHTML={md(r.use)} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Wrap>
+);
+
+const DecisionMatrix: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="decision-matrix" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <div className="ds-tablewrap">
+      <table>
+        <thead><tr><th>Option</th>{(b.criteria || []).map((c: string, i: number) => <th key={i}>{c}</th>)}</tr></thead>
+        <tbody>
+          {(b.options || []).map((o: any, i: number) => (
+            <tr className={o.recommended ? "ds-rec" : ""} key={i}>
+              <td><strong>{o.name}</strong>{o.recommended && <span className="ds-pill"> recommended</span>}</td>
+              {(o.scores || []).map((s: string, j: number) => <td key={j} dangerouslySetInnerHTML={md(s)} />)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Wrap>
+);
+
+const RiskRegister: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="risk-register" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <div className="ds-tablewrap">
+      <table>
+        <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          {(b.risks || []).map((r: any, i: number) => (
+            <tr key={i}>
+              <td dangerouslySetInnerHTML={md(r.risk)} />
+              <td><span className={`ds-lvl l-${r.likelihood || ""}`}>{r.likelihood}</span></td>
+              <td><span className={`ds-lvl l-${r.impact || ""}`}>{r.impact}</span></td>
+              <td dangerouslySetInnerHTML={md(r.mitigation)} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </Wrap>
+);
+
+const ActionItems: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="action-items" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <ul className="ds-actions">
+      {(b.items || []).map((it: any, i: number) => (
+        <li className="ds-action" data-action={`${b.id}:${i}`} key={i}>
+          <label><input type="checkbox" data-action-check defaultChecked={it.status === "done"} /><span className="ds-action-title" dangerouslySetInnerHTML={md(it.title)} /></label>
+          <span className="ds-action-meta">
+            {it.owner && <span className="ds-owner">{it.owner}</span>}
+            <span className={`ds-status s-${it.status || "todo"}`}>{it.status || "todo"}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  </Wrap>
+);
+
+const Assumptions: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="assumptions" id={b.id}>
+    <h3 id={b.id}>{b.title || "Assumptions & open questions"}</h3>
+    <ul className="ds-assumptions">
+      {(b.items || []).map((it: any, i: number) => (
+        <li className={`ds-assumption a-${it.status || "unverified"}`} key={i}>
+          <span className="ds-akind">{it.kind || "assumption"}</span>
+          <span dangerouslySetInnerHTML={md(it.statement)} />
+          <span className="ds-astatus">{it.status || "unverified"}</span>
+        </li>
+      ))}
+    </ul>
+  </Wrap>
+);
+
+const Glossary: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="glossary" id={b.id}>
+    <h3 id={b.id}>{b.title || "Glossary"}</h3>
+    <dl className="ds-glossary">
+      {(b.terms || []).map((t: any, i: number) => (
+        <div className="ds-gterm" id={`term-${slugify(t.term)}`} key={i}>
+          <dt>{t.term}</dt><dd dangerouslySetInnerHTML={md(t.definition)} />
+        </div>
+      ))}
+    </dl>
+  </Wrap>
+);
+
+const Diagram: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="diagram" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    {b._svg ? (
+      <div className="ds-diagram ds-diagram-svg" dangerouslySetInnerHTML={raw(b._svg)} />
+    ) : (
+      <div className="ds-diagram">
+        <div className="ds-code-bar"><span>diagram · {b.format || "dot"}</span></div>
+        <pre><code>{b.spec}</code></pre>
+      </div>
+    )}
+  </Wrap>
+);
+
+const ReviewItem: React.FC<{ c: ReviewCandidate }> = ({ c }) => {
+  const chips: string[] = [];
+  if (c.category) chips.push(c.category);
+  if (c.impact) chips.push(`Impact · ${c.impact}`);
+  if (c.effort) chips.push(`Effort · ${c.effort}`);
+  (c.badges || []).forEach((x) => chips.push(x));
+  const searchText = [c.title, c.summary, c.category, c.body].filter(Boolean).join(" ").toLowerCase();
+  const hasRef = !!(c.body || (c.blocks && c.blocks.length) || (c.details && Object.keys(c.details).length));
+  return (
+    <article className="ds-ritem" data-candidate={c.id} {...(c.scope ? { "data-scope": c.scope } : {})} data-text={searchText}>
+      <div className="ds-ritem-head" data-rtoggle>
+        <span className="ds-ritem-check" data-stop><input type="checkbox" data-select={c.id} aria-label={`Select ${c.title}`} /></span>
+        <div className="ds-ritem-titles">
+          <h4>{c.title}</h4>
+          <p className="ds-muted" dangerouslySetInnerHTML={md(c.summary)} />
+          {chips.length > 0 && <div className="ds-chips">{chips.map((x, i) => <span className="ds-chip" key={i}>{x}</span>)}</div>}
+        </div>
+        <div className="ds-ritem-aside">
+          {c.status && <span className={`ds-status s-${slugify(c.status)}`}>{c.status}</span>}
+          <span className="ds-chev" aria-hidden="true">▾</span>
+        </div>
+      </div>
+      <div className="ds-ritem-wrap">
+        <div className="ds-ritem-body">
+          {hasRef && (
+            <div className="ds-ref">
+              {c.body && c.body.split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
+              {(c.blocks || []).map((x, i) => <Block b={x} key={x.id || i} />)}
+              {c.details && Object.keys(c.details).length > 0 && (
+                <dl className="ds-detailgrid">
+                  {Object.entries(c.details).map(([k, v], i) => (
+                    <div className="ds-detail" key={i}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          )}
+          <label className="ds-notes"><span>Notes</span><textarea data-notes={c.id} placeholder="Decision notes, priority, constraints" /></label>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const ReviewBoard: React.FC<{ b: B }> = ({ b }) => (
+  <section className="ds-block ds-reviewboard" data-block="review-board" data-id={b.id}>
+    {b.title && <h2 id={b.id}>{b.title}</h2>}
+    <div className="ds-review-bar">
+      <input className="ds-review-search" type="search" placeholder="Filter…" data-review-search aria-label="Filter items" />
+      <label className="ds-review-only"><input type="checkbox" data-review-only /> Selected only</label>
+      <button className="ds-btn ds-btn-line" type="button" data-review-expand>Expand all</button>
+      <span className="ds-review-count" data-review-count>0 selected</span>
+      <button className="ds-btn ds-btn-line" type="button" data-export-decisions>Export JSON</button>
+      <button className="ds-btn ds-btn-line" type="button" data-import-decisions>Import</button>
+    </div>
+    <div className="ds-rlist">
+      {(b.candidates || []).map((c: ReviewCandidate, i: number) => <ReviewItem c={c} key={c.id || i} />)}
+    </div>
+  </section>
+);
+
+const Prose: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="prose" id={b.id}>
+    {b.heading && <h2 id={b.id}>{b.heading}</h2>}
+    {String(b.markdown || "").split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
+  </Wrap>
+);
+
+export const Block: React.FC<{ b: B }> = ({ b }) => {
+  switch (b.type) {
+    case "hero": return <Hero b={b} />;
+    case "prose": return <Prose b={b} />;
+    case "section": return <Section b={b} />;
+    case "two-col": return <TwoCol b={b} />;
+    case "summary-cards": return <SummaryCards b={b} />;
+    case "stat-strip": return <StatStrip b={b} />;
+    case "flow": return <Flow b={b} />;
+    case "timeline": return <Timeline b={b} />;
+    case "table": return <Table b={b} />;
+    case "callout": return <Callout b={b} />;
+    case "code": return <Code b={b} />;
+    case "tabs": return <Tabs b={b} />;
+    case "faq": return <Faq b={b} />;
+    case "references": return <References b={b} />;
+    case "decision-matrix": return <DecisionMatrix b={b} />;
+    case "risk-register": return <RiskRegister b={b} />;
+    case "action-items": return <ActionItems b={b} />;
+    case "assumptions": return <Assumptions b={b} />;
+    case "glossary": return <Glossary b={b} />;
+    case "diagram": return <Diagram b={b} />;
+    case "review-board": return <ReviewBoard b={b} />;
+    default:
+      return (
+        <Wrap type={b.type} id={b.id}>
+          <div className="ds-callout tone-warn">Unsupported block type: <code>{b.type}</code></div>
+        </Wrap>
+      );
+  }
+};
