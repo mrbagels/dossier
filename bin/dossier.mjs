@@ -7,7 +7,7 @@ import { generateFile, validateModel, registerBlock, esc, inlineMd, slugify } fr
 const argv = process.argv.slice(2);
 const cmd = argv[0];
 // pull out --flags; rest are positional
-const VALUE_FLAGS = new Set(["kind", "out", "plugin"]);
+const VALUE_FLAGS = new Set(["kind", "out", "plugin", "port"]);
 const flags = {};
 const args = [];
 const rest = argv.slice(1);
@@ -36,6 +36,7 @@ const USAGE = [
   "Usage:",
   "  dossier init [name] [--kind <kind>]      scaffold <name>.dossier.json from a starter",
   "  dossier build <file.dossier.json> ...    validate + render to <slug>.html (+ .md)",
+  "  dossier serve <file.dossier.json>        build + live-reload dev server (--open, --port)",
   "  dossier validate <file.dossier.json> ... check a model without rendering",
   "  dossier diff <old.json> <new.json>      structural diff between two versions",
   "",
@@ -64,6 +65,27 @@ if (cmd === "build" && args.length) {
       process.exitCode = 1;
     }
   }
+  if (flags.watch) {
+    const { watch } = await import("node:fs");
+    console.log("watching " + args.join(", ") + " — Ctrl-C to stop");
+    for (const f of args) {
+      let t;
+      watch(f, () => {
+        clearTimeout(t);
+        t = setTimeout(async () => {
+          try {
+            const r = await generateFile(f, { validate: flags["no-validate"] ? false : true });
+            console.log("↻ " + r.htmlPath);
+          } catch (e) {
+            console.error("✗ " + e.message.replace(/\n/g, "\n  "));
+          }
+        }, 80);
+      });
+    }
+  }
+} else if (cmd === "serve" && args.length) {
+  const { serve } = await import("../src/serve.mjs");
+  await serve(args[0], { port: flags.port, open: !!flags.open });
 } else if (cmd === "validate" && args.length) {
   for (const f of args) {
     try {
