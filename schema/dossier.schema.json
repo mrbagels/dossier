@@ -315,6 +315,9 @@
         },
         {
           "$ref": "#/$defs/blocks/chart"
+        },
+        {
+          "$ref": "#/$defs/blocks/receipt"
         }
       ]
     },
@@ -1330,6 +1333,59 @@
                 }
               }
             }
+          }
+        }
+      },
+      "receipt": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "const": "receipt"
+          },
+          "title": {
+            "type": "string"
+          },
+          "generatedBy": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "string"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "notes": {
+            "type": "string"
           }
         }
       }

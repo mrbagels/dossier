@@ -37,6 +37,7 @@ const USAGE = [
   "  dossier init [name] [--kind <kind>]      scaffold <name>.dossier.json from a starter",
   "  dossier build <file.dossier.json> ...    validate + render to <slug>.html (+ .md)",
   "  dossier validate <file.dossier.json> ... check a model without rendering",
+  "  dossier diff <old.json> <new.json>      structural diff between two versions",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
   "Flags: --no-validate (build without validating)",
@@ -77,6 +78,17 @@ if (cmd === "build" && args.length) {
       console.error("✗ " + f + ": " + e.message);
       process.exitCode = 1;
     }
+  }
+} else if (cmd === "diff" && args.length >= 2) {
+  const { diffModels, formatDiff } = await import("../src/diff.mjs");
+  try {
+    const oldM = JSON.parse(readFileSync(args[0], "utf8"));
+    const newM = JSON.parse(readFileSync(args[1], "utf8"));
+    console.log(`diff ${args[0]} → ${args[1]}`);
+    console.log(formatDiff(diffModels(oldM, newM)));
+  } catch (e) {
+    console.error("✗ " + e.message);
+    process.exitCode = 1;
   }
 } else if (cmd === "init") {
   const name = (args[0] || "dossier").replace(/\.dossier\.json$/i, "").replace(/\.json$/i, "");
