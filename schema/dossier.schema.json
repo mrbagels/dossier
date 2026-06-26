@@ -303,6 +303,18 @@
         },
         {
           "$ref": "#/$defs/blocks/reviewBoard"
+        },
+        {
+          "$ref": "#/$defs/blocks/figure"
+        },
+        {
+          "$ref": "#/$defs/blocks/math"
+        },
+        {
+          "$ref": "#/$defs/blocks/footnotes"
+        },
+        {
+          "$ref": "#/$defs/blocks/chart"
         }
       ]
     },
@@ -1181,6 +1193,140 @@
                   "items": {
                     "type": "string"
                   }
+                }
+              }
+            }
+          }
+        }
+      },
+      "figure": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "src"
+        ],
+        "properties": {
+          "type": {
+            "const": "figure"
+          },
+          "src": {
+            "type": "string",
+            "description": "Local path, data URI, or URL. Local paths are inlined as data URIs at build time."
+          },
+          "alt": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          }
+        }
+      },
+      "math": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "tex"
+        ],
+        "properties": {
+          "type": {
+            "const": "math"
+          },
+          "tex": {
+            "type": "string",
+            "description": "LaTeX, rendered to MathML at build time."
+          },
+          "display": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "footnotes": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "const": "footnotes"
+          },
+          "title": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "text"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                },
+                "text": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "chart": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "const": "chart"
+          },
+          "title": {
+            "type": "string"
+          },
+          "chartType": {
+            "type": "string",
+            "enum": [
+              "bar",
+              "line",
+              "area"
+            ],
+            "default": "bar"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "label",
+                "value"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "number"
                 }
               }
             }

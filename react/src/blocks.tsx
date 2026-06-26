@@ -1,5 +1,5 @@
 import React from "react";
-import { inlineMd, slugify } from "../../src/generate.mjs";
+import { inlineMd, slugify, chartSvg } from "../../src/generate.mjs";
 import type { Block as B, ReviewCandidate } from "./types.js";
 
 // Render context (glossary + baseUrl) for inline-markdown resolution. Set once per render.
@@ -373,6 +373,44 @@ const Prose: React.FC<{ b: B }> = ({ b }) => (
   </Wrap>
 );
 
+const Figure: React.FC<{ b: B }> = ({ b }) => {
+  const src = b._src || b.src || "";
+  return (
+    <Wrap type="figure" id={b.id}>
+      <figure className="ds-figure">
+        {src && <img src={src} alt={b.alt || b.caption || ""} loading="lazy" />}
+        {b.caption && <figcaption dangerouslySetInnerHTML={md(b.caption)} />}
+      </figure>
+    </Wrap>
+  );
+};
+
+const Math: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="math" id={b.id}>
+    <div className={"ds-math" + (b.display === false ? " inline" : "")} dangerouslySetInnerHTML={raw(b._math || ("$" + (b.tex || "") + "$"))} />
+  </Wrap>
+);
+
+const Footnotes: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="footnotes" id={b.id}>
+    <h3 id={b.id}>{b.title || "Notes"}</h3>
+    <ol className="ds-footnotes">
+      {(b.items || []).map((it: any, i: number) => (
+        <li id={`fn-${it.id}`} key={i}>
+          <span dangerouslySetInnerHTML={md(it.text)} /> <a className="ds-fnback" href={`#fnref-${it.id}`} aria-label="Back to reference">↩</a>
+        </li>
+      ))}
+    </ol>
+  </Wrap>
+);
+
+const Chart: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="chart" id={b.id}>
+    {b.title && <h3 id={b.id}>{b.title}</h3>}
+    <div className="ds-chart" dangerouslySetInnerHTML={raw(chartSvg(b))} />
+  </Wrap>
+);
+
 export const Block: React.FC<{ b: B }> = ({ b }) => {
   switch (b.type) {
     case "hero": return <Hero b={b} />;
@@ -396,6 +434,10 @@ export const Block: React.FC<{ b: B }> = ({ b }) => {
     case "glossary": return <Glossary b={b} />;
     case "diagram": return <Diagram b={b} />;
     case "review-board": return <ReviewBoard b={b} />;
+    case "figure": return <Figure b={b} />;
+    case "math": return <Math b={b} />;
+    case "footnotes": return <Footnotes b={b} />;
+    case "chart": return <Chart b={b} />;
     default:
       return (
         <Wrap type={b.type} id={b.id}>

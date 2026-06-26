@@ -21,6 +21,10 @@ function inlineMd(s, ctx) {
   let t = esc(s);
   t = t.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);
   t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\[\^([a-z0-9-]+)\]/g, (m, id) => {
+    const fn = ctx.footnotes && ctx.footnotes.get(id);
+    return fn ? `<sup class="ds-fnref"><a id="fnref-${esc(id)}" href="#fn-${esc(id)}">${fn.num}</a></sup>` : m;
+  });
   t = t.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2">$1</a>');
   t = t.replace(/\[\[([^\]]+)\]\]/g, (_, ref) => {
     const key = ref.trim().toLowerCase();
@@ -276,6 +280,24 @@ const renderers = {
       `<div class="ds-rlist">${items}</div></section>`
     );
   },
+  figure(b, ctx) {
+    const src = b._src || b.src || "";
+    const img = src ? `<img src="${esc(src)}" alt="${esc(b.alt || b.caption || "")}" loading="lazy">` : "";
+    const cap = b.caption ? `<figcaption>${inlineMd(b.caption, ctx)}</figcaption>` : "";
+    return wrap("figure", b.id, `<figure class="ds-figure">${img}${cap}</figure>`);
+  },
+  math(b) {
+    return wrap("math", b.id, `<div class="ds-math${b.display === false ? " inline" : ""}">${b._math || `<code>${esc(b.tex)}</code>`}</div>`);
+  },
+  footnotes(b, ctx) {
+    const items = (b.items || [])
+      .map((it) => `<li id="fn-${esc(it.id)}"><span>${inlineMd(it.text, ctx)}</span> <a class="ds-fnback" href="#fnref-${esc(it.id)}" aria-label="Back to reference">↩</a></li>`)
+      .join("");
+    return wrap("footnotes", b.id, (b.title ? `<h3 id="${esc(b.id)}">${esc(b.title)}</h3>` : `<h3 id="${esc(b.id)}">Notes</h3>`) + `<ol class="ds-footnotes">${items}</ol>`);
+  },
+  chart(b) {
+    return wrap("chart", b.id, (b.title ? `<h3 id="${esc(b.id)}">${esc(b.title)}</h3>` : "") + `<div class="ds-chart">${chartSvg(b)}</div>`);
+  },
 };
 
 function renderBlock(b, ctx) {
@@ -389,6 +411,67 @@ function collectGlossary(blocks, map) {
   });
 }
 
+// ---- footnotes -------------------------------------------------------------
+
+function collectFootnotes(blocks, map) {
+  let n = map.size;
+  const visit = (arr) =>
+    (arr || []).forEach((b) => {
+      if (b.type === "footnotes")
+        (b.items || []).forEach((it) => {
+          if (it.id && !map.has(it.id)) map.set(it.id, { num: ++n, text: it.text });
+        });
+      if (b.blocks) visit(b.blocks);
+      if (b.left) visit(b.left);
+      if (b.right) visit(b.right);
+      if (b.tabs) b.tabs.forEach((t) => visit(t.blocks));
+      if (b.candidates) b.candidates.forEach((c) => c.blocks && visit(c.blocks));
+    });
+  visit(blocks);
+}
+
+// ---- charts: data -> inline SVG (hand-rolled, no dependency) ----------------
+
+const fmtNum = (v) => (Math.abs(v) >= 1000 ? v.toLocaleString("en-US") : String(v));
+
+function chartSvg(b) {
+  const data = (b.data || []).map((d) => ({ label: String(d.label ?? ""), value: Number(d.value) || 0 }));
+  if (!data.length) return "";
+  const type = b.chartType || "bar";
+  const W = 640, H = 280, padL = 44, padB = 38, padT = 14, padR = 14;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  const max = Math.max(...data.map((d) => d.value), 0);
+  const min = Math.min(...data.map((d) => d.value), 0);
+  const top = max || 1, bottom = Math.min(0, min);
+  const span = top - bottom || 1;
+  const y = (v) => padT + ih - ((v - bottom) / span) * ih;
+  const n = data.length;
+  const y0 = y(0);
+  let inner = `<line x1="${padL}" y1="${y0}" x2="${W - padR}" y2="${y0}" stroke="var(--ds-line-2)"/>`;
+  inner += `<text x="${padL - 7}" y="${y(top) + 4}" text-anchor="end" class="ds-chart-tick">${esc(fmtNum(top))}</text>`;
+  if (type === "bar") {
+    const gap = iw / n;
+    const bw = Math.min(gap * 0.62, 56);
+    data.forEach((d, i) => {
+      const cx = padL + gap * i + gap / 2;
+      const yy = y(d.value);
+      inner += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${Math.min(yy, y0).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.abs(y0 - yy).toFixed(1)}" rx="3" fill="var(--ds-accent)"><title>${esc(d.label)}: ${esc(fmtNum(d.value))}</title></rect>`;
+      inner += `<text x="${cx.toFixed(1)}" y="${H - padB + 16}" text-anchor="middle" class="ds-chart-label">${esc(d.label)}</text>`;
+    });
+  } else {
+    const step = n > 1 ? iw / (n - 1) : 0;
+    const pts = data.map((d, i) => `${(padL + step * i).toFixed(1)},${y(d.value).toFixed(1)}`);
+    if (type === "area")
+      inner += `<polygon points="${padL},${y0.toFixed(1)} ${pts.join(" ")} ${(padL + step * (n - 1)).toFixed(1)},${y0.toFixed(1)}" fill="var(--ds-accent)" fill-opacity="0.12"/>`;
+    inner += `<polyline points="${pts.join(" ")}" fill="none" stroke="var(--ds-accent)" stroke-width="2"/>`;
+    data.forEach((d, i) => {
+      inner += `<circle cx="${(padL + step * i).toFixed(1)}" cy="${y(d.value).toFixed(1)}" r="3" fill="var(--ds-accent)"><title>${esc(d.label)}: ${esc(fmtNum(d.value))}</title></circle>`;
+      inner += `<text x="${(padL + step * i).toFixed(1)}" y="${H - padB + 16}" text-anchor="middle" class="ds-chart-label">${esc(d.label)}</text>`;
+    });
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" class="ds-chart-svg" role="img" aria-label="${esc(b.title || type + " chart")}">${inner}</svg>`;
+}
+
 function buildToc(blocks) {
   const toc = [];
   (blocks || []).forEach((b) => {
@@ -434,12 +517,16 @@ const normLang = (l) => (l ? (LANG_ALIAS[String(l).toLowerCase()] || String(l).t
 
 // Build-time enrichment: Shiki syntax highlighting + Graphviz DOT -> inline SVG.
 // Results are stashed on `_hl` / `_svg` (stripped from the embedded JSON island).
-async function enrich(model) {
+async function enrich(model, baseDir) {
   const codeBlocks = [];
   const dotBlocks = [];
+  const figureBlocks = [];
+  const mathBlocks = [];
   eachBlock(model.blocks || [], (b) => {
     if (b.type === "code") codeBlocks.push(b);
     else if (b.type === "diagram" && String(b.format || "").toLowerCase() === "dot") dotBlocks.push(b);
+    else if (b.type === "figure") figureBlocks.push(b);
+    else if (b.type === "math") mathBlocks.push(b);
   });
 
   if (codeBlocks.length) {
@@ -477,13 +564,49 @@ async function enrich(model) {
       /* graphviz unavailable — fall back to source */
     }
   }
+
+  if (figureBlocks.length) {
+    const { readFileSync } = await import("node:fs");
+    const { resolve, extname } = await import("node:path");
+    const MIME = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml", ".webp": "image/webp", ".avif": "image/avif" };
+    for (const b of figureBlocks) {
+      const src = String(b.src || "");
+      if (!src || /^(data:|https?:)/i.test(src)) {
+        b._src = src; // pass through data URIs and remote URLs as-is
+        continue;
+      }
+      try {
+        const file = baseDir ? resolve(baseDir, src) : src;
+        const mime = MIME[extname(file).toLowerCase()] || "application/octet-stream";
+        b._src = `data:${mime};base64,${readFileSync(file).toString("base64")}`;
+      } catch {
+        b._src = src; // unreadable — leave the path
+      }
+    }
+  }
+
+  if (mathBlocks.length) {
+    try {
+      const katex = (await import("katex")).default;
+      for (const b of mathBlocks) {
+        try {
+          b._math = katex.renderToString(String(b.tex || ""), { output: "mathml", displayMode: b.display !== false, throwOnError: false });
+        } catch {
+          b._math = null;
+        }
+      }
+    } catch {
+      /* katex unavailable — fall back to source */
+    }
+  }
 }
 
-export async function generate(model) {
-  await enrich(model);
+export async function generate(model, opts = {}) {
+  await enrich(model, opts.baseDir);
   const meta = model.meta || {};
-  const ctx = { seq: 0, glossary: new Map(), baseUrl: meta.baseUrl || "" };
+  const ctx = { seq: 0, glossary: new Map(), footnotes: new Map(), baseUrl: meta.baseUrl || "" };
   collectGlossary(model.blocks, ctx.glossary);
+  collectFootnotes(model.blocks, ctx.footnotes);
   // assign ids up front so TOC + render agree
   assignIds(model.blocks);
 
@@ -575,5 +698,5 @@ function knownBlockTypes() {
 }
 
 // Helpers reused by the React port (single source of truth).
-export { slugify, inlineMd, toMarkdown, agentDigest, collectGlossary, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes };
+export { slugify, inlineMd, toMarkdown, agentDigest, collectGlossary, collectFootnotes, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes, chartSvg };
 // renderShell is exported at its definition (above).

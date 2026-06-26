@@ -16,8 +16,8 @@ export async function generateFile(path, opts = {}) {
       throw err;
     }
   }
-  const { html, md } = await generate(model);
   const dir = dirname(path);
+  const { html, md } = await generate(model, { baseDir: dir });
   const slug = (model.meta && model.meta.slug) || basename(path).replace(/\.(dossier\.)?json$/i, "");
   const htmlPath = join(dir, slug + ".html");
   const mdPath = join(dir, slug + ".md");

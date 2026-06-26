@@ -198,6 +198,29 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-diagram-svg{display:flex;justify-content:center;padding:18px;background:#fff;border:0}
 .ds-diagram-svg svg{max-width:100%;height:auto}
 
+/* figure */
+.ds-figure{margin:0;display:grid;gap:9px}
+.ds-figure img{display:block;max-width:100%;height:auto;border:1px solid var(--ds-line);border-radius:12px}
+.ds-figure figcaption{color:var(--ds-ink-3);font-size:13px;text-align:center}
+
+/* math (KaTeX MathML, native render) */
+.ds-math{overflow-x:auto;text-align:center;font-size:1.05em}
+.ds-math.inline{display:inline-block;text-align:left}
+.ds-math math{font-size:1.15em}
+
+/* footnotes */
+.ds-fnref{font-size:.72em;line-height:0}
+.ds-fnref a{padding:0 1px}
+.ds-footnotes{margin:0;padding-left:22px;color:var(--ds-ink-2);font-size:14.5px}
+.ds-footnotes li{margin:6px 0}
+.ds-footnotes li:target{background:var(--ds-accent-tint);border-radius:6px}
+.ds-fnback{margin-left:4px;text-decoration:none}
+
+/* charts (inline SVG) */
+.ds-chart{border:1px solid var(--ds-line);border-radius:12px;background:var(--ds-bg);padding:14px 12px}
+.ds-chart-svg{display:block;width:100%;height:auto}
+.ds-chart-label,.ds-chart-tick{fill:var(--ds-ink-3);font-family:var(--ds-font);font-size:11px}
+
 /* tabs */
 .ds-tabbar{display:flex;gap:22px;border-bottom:1px solid var(--ds-line);margin-bottom:20px;overflow-x:auto}
 .ds-tab{border:0;background:transparent;padding:0 0 11px;color:var(--ds-ink-3);font-size:14px;font-weight:560;border-bottom:1.5px solid transparent;margin-bottom:-1px;cursor:pointer;white-space:nowrap}

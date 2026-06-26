@@ -123,6 +123,30 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 ```
 Use DOT. (Mermaid `format` falls back to showing source.)
 
+## figure — image with caption (inlined as a data URI at build time)
+```json
+{ "type": "figure", "src": "./diagram.png", "alt": "...", "caption": "What it shows." }
+```
+Local paths are read and inlined (self-contained). `data:`/`https:` sources pass through.
+
+## math — LaTeX → MathML (build-time, self-contained, no fonts/CSS)
+```json
+{ "type": "math", "tex": "E = mc^2", "display": true }
+```
+
+## footnotes — numbered notes; `[^id]` in any text field links to them
+```json
+{ "type": "footnotes", "items": [ { "id": "src", "text": "The source, **inline** formatted." } ] }
+```
+Reference a note inline with `[^src]`. Place the `footnotes` block near the end.
+
+## chart — bar / line / area, rendered to inline SVG (build-time, no dependency)
+```json
+{ "type": "chart", "title": "Quarterly", "chartType": "bar",
+  "data": [ { "label": "Q1", "value": 12 }, { "label": "Q2", "value": 18 } ] }
+```
+`chartType`: `bar | line | area`. Bars/lines use the accent color and adapt to the theme.
+
 ## review-board — interactive triage / decision surface
 Each candidate is an expandable row: collapsed shows title/summary/chips/status/select;
 expanded shows the full reference (`body` markdown and/or nested `blocks`) + a notes
