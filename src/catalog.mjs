@@ -47,8 +47,8 @@ export function buildCatalogModel(dir, opts = {}) {
         updated: meta.updated || "",
         links: collectLinks(m.blocks),
       });
-    } catch {
-      /* skip unreadable / invalid files */
+    } catch (e) {
+      console.error(`  ! skipped ${f}: ${e.message}`);
     }
   }
   docs.sort((a, b) => (b.updated || "").localeCompare(a.updated || "") || a.title.localeCompare(b.title));

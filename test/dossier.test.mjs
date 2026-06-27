@@ -47,6 +47,28 @@ test("plugins: a registered block validates and renders", async () => {
   assert.ok(/data-block="badge-test"/.test(html), "registered block renders");
 });
 
+test("renderer sanitizes hostile input (href schemes, theme vars, ragged rows)", async () => {
+  const { html } = await generate({
+    dossierVersion: "1.0",
+    meta: { title: "X", theme: { accent: "red;} body{display:none}", "ev<il": "x" } },
+    blocks: [
+      { type: "references", items: [{ label: "bad", url: "javascript:alert(1)" }, { label: "ok", url: "https://example.com" }] },
+      { type: "table", columns: ["A"], rows: [["fine"], "notarow", null] },
+    ],
+  });
+  const themeDecl = html.match(/<style>:root\{([^}]*)\}/)[1]; // the injected theme vars only
+  assert.ok(!/href="javascript:/.test(html), "javascript: href is neutralized");
+  assert.ok(html.includes('href="https://example.com"'), "safe href passes through");
+  assert.ok(!themeDecl.includes("{") && !themeDecl.includes("<"), "theme value cannot break out of its CSS declaration");
+  assert.ok(html.includes("<td>fine</td>"), "valid row renders; non-array rows do not crash");
+});
+
+test("markdown frontmatter survives titles with colons and newlines", async () => {
+  const { md } = await generate({ dossierVersion: "1.0", meta: { title: "a: b\n---\nx: y" }, blocks: [] });
+  assert.ok(md.includes('title: "a: b\\n---\\nx: y"'), "title is a single quoted YAML scalar (newlines/colons escaped)");
+  assert.ok(md.startsWith("---\ntitle:"), "frontmatter opens cleanly");
+});
+
 test("export to docx produces a valid Word document", async () => {
   const { exportDocx } = await import("../src/export.mjs");
   const buf = await exportDocx({ meta: { title: "X" }, blocks: [{ type: "hero", title: "H" }, { type: "prose", markdown: "hi" }, { type: "table", columns: ["A"], rows: [["1"]] }] });

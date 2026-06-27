@@ -11,6 +11,7 @@ export { registerBlock, esc, inlineMd, slugify, chartSvg, knownBlockTypes } from
 export async function generateFile(path, opts = {}) {
   const model = JSON.parse(readFileSync(path, "utf8"));
   if (opts.theme && THEMES[opts.theme]) {
+    // A document's own meta.theme always wins over the named pack.
     model.meta = { ...(model.meta || {}), theme: { ...THEMES[opts.theme], ...((model.meta || {}).theme || {}) } };
   }
   if (opts.validate !== false) {

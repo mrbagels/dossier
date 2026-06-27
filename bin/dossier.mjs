@@ -125,7 +125,7 @@ if (cmd === "build" && args.length) {
     const { model, docs } = buildCatalogModel(dir, { title: flags.title, baseUrl: flags["base-url"] });
     const outPath = flags.out || join(dir, "index.dossier.json");
     writeFileSync(outPath, JSON.stringify(model, null, 2) + "\n");
-    const r = await generateFile(outPath);
+    const r = await generateFile(outPath, { theme: flags.theme });
     console.log(`✓ ${r.htmlPath}  (${docs.length} documents)`);
   } catch (e) {
     console.error("✗ " + e.message);

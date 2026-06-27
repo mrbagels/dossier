@@ -408,7 +408,11 @@ const Figure: React.FC<{ b: B }> = ({ b }) => {
 
 const Math: React.FC<{ b: B }> = ({ b }) => (
   <Wrap type="math" id={b.id}>
-    <div className={"ds-math" + (b.display === false ? " inline" : "")} dangerouslySetInnerHTML={raw(b._math || ("$" + (b.tex || "") + "$"))} />
+    {b._math ? (
+      <div className={"ds-math" + (b.display === false ? " inline" : "")} dangerouslySetInnerHTML={raw(b._math)} />
+    ) : (
+      <div className={"ds-math" + (b.display === false ? " inline" : "")}><code>{b.tex || ""}</code></div>
+    )}
   </Wrap>
 );
 

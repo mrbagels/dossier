@@ -113,7 +113,7 @@ export const RUNTIME = `
 
   // in-place text editing: toggle edit mode, sync edits into the model (Export -> Download JSON to save)
   var __editing=false,__hinted=false;
-  function __findBlock(blocks,id){if(!blocks)return null;for(var i=0;i<blocks.length;i++){var b=blocks[i],r;if(b&&b.id===id)return b;if(b){if((r=__findBlock(b.blocks,id)))return r;if((r=__findBlock(b.left,id)))return r;if((r=__findBlock(b.right,id)))return r;if(b.tabs){for(var j=0;j<b.tabs.length;j++){if((r=__findBlock(b.tabs[j].blocks,id)))return r;}}}}return null;}
+  function __findBlock(blocks,id){if(!blocks)return null;for(var i=0;i<blocks.length;i++){var b=blocks[i],r;if(b&&b.id===id)return b;if(b){if((r=__findBlock(b.blocks,id)))return r;if((r=__findBlock(b.left,id)))return r;if((r=__findBlock(b.right,id)))return r;if(b.tabs){for(var j=0;j<b.tabs.length;j++){if((r=__findBlock(b.tabs[j].blocks,id)))return r;}}if(b.candidates){for(var k=0;k<b.candidates.length;k++){if((r=__findBlock(b.candidates[k].blocks,id)))return r;}}}}return null;}
   var __editBtn=$("[data-edit-toggle]"),__editFields=$$("[data-edit]");
   if(__editBtn&&__editFields.length){
     __editFields.forEach(function(el){el.addEventListener("input",function(){if(!__editing)return;var p=el.getAttribute("data-edit"),i=p.indexOf(":"),b=__findBlock(model.blocks,p.slice(0,i));if(b)b[p.slice(i+1)]=el.innerText.trim();});});
@@ -125,7 +125,7 @@ export const RUNTIME = `
   if(__studio&&__studioBtn){
     var __themes={};try{__themes=JSON.parse(($("#ds-themes")||{}).textContent||"{}");}catch(e){}
     var __ov={},__accIn=$("[data-studio-accent]");
-    function __h2(c){c=c.replace("#","");if(c.length===3)c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
+    function __h2(c){c=String(c||"").replace("#","");if(!/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c))return [0,0,0];if(c.length===3)c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
     function __darken(hex,amt){return "#"+__h2(hex).map(function(v){return ("0"+Math.max(0,Math.round(v*(1-amt))).toString(16)).slice(-2);}).join("");}
     function __rgba(hex,a){var r=__h2(hex);return "rgba("+r[0]+","+r[1]+","+r[2]+","+a+")";}
     function __set(name,val){document.documentElement.style.setProperty("--ds-"+name,val);__ov[name]=val;}

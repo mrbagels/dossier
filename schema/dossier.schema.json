@@ -1100,13 +1100,14 @@
           "format": {
             "type": "string",
             "enum": [
+              "dot",
               "mermaid"
             ],
-            "default": "mermaid"
+            "default": "dot"
           },
           "spec": {
             "type": "string",
-            "description": "Diagram source (e.g. Mermaid)."
+            "description": "Diagram source. DOT (Graphviz) renders to inline SVG at build time; Mermaid is emitted as source."
           }
         }
       },

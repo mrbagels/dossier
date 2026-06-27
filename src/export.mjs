@@ -53,7 +53,7 @@ function block(b, out) {
       break;
     case "decision-matrix":
       if (b.title) out.push(H(b.title, HeadingLevel.HEADING_3));
-      addTable(out, ["Option", ...(b.criteria || [])], (b.options || []).map((o) => [o.name, ...(o.scores || [])]));
+      addTable(out, ["Option", ...(b.criteria || [])], (b.options || []).map((o) => [o.name, ...(b.criteria || []).map((_, i) => (o.scores || [])[i] || "")]));
       break;
     case "risk-register":
       if (b.title) out.push(H(b.title, HeadingLevel.HEADING_3));
@@ -101,6 +101,8 @@ function block(b, out) {
         out.push(H(plain(c.title) + (c.status ? " (" + c.status + ")" : ""), HeadingLevel.HEADING_3));
         if (c.summary) out.push(P(c.summary));
         if (c.body) String(c.body).split(/\n{2,}/).forEach((p) => out.push(P(p)));
+        (c.blocks || []).forEach((x) => block(x, out));
+        Object.entries(c.details || {}).forEach(([k, v]) => out.push(P(k + ": " + plain(v))));
       });
       break;
     case "footnotes":

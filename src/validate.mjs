@@ -31,6 +31,7 @@ const REQUIRED = {
   math: ["tex"],
   footnotes: ["items"],
   chart: ["data"],
+  receipt: [],
 };
 
 const isEmpty = (v) =>
