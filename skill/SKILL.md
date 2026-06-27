@@ -68,7 +68,7 @@ For React/Next codebases, the same design renders via typed TSX components:
 ```
 cd react && npm install && npx tsx src/cli.tsx <file>   # -> <slug>.react.html
 ```
-Identical output; reuses the same design system. Importable: `import { renderDossier } from "@dossier/react"`.
+Identical output; reuses the same design system. Importable: `import { renderDossier } from "@mrbagels/dossier-react"`.
 
 ## Authoring essentials
 

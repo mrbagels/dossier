@@ -1,4 +1,4 @@
-# @dossier/react
+# @mrbagels/dossier-react
 
 Typed React/TSX components for [Dossier](../). Render the same self-contained design via
 SSR, or use the block components live inside a React/Next app.
@@ -6,7 +6,7 @@ SSR, or use the block components live inside a React/Next app.
 ## SSR a self-contained artifact
 
 ```ts
-import { renderDossier } from "@dossier/react";
+import { renderDossier } from "@mrbagels/dossier-react";
 
 const { html, md, digest } = await renderDossier(model); // model: DossierModel
 ```
@@ -21,7 +21,7 @@ npx tsx src/cli.tsx ../examples/sample.dossier.json   # -> *.react.html
 ## Use it live in a React app
 
 ```tsx
-import { DossierDocument, setCtx } from "@dossier/react";
+import { DossierDocument, setCtx } from "@mrbagels/dossier-react";
 
 setCtx({ glossary: new Map(), baseUrl: "" });   // resolves [[Term]] / [[slug]] in text
 <DossierDocument model={model} animate />        // whole document; Motion entrance on scroll when hydrated

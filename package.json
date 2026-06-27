@@ -1,5 +1,5 @@
 {
-  "name": "dossier",
+  "name": "@mrbagels/dossier",
   "version": "0.2.2",
   "description": "Generate polished, self-contained, agent-readable HTML briefs (plus Markdown) from a single JSON document model. Zero runtime dependencies.",
   "type": "module",
@@ -29,7 +29,8 @@
     "example": "node bin/dossier.mjs build examples/sample.dossier.json",
     "test": "node --test",
     "serve": "node bin/dossier.mjs serve",
-    "site": "node scripts/build-site.mjs"
+    "site": "node scripts/build-site.mjs",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "documentation",
@@ -45,5 +46,8 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "katex": "^0.17.0",
     "shiki": "^4.3.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -75,7 +75,7 @@
         {
           "type": "tabs",
           "tabs": [
-            { "label": "Code", "blocks": [ { "type": "code", "lang": "ts", "filename": "render.ts", "code": "import { renderDossier } from \"@dossier/react\";\nconst { html, md } = await renderDossier(model); // one self-contained file" } ] },
+            { "label": "Code", "blocks": [ { "type": "code", "lang": "ts", "filename": "render.ts", "code": "import { renderDossier } from \"@mrbagels/dossier-react\";\nconst { html, md } = await renderDossier(model); // one self-contained file" } ] },
             { "label": "Shell", "blocks": [ { "type": "code", "lang": "bash", "code": "dossier init my-doc\ndossier build my-doc.dossier.json && open my-doc.html" } ] }
           ]
         },

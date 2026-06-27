@@ -1,5 +1,5 @@
 {
-  "name": "@dossier/react",
+  "name": "@mrbagels/dossier-react",
   "version": "0.2.2",
   "type": "module",
   "description": "React/TSX components for Dossier. Renders the same self-contained design via SSR, reusing the core design system, runtime, and build-time enrichment.",
@@ -27,5 +27,8 @@
       "types": "./src/index.ts",
       "import": "./src/index.ts"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

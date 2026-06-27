@@ -189,17 +189,17 @@ decisions and implements them. That's the human-to-agent loop, in one file.
 
 ## React
 
-Dossier also ships as typed React/TSX components ([`react/`](react/), `@dossier/react`), for
+Dossier also ships as typed React/TSX components ([`react/`](react/), `@mrbagels/dossier-react`), for
 teams that want to render the same design from a React/Next app.
 
 ```ts
-import { renderDossier } from "@dossier/react";
+import { renderDossier } from "@mrbagels/dossier-react";
 const { html, md } = await renderDossier(model);   // -> the same self-contained file
 ```
 
 ```tsx
 // or render blocks live inside an app (optional Motion entrance animation when hydrated)
-import { DossierDocument } from "@dossier/react";
+import { DossierDocument } from "@mrbagels/dossier-react";
 <DossierDocument model={model} animate />
 ```
 
