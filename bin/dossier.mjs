@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { resolve, join, basename } from "node:path";
+import { resolve, join, basename, dirname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateFile, validateModel, registerBlock, esc, inlineMd, slugify } from "../src/index.mjs";
 
@@ -40,7 +40,7 @@ const USAGE = [
   "  dossier validate <file.dossier.json> ... check a model without rendering",
   "  dossier diff <old.json> <new.json>      structural diff between two versions",
   "  dossier catalog <dir>                    index a folder of dossiers (+ link graph)",
-  "  dossier export <file> --format docx|md   export to another format (PDF: print the .html)",
+  "  dossier export <file> --format docx|md|pdf  export to Word, Markdown, or PDF",
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
@@ -144,12 +144,19 @@ if (cmd === "build" && args.length) {
       console.log("✓ " + out);
     } else if (fmt === "md") {
       const { generate } = await import("../src/index.mjs");
-      const { md } = await generate(model, {});
+      const { md } = await generate(model, { baseDir: dirname(f) });
       const out = flags.out || slug + ".md";
       writeFileSync(out, md);
       console.log("✓ " + out);
+    } else if (fmt === "pdf") {
+      const { generate } = await import("../src/index.mjs");
+      const { exportPdf } = await import("../src/export.mjs");
+      const { html } = await generate(model, { baseDir: dirname(f) });
+      const out = flags.out || slug + ".pdf";
+      writeFileSync(out, await exportPdf(html));
+      console.log("✓ " + out);
     } else {
-      console.error("✗ unknown format: " + fmt + " (supported: docx, md; for PDF open the .html and print)");
+      console.error("✗ unknown format: " + fmt + " (supported: docx, md, pdf)");
       process.exitCode = 1;
     }
   } catch (e) {

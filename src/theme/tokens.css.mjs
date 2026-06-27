@@ -435,6 +435,7 @@ tbody tr:hover td{color:var(--ds-ink)}
   .ds-section[data-collapsed="1"] .ds-section-body{display:grid!important}
   .ds-ritem-wrap{grid-template-rows:1fr!important}
   .ds-section,.ds-block,.ds-ritem,.ds-card,.ds-stat,.ds-chart,.ds-figure,table,pre{break-inside:avoid}
+  .ds-reveal{opacity:1!important;transform:none!important}
   h1,h2,h3,h4{break-after:avoid}
   a{color:inherit;text-decoration:none}
   .ds-reveal{opacity:1!important;transform:none!important}

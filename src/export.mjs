@@ -1,7 +1,27 @@
-// Export a Dossier model to other formats. Currently DOCX (Word), mapping the common
-// block types. Inline markdown is flattened to plain text.
+// Export a Dossier to other formats: DOCX (Word, mapping the common block types,
+// inline markdown flattened to plain text) and PDF (the self-contained HTML printed
+// through a headless browser).
 
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType } from "docx";
+
+// Print the already-rendered, self-contained HTML to a PDF buffer via Playwright.
+export async function exportPdf(html, opts = {}) {
+  const { getBrowser } = await import("./headless.mjs");
+  const browser = await getBrowser();
+  if (!browser) throw new Error("PDF export needs Playwright. Install it: npm i playwright && npx playwright install chromium");
+  const page = await browser.newPage();
+  try {
+    await page.setContent(html, { waitUntil: "load" });
+    await page.emulateMedia({ media: "print" });
+    return await page.pdf({
+      format: opts.size || "A4",
+      printBackground: true,
+      margin: { top: "16mm", bottom: "16mm", left: "14mm", right: "14mm" },
+    });
+  } finally {
+    await page.close();
+  }
+}
 
 const plain = (s) =>
   String(s == null ? "" : s)
