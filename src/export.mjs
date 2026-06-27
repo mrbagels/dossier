@@ -2,25 +2,27 @@
 // inline markdown flattened to plain text) and PDF (the self-contained HTML printed
 // through a headless browser).
 
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType } from "docx";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, ImageRun } from "docx";
+import { chartSvg, enrich } from "./generate.mjs";
 
 // Print the already-rendered, self-contained HTML to a PDF buffer via Playwright.
 export async function exportPdf(html, opts = {}) {
-  const { getBrowser } = await import("./headless.mjs");
-  const browser = await getBrowser();
-  if (!browser) throw new Error("PDF export needs Playwright. Install it: npm i playwright && npx playwright install chromium");
-  const page = await browser.newPage();
-  try {
-    await page.setContent(html, { waitUntil: "load" });
-    await page.emulateMedia({ media: "print" });
-    return await page.pdf({
-      format: opts.size || "A4",
-      printBackground: true,
-      margin: { top: "16mm", bottom: "16mm", left: "14mm", right: "14mm" },
-    });
-  } finally {
-    await page.close();
-  }
+  const { withBrowser } = await import("./headless.mjs");
+  return withBrowser(async (browser) => {
+    if (!browser) throw new Error("PDF export needs Playwright. Install it: npm i playwright && npx playwright install chromium");
+    const page = await browser.newPage();
+    try {
+      await page.setContent(html, { waitUntil: "load" });
+      await page.emulateMedia({ media: "print" });
+      return await page.pdf({
+        format: opts.size || "A4",
+        printBackground: true,
+        margin: { top: "16mm", bottom: "16mm", left: "14mm", right: "14mm" },
+      });
+    } finally {
+      await page.close();
+    }
+  });
 }
 
 const plain = (s) =>
@@ -42,7 +44,73 @@ function addTable(out, columns, rows) {
   out.push(new Paragraph({ text: "" }));
 }
 
-function block(b, out) {
+// ---- images ----------------------------------------------------------------
+
+const MIME_TYPE = { "image/png": "png", "image/jpeg": "jpg", "image/jpg": "jpg", "image/gif": "gif", "image/bmp": "bmp" };
+const EXT_TYPE = { ".png": "png", ".jpg": "jpg", ".jpeg": "jpg", ".gif": "gif", ".bmp": "bmp" };
+
+// Rasterize an SVG string to a PNG buffer via resvg (no browser needed).
+async function svgToPng(svg) {
+  try {
+    const { Resvg } = await import("@resvg/resvg-js");
+    const img = new Resvg(String(svg), { fitTo: { mode: "width", value: 900 } }).render();
+    return { data: img.asPng(), width: img.width, height: img.height };
+  } catch {
+    return null;
+  }
+}
+
+// A paragraph holding one image, scaled to fit the page width (96dpi pixels).
+function imageRun(data, type, w, h) {
+  const maxW = 540;
+  let width = w || maxW;
+  let height = h || Math.round(width * 0.6);
+  if (width > maxW) {
+    height = Math.round(height * (maxW / width));
+    width = maxW;
+  }
+  return new Paragraph({ children: [new ImageRun({ data, type, transformation: { width, height } })] });
+}
+
+// Resolve a figure to an image paragraph: data-URI, local file, raster or SVG.
+async function figureImage(b, baseDir) {
+  let buf = null, type = null, svg = null;
+  const src = b._src || b.src || "";
+  const m = /^data:(image\/[a-z.+-]+)(;base64)?,(.*)$/i.exec(src);
+  if (m) {
+    const mime = m[1].toLowerCase(), isB64 = !!m[2], raw = m[3];
+    if (/svg/i.test(mime)) {
+      try { svg = isB64 ? Buffer.from(raw, "base64").toString("utf8") : decodeURIComponent(raw); } catch { svg = raw; }
+    } else if (MIME_TYPE[mime] && isB64) { buf = Buffer.from(raw, "base64"); type = MIME_TYPE[mime]; }
+  } else if (src && !/^https?:/i.test(src) && baseDir) {
+    try {
+      const { readFileSync } = await import("node:fs");
+      const { resolve, extname } = await import("node:path");
+      const file = resolve(baseDir, src);
+      if (/\.svg$/i.test(file)) svg = readFileSync(file, "utf8");
+      else if (EXT_TYPE[extname(file).toLowerCase()]) { buf = readFileSync(file); type = EXT_TYPE[extname(file).toLowerCase()]; }
+    } catch {
+      /* unreadable, no image */
+    }
+  }
+  if (svg) {
+    const png = await svgToPng(svg);
+    return png ? imageRun(png.data, "png", png.width, png.height) : null;
+  }
+  if (buf && type) {
+    let dim = null;
+    try { const { imageSize } = await import("image-size"); dim = imageSize(buf); } catch { /* dims unknown */ }
+    return imageRun(buf, type, dim && dim.width, dim && dim.height);
+  }
+  return null; // unsupported (e.g. webp/avif) or remote URL
+}
+
+// Chart SVG uses CSS variables for color; bind them to concrete values for raster.
+function chartPngSvg(b, accent) {
+  return chartSvg(b).replace(/var\(--ds-accent\)/g, accent).replace(/var\(--ds-line-2\)/g, "#dcd9e4");
+}
+
+async function block(b, out, ctx) {
   switch (b.type) {
     case "hero":
       out.push(H(b.title, HeadingLevel.TITLE));
@@ -51,7 +119,7 @@ function block(b, out) {
     case "section":
       out.push(H(b.title, HeadingLevel.HEADING_1));
       if (b.subtitle) out.push(P(b.subtitle, { run: { italics: true, color: "666666" } }));
-      (b.blocks || []).forEach((c) => block(c, out));
+      for (const c of b.blocks || []) await block(c, out, ctx);
       break;
     case "prose":
       if (b.heading) out.push(H(b.heading, HeadingLevel.HEADING_2));
@@ -110,20 +178,23 @@ function block(b, out) {
       (b.items || []).forEach((it) => { out.push(new Paragraph({ children: [new TextRun({ text: plain(it.q), bold: true })] })); out.push(P(it.a)); });
       break;
     case "two-col":
-      [...(b.left || []), ...(b.right || [])].forEach((c) => block(c, out));
+      for (const c of [...(b.left || []), ...(b.right || [])]) await block(c, out, ctx);
       break;
     case "tabs":
-      (b.tabs || []).forEach((t) => { out.push(H(t.label, HeadingLevel.HEADING_3)); (t.blocks || []).forEach((c) => block(c, out)); });
+      for (const t of b.tabs || []) {
+        out.push(H(t.label, HeadingLevel.HEADING_3));
+        for (const c of t.blocks || []) await block(c, out, ctx);
+      }
       break;
     case "review-board":
       if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
-      (b.candidates || []).forEach((c) => {
+      for (const c of b.candidates || []) {
         out.push(H(plain(c.title) + (c.status ? " (" + c.status + ")" : ""), HeadingLevel.HEADING_3));
         if (c.summary) out.push(P(c.summary));
         if (c.body) String(c.body).split(/\n{2,}/).forEach((p) => out.push(P(p)));
-        (c.blocks || []).forEach((x) => block(x, out));
+        for (const x of c.blocks || []) await block(x, out, ctx);
         Object.entries(c.details || {}).forEach(([k, v]) => out.push(P(k + ": " + plain(v))));
-      });
+      }
       break;
     case "footnotes":
       out.push(H(b.title || "Notes", HeadingLevel.HEADING_3));
@@ -135,14 +206,38 @@ function block(b, out) {
       if (b.tools && b.tools.length) out.push(P("tools: " + b.tools.join(", ")));
       if (b.notes) out.push(P(b.notes));
       break;
+    case "figure": {
+      const im = await figureImage(b, ctx.baseDir);
+      if (im) out.push(im);
+      if (b.caption) out.push(P(b.caption, { run: { italics: true, color: "666666" } }));
+      break;
+    }
+    case "chart": {
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_3));
+      const png = await svgToPng(chartPngSvg(b, ctx.accent));
+      if (png) out.push(imageRun(png.data, "png", png.width, png.height));
+      break;
+    }
+    case "diagram": {
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_3));
+      const png = b._svg ? await svgToPng(b._svg) : null;
+      if (png) out.push(imageRun(png.data, "png", png.width, png.height));
+      else out.push(P("[" + (b.format || "dot") + " diagram]"));
+      break;
+    }
+    case "math":
+      if (b.tex) out.push(new Paragraph({ children: [new TextRun({ text: String(b.tex), font: "Consolas", italics: true })] }));
+      break;
     default:
-      break; // figure / math / chart / diagram: visual blocks skipped in DOCX
+      break; // unknown / plugin blocks: nothing to emit
   }
 }
 
-export async function exportDocx(model) {
+export async function exportDocx(model, opts = {}) {
+  await enrich(model, opts.baseDir); // populates figure _src and diagram _svg
+  const ctx = { baseDir: opts.baseDir, accent: (model.meta && model.meta.theme && model.meta.theme.accent) || "#c81e4a" };
   const out = [];
-  (model.blocks || []).forEach((b) => block(b, out));
+  for (const b of model.blocks || []) await block(b, out, ctx);
   if (!out.length) out.push(new Paragraph({ text: (model.meta && model.meta.title) || "" }));
   const doc = new Document({ sections: [{ children: out }] });
   return Packer.toBuffer(doc);

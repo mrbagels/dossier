@@ -67,7 +67,7 @@ test("author-supplied _svg/_math fields are dropped (no raw HTML injection)", as
   const { html } = await generate({
     dossierVersion: "1.0",
     meta: { title: "X" },
-    blocks: [{ type: "diagram", format: "mermaid", spec: "graph", _svg: "<script>alert(1)</script>" }, { type: "math", tex: "x", _math: "<img src=x onerror=alert(1)>" }],
+    blocks: [{ type: "diagram", format: "dot", spec: "not valid dot", _svg: "<script>alert(1)</script>" }, { type: "math", tex: "x", _math: "<img src=x onerror=alert(1)>" }],
   });
   assert.ok(!/<script>alert\(1\)<\/script>/.test(html), "smuggled _svg is not injected");
   assert.ok(!/onerror=alert/.test(html), "smuggled _math is not injected");
@@ -84,6 +84,19 @@ test("export to docx produces a valid Word document", async () => {
   const buf = await exportDocx({ meta: { title: "X" }, blocks: [{ type: "hero", title: "H" }, { type: "prose", markdown: "hi" }, { type: "table", columns: ["A"], rows: [["1"]] }] });
   assert.ok(Buffer.isBuffer(buf) && buf.length > 0, "returns a buffer");
   assert.equal(buf.slice(0, 2).toString(), "PK", "is a zip (docx) file");
+});
+
+test("docx export embeds chart and figure as images", async () => {
+  const { exportDocx } = await import("../src/export.mjs");
+  const buf = await exportDocx({
+    meta: { title: "X" },
+    blocks: [
+      { type: "chart", chartType: "bar", data: [{ label: "a", value: 3 }, { label: "b", value: 5 }] },
+      { type: "figure", src: "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='10'%20height='10'%3E%3Crect%20width='10'%20height='10'/%3E%3C/svg%3E" },
+    ],
+  });
+  const s = buf.toString("latin1");
+  assert.ok((s.match(/word\/media\/[0-9a-f]+\.png/g) || []).length >= 2, "chart + figure both embed as PNG");
 });
 
 test("catalog indexes a folder and finds cross-links", async () => {

@@ -1,31 +1,19 @@
-// Lazy, optional headless browser (Playwright Chromium), shared by Mermaid diagram
-// rendering and PDF export. Returns null when Playwright is unavailable so callers
-// fall back gracefully. The browser is launched once and reused, then closed by the
-// CLI when the run finishes (see closeBrowser).
+// Optional headless browser (Playwright Chromium), used for Mermaid diagram rendering
+// and PDF export. withBrowser launches a browser, runs the callback, and always closes
+// it, so a single generate()/export call never leaves the process alive. The callback
+// receives null when Playwright is unavailable, so callers can fall back gracefully.
 
-let browserPromise = null;
-
-export async function getBrowser() {
-  if (browserPromise) return browserPromise;
-  browserPromise = (async () => {
-    try {
-      const { chromium } = await import("playwright");
-      return await chromium.launch();
-    } catch {
-      return null; // playwright not installed, or no browser available
-    }
-  })();
-  return browserPromise;
-}
-
-export async function closeBrowser() {
-  if (!browserPromise) return;
-  const p = browserPromise;
-  browserPromise = null;
+export async function withBrowser(fn) {
+  let browser;
   try {
-    const b = await p;
-    if (b) await b.close();
+    const { chromium } = await import("playwright");
+    browser = await chromium.launch();
   } catch {
-    /* already gone */
+    return fn(null); // playwright not installed, or no browser available
+  }
+  try {
+    return await fn(browser);
+  } finally {
+    await browser.close();
   }
 }
