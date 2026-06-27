@@ -61,7 +61,7 @@ if (cmd === "build" && args.length) {
   }
   for (const f of args) {
     try {
-      const r = await generateFile(f, { validate: flags["no-validate"] ? false : true });
+      const r = await generateFile(f, { validate: flags["no-validate"] ? false : true, theme: flags.theme });
       console.log("✓ " + r.htmlPath);
     } catch (e) {
       console.error("✗ " + f + ":\n  " + e.message.replace(/\n/g, "\n  "));
@@ -77,7 +77,7 @@ if (cmd === "build" && args.length) {
         clearTimeout(t);
         t = setTimeout(async () => {
           try {
-            const r = await generateFile(f, { validate: flags["no-validate"] ? false : true });
+            const r = await generateFile(f, { validate: flags["no-validate"] ? false : true, theme: flags.theme });
             console.log("↻ " + r.htmlPath);
           } catch (e) {
             console.error("✗ " + e.message.replace(/\n/g, "\n  "));

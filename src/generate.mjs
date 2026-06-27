@@ -508,6 +508,7 @@ function buildToc(blocks) {
 
 import { CSS } from "./theme/tokens.css.mjs";
 import { RUNTIME } from "./runtime/runtime.mjs";
+import { THEMES } from "./themes.mjs";
 
 // Visit every block in the tree, including nested ones.
 function eachBlock(blocks, fn) {
@@ -671,7 +672,7 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="${esc(generator)}/${esc(model.dossierVersion || "1.0")}">
 <title>${esc(meta.title || "Dossier")}</title>
-<style>:root{${themeVars}}${CSS}</style>
+<style>:root{${themeVars}}${CSS}${themeVars ? `[data-theme="dark"]{${themeVars}}` : ""}</style>
 </head>
 <body>
 <div class="ds-progress"><div class="ds-progress-bar"></div></div>
@@ -681,6 +682,7 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
 <div class="ds-tools">
 <button class="ds-btn ds-search-btn" type="button" data-palette-open><span class="ds-i"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.4-3.4"></path></svg></span><span class="ds-search-label">Search</span><kbd>⌘K</kbd></button>
 <button class="ds-btn" type="button" data-edit-toggle title="Edit text in place">Edit</button>
+<button class="ds-btn ds-swatch" type="button" data-studio-open title="Theme studio"><span></span></button>
 <button class="ds-btn" type="button" data-theme-toggle aria-label="Toggle theme">◐</button>
 <details class="ds-menu"><summary>Export</summary><div class="ds-menu-list">
 <button class="ds-btn" type="button" data-action="copy-md">Copy Markdown</button>
@@ -705,6 +707,13 @@ ${toc.length ? `<aside class="ds-toc"><div class="ds-search"><input type="search
 <div class="ds-palette" data-palette hidden><div class="ds-palette-box"><input type="text" placeholder="Jump to or run an action…" data-palette-input><div class="ds-palette-list" data-palette-list></div></div></div>
 <div class="ds-modal" data-source-modal hidden><div class="ds-modal-box"><div class="ds-modal-head"><strong>Markdown source</strong><button class="ds-btn" type="button" data-source-close>Close</button></div><textarea readonly data-source-text></textarea></div></div>
 <div class="ds-toast" data-toast></div>
+<div class="ds-studio" data-studio hidden>
+<div class="ds-studio-head"><strong>Theme studio</strong><button class="ds-btn" type="button" data-studio-close>Close</button></div>
+<label class="ds-studio-row">Accent <input type="color" data-studio-accent></label>
+<div class="ds-studio-presets">${Object.entries(THEMES).filter(([, v]) => v.accent).map(([k, v]) => `<button class="ds-studio-sw" type="button" data-studio-preset="${esc(k)}" title="${esc(k)}" style="background:${esc(v.accent)}"></button>`).join("")}</div>
+<div class="ds-studio-actions"><button class="ds-btn ds-btn-line" type="button" data-studio-copy>Copy theme JSON</button><button class="ds-btn ds-btn-line" type="button" data-studio-reset>Reset</button></div>
+</div>
+<script type="application/json" id="ds-themes">${JSON.stringify(THEMES).replace(/</g, "\\u003c")}</script>
 
 <script type="application/json" id="dossier-model">${modelJson}</script>
 <script type="text/markdown" id="dossier-markdown">${esc(md)}</script>

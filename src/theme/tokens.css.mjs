@@ -109,6 +109,20 @@ html.ds-editing .ds-btn[data-edit-toggle]{background:var(--ds-accent-tint);color
 .ds-editing [data-edit]{outline:1px dashed var(--ds-line-strong);outline-offset:3px;border-radius:4px;cursor:text}
 .ds-editing [data-edit]:hover{outline-color:var(--ds-accent)}
 .ds-editing [data-edit]:focus{outline:2px solid var(--ds-accent);outline-offset:3px}
+
+/* theme studio */
+.ds-swatch{width:34px;padding:0;justify-content:center}
+.ds-swatch span{width:14px;height:14px;border-radius:50%;background:var(--ds-accent);box-shadow:0 0 0 1px var(--ds-line-2)}
+.ds-studio{position:fixed;right:18px;top:62px;z-index:70;width:238px;background:var(--ds-bg);border:1px solid var(--ds-line-2);border-radius:14px;box-shadow:0 18px 44px rgba(20,16,40,.18);padding:14px;display:grid;gap:12px}
+.ds-studio[hidden]{display:none}
+.ds-studio-head{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.ds-studio-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:560;color:var(--ds-ink-2)}
+.ds-studio-row input[type=color]{width:46px;height:28px;border:1px solid var(--ds-line-2);border-radius:7px;background:none;cursor:pointer;padding:2px}
+.ds-studio-presets{display:flex;flex-wrap:wrap;gap:8px}
+.ds-studio-sw{width:26px;height:26px;border-radius:50%;border:1px solid var(--ds-line-2);cursor:pointer;padding:0;transition:transform .1s var(--ds-ease)}
+.ds-studio-sw:hover{transform:scale(1.1)}
+.ds-studio-actions{display:grid;gap:7px}
+.ds-studio-actions .ds-btn-line{justify-content:center}
 mark{background:var(--ds-accent-tint);color:inherit;border-radius:3px;padding:0 2px}
 
 /* hero, no background wash */
@@ -414,7 +428,7 @@ tbody tr:hover td{color:var(--ds-ink)}
 @media print{
   :root{--ds-bg:#fff;--ds-bg-2:#fff;--ds-ink:#111;--ds-ink-2:#333;--ds-ink-3:#666;--ds-line:#ddd;--ds-line-2:#ccc}
   html{font-size:11pt}
-  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy{display:none!important}
+  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy{display:none!important}
   .ds-layout{display:block}
   .ds-content{max-width:none}
   .ds-shell{width:100%}
