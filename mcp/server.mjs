@@ -1,4 +1,4 @@
-// Dossier MCP server — lets any MCP-capable agent author, validate, render, and read
+// Dossier MCP server, lets any MCP-capable agent author, validate, render, and read
 // decisions from dossiers. Run via `dossier mcp` (stdio transport).
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -35,7 +35,7 @@ const TOOLS = [
   {
     name: "dossier_read_decisions",
     description:
-      "Read a decisions packet exported from a review-board ({ slug, decisions: { id: { selected, notes } } }) and return the selected items with notes — the human's choices to implement.",
+      "Read a decisions packet exported from a review-board ({ slug, decisions: { id: { selected, notes } } }) and return the selected items with notes, the human's choices to implement.",
     inputSchema: {
       type: "object",
       properties: {

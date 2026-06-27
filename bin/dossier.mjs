@@ -31,7 +31,7 @@ for (let i = 0; i < rest.length; i++) {
 const STARTERS = ["dossier", "adr", "runbook", "postmortem", "review-board"];
 
 const USAGE = [
-  "Dossier — self-contained, agent-readable HTML documents from one JSON file.",
+  "Dossier, self-contained, agent-readable HTML documents from one JSON file.",
   "",
   "Usage:",
   "  dossier init [name] [--kind <kind>]      scaffold <name>.dossier.json from a starter",
@@ -69,7 +69,7 @@ if (cmd === "build" && args.length) {
   }
   if (flags.watch) {
     const { watch } = await import("node:fs");
-    console.log("watching " + args.join(", ") + " — Ctrl-C to stop");
+    console.log("watching " + args.join(", ") + ", Ctrl-C to stop");
     for (const f of args) {
       let t;
       watch(f, () => {

@@ -1,4 +1,4 @@
-// Dossier design system — editorial/SaaS hybrid, denser layout, first-class
+// Dossier design system, editorial/SaaS hybrid, denser layout, first-class
 // responsive + iOS. Near-monochrome plum neutrals + one berry accent. No card
 // accent strokes, no hero background wash. Light + dark.
 
@@ -111,7 +111,7 @@ html.ds-editing .ds-btn[data-edit-toggle]{background:var(--ds-accent-tint);color
 .ds-editing [data-edit]:focus{outline:2px solid var(--ds-accent);outline-offset:3px}
 mark{background:var(--ds-accent-tint);color:inherit;border-radius:3px;padding:0 2px}
 
-/* hero — no background wash */
+/* hero, no background wash */
 .ds-hero{padding:34px 0 4px}
 .ds-eyebrow{display:inline-flex;align-items:center;margin:0 0 15px;padding:5px 12px;background:var(--ds-accent-tint);color:var(--ds-accent);font-size:12px;font-weight:600;letter-spacing:.02em;border-radius:999px}
 .ds-hero h1{font-family:var(--ds-serif);font-weight:400;font-size:clamp(30px,4.2vw,44px);line-height:1.08;letter-spacing:-.022em;margin:0;max-width:20ch}
@@ -348,7 +348,7 @@ textarea:focus{border-color:var(--ds-line-strong)}
 .ds-totop.show{opacity:1;transform:none;pointer-events:auto}
 .ds-totop:hover{color:var(--ds-accent);border-color:var(--ds-line-strong)}
 
-/* entrance reveal — JS-added, so no-JS markup stays visible */
+/* entrance reveal, JS-added, so no-JS markup stays visible */
 .ds-reveal{opacity:0;transform:translateY(12px);transition:opacity .55s var(--ds-ease),transform .55s var(--ds-ease)}
 .ds-reveal.in{opacity:1;transform:none}
 

@@ -1,4 +1,4 @@
-# Dossier — Design Record
+# Dossier, Design Record
 
 > Durable record of locked decisions. Update this when a decision changes.
 
@@ -85,8 +85,8 @@ display blocks only.)
 The **output stays self-contained** (highlighted code + diagram SVG are inlined; no
 view-time network). These run only at generate time:
 
-- `shiki` — dual-theme (light/dark) highlighting via CSS variables, zero client JS.
-- `@hpcc-js/wasm-graphviz` — `diagram` blocks with `format: "dot"` → inline SVG, browserless.
+- `shiki`, dual-theme (light/dark) highlighting via CSS variables, zero client JS.
+- `@hpcc-js/wasm-graphviz`, `diagram` blocks with `format: "dot"` → inline SVG, browserless.
 
 The "zero-dependency" promise now means **zero runtime dependencies in the artifact**,
 not a dependency-free toolchain.
@@ -97,5 +97,5 @@ Typed TSX components (`Block` dispatcher over all 21 types) rendered via
 `react-dom/server` `renderToStaticMarkup`, **reusing the core `CSS`, `RUNTIME`, and
 enrichment** (`enrich`/`assignIds`/`buildToc`/`toMarkdown`/`agentDigest`/`inlineMd`) as
 the single source of truth. Produces the same self-contained artifact; `tsc --noEmit`
-clean. The shell template is currently duplicated in `react/src/render.tsx` — a future
+clean. The shell template is currently duplicated in `react/src/render.tsx`, a future
 cleanup is to extract a shared `renderShell()` from the core so both paths share it.

@@ -4,7 +4,7 @@ import { Block } from "./blocks";
 import type { DossierModel } from "./types";
 
 /**
- * Live React document — renders a model's blocks for mounting inside a React/Next app
+ * Live React document, renders a model's blocks for mounting inside a React/Next app
  * (import the core `CSS` once at your app root for the `ds-` classes).
  *
  * With `animate`, top-level blocks reveal on scroll via Motion. This path is for

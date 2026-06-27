@@ -1,5 +1,5 @@
 // Build the demo site (deployed to GitHub Pages by .github/workflows/pages.yml).
-// The showcase is the landing page, so it always reflects the current capabilities —
+// The showcase is the landing page, so it always reflects the current capabilities -
 // add new block types to examples/showcase.dossier.json and the live demo updates.
 
 import { generateFile } from "../src/index.mjs";

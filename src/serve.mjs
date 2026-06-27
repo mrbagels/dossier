@@ -60,7 +60,7 @@ export async function serve(file, opts = {}) {
 
   server.listen(port, () => {
     const url = `http://localhost:${port}`;
-    console.log(`serving ${file} at ${url}\n  watching for changes — edit and save to live-reload`);
+    console.log(`serving ${file} at ${url}\n  watching for changes, edit and save to live-reload`);
     if (opts.open) openUrl(url);
   });
 

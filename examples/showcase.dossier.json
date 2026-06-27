@@ -3,7 +3,7 @@
   "dossierVersion": "1.0",
   "kind": "dossier",
   "meta": {
-    "title": "Dossier — capabilities showcase",
+    "title": "Dossier, capabilities showcase",
     "slug": "showcase",
     "eyebrow": "Live demo",
     "crumbs": ["Dossier", "Showcase"],
@@ -19,7 +19,7 @@
       "type": "hero",
       "eyebrow": "Live demo",
       "title": "One JSON file becomes this",
-      "lede": "Everything below — navigation, search, theme, code, diagrams, charts, math, and an interactive review board — lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.",
+      "lede": "Everything below, navigation, search, theme, code, diagrams, charts, math, and an interactive review board, lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.",
       "pills": ["26 block types", "Self-contained", "Agent-readable", "Light + dark"],
       "sideCards": [
         { "label": "Source", "value": "one .dossier.json" },
@@ -39,9 +39,9 @@
     {
       "type": "summary-cards",
       "cards": [
-        { "title": "For humans", "body": "A navigable, searchable, themeable page — not a wall of Markdown.", "tone": "accent" },
+        { "title": "For humans", "body": "A navigable, searchable, themeable page, not a wall of Markdown.", "tone": "accent" },
         { "title": "For agents", "body": "The full model is embedded as `#dossier-model`; read one block, no scraping.", "tone": "highlight" },
-        { "title": "For your wiki", "body": "One portable file — link it, email it, or `<iframe>` it anywhere.", "tone": "success" }
+        { "title": "For your wiki", "body": "One portable file, link it, email it, or `<iframe>` it anywhere.", "tone": "success" }
       ]
     },
     {
@@ -82,7 +82,7 @@
         { "type": "diagram", "title": "Pipeline", "format": "dot", "spec": "digraph { rankdir=LR; bgcolor=\"transparent\"; node [shape=box style=rounded fontname=\"Inter\" fontsize=12 color=\"#c81e4a\" fontcolor=\"#1a1822\"]; edge [color=\"#8b8698\"]; \"doc.json\" -> \"build\" -> \"doc.html\"; \"build\" -> \"doc.md\"; }" },
         { "type": "table", "title": "Exports", "columns": ["Format", "Use"], "rows": [["HTML", "The page humans open"], ["Markdown", "Plain-text copy"], ["JSON / digest", "What agents read"]] },
         { "type": "references", "items": [ { "label": "Repository", "url": "https://github.com/mrbagels/dossier", "signal": "Source + docs", "use": "Clone, star, contribute" } ] },
-        { "type": "faq", "title": "FAQ", "items": [ { "q": "Does it replace my docs site?", "a": "No — it's a companion: linkable, embeddable, exportable artifacts." } ] }
+        { "type": "faq", "title": "FAQ", "items": [ { "q": "Does it replace my docs site?", "a": "No, it's a companion: linkable, embeddable, exportable artifacts." } ] }
       ]
     },
     {
@@ -108,10 +108,10 @@
     },
     {
       "type": "review-board",
-      "title": "Interactive review board — try it",
+      "title": "Interactive review board, try it",
       "candidates": [
-        { "id": "navigation", "title": "Navigation", "summary": "Sticky TOC + scroll-spy, search, and a command palette (Cmd/Ctrl-K).", "category": "Reader", "status": "shipped", "impact": "High", "effort": "—", "body": "Expand a row, tick the checkbox, leave a note, then **Export JSON** — that decisions packet is what an agent reads back.", "details": { "Shortcut": "Cmd/Ctrl-K" } },
-        { "id": "themeable", "title": "Themeable", "summary": "Light + dark, per-project token overrides, fully responsive to mobile.", "category": "Design", "status": "shipped", "impact": "High", "effort": "—", "body": "The whole design is a small token system; one accent, near-monochrome neutrals." }
+        { "id": "navigation", "title": "Navigation", "summary": "Sticky TOC + scroll-spy, search, and a command palette (Cmd/Ctrl-K).", "category": "Reader", "status": "shipped", "impact": "High", "effort": "-", "body": "Expand a row, tick the checkbox, leave a note, then **Export JSON**, that decisions packet is what an agent reads back.", "details": { "Shortcut": "Cmd/Ctrl-K" } },
+        { "id": "themeable", "title": "Themeable", "summary": "Light + dark, per-project token overrides, fully responsive to mobile.", "category": "Design", "status": "shipped", "impact": "High", "effort": "-", "body": "The whole design is a small token system; one accent, near-monochrome neutrals." }
       ]
     },
     {

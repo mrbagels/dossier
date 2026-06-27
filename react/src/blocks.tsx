@@ -1,7 +1,7 @@
 import React from "react";
 import { inlineMd, slugify, chartSvg, renderBlock, knownBlockTypes } from "../../src/generate.mjs";
 
-// React-side plugin registry — register a component for a custom block type so it renders
+// React-side plugin registry, register a component for a custom block type so it renders
 // natively in the React port (parity with the Node generator's registerBlock).
 const componentRegistry = new Map<string, React.FC<{ b: any }>>();
 export function registerComponent(type: string, Component: React.FC<{ b: any }>) {

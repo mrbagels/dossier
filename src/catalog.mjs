@@ -54,7 +54,7 @@ export function buildCatalogModel(dir, opts = {}) {
   docs.sort((a, b) => (b.updated || "").localeCompare(a.updated || "") || a.title.localeCompare(b.title));
 
   const allTags = [...new Set(docs.flatMap((d) => d.tags))];
-  const rows = docs.map((d) => [`[[${d.slug}]]`, d.kind, d.status || "—", (d.tags || []).join(", ") || "—", d.updated || "—"]);
+  const rows = docs.map((d) => [`[[${d.slug}]]`, d.kind, d.status || "-", (d.tags || []).join(", ") || "-", d.updated || "-"]);
   const dot = buildGraphDot(docs);
 
   const blocks = [

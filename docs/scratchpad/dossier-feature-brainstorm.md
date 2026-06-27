@@ -1,5 +1,5 @@
 ---
-title: Dossier — feature & improvement brainstorm
+title: Dossier, feature & improvement brainstorm
 slug: dossier-feature-brainstorm
 status: review
 updated: 2026-06-26
@@ -8,7 +8,7 @@ updated: 2026-06-26
 
 A focused set of opportunities across ergonomics, capabilities, the agent loop, distribution, and long-term direction. Expand any item for detail, tick the ones worth pursuing, leave notes, then export your decisions.
 
-> **Meta.** This brainstorm is itself a Dossier review board — the exact surface several of the ideas below would deepen.
+> **Meta.** This brainstorm is itself a Dossier review board, the exact surface several of the ideas below would deepen.
 
 ## Minor features & improvements
 
@@ -18,7 +18,7 @@ A focused set of opportunities across ergonomics, capabilities, the agent loop, 
 
 **How it works:** a tiny static server watches the `.dossier.json`, rebuilds on change, and pushes a reload over an injected dev socket (dev-only; never in the artifact).
 
-**Experience:** edit JSON, see the page update instantly — no manual rebuild/refresh loop.
+**Experience:** edit JSON, see the page update instantly, no manual rebuild/refresh loop.
 
 **Why:** tightens the authoring and agent iteration loop, the single biggest day-to-day friction today.
 
@@ -54,7 +54,7 @@ A real `@page` print path: page breaks, headers/footers, print-optimized layout.
 
 **How it works:** a print media block in the inlined CSS controlling breaks, hiding chrome, and tuning type.
 
-**Experience:** Cmd-P produces a clean PDF — no garbled reader UI.
+**Experience:** Cmd-P produces a clean PDF, no garbled reader UI.
 
 **Why:** PDF is still the lingua franca for sharing plans and reports outside the browser.
 
@@ -68,7 +68,7 @@ Images with caption and optional lightbox, inlined as data-URIs to stay self-con
 
 **Experience:** screenshots, mockups, and diagrams-as-images live in the document and travel with the single file.
 
-**Why:** closes a real capability gap — today there is no first-class image support.
+**Why:** closes a real capability gap, today there is no first-class image support.
 
 - **Unlocks:** Visual reports, design reviews
 
@@ -92,7 +92,7 @@ One-click "copy as Markdown" per section and a whole-document "copy agent digest
 
 **Experience:** start from a real ADR/postmortem skeleton instead of a blank doc.
 
-**Why:** discoverability and onboarding — shows the range of what Dossier is for.
+**Why:** discoverability and onboarding, shows the range of what Dossier is for.
 
 - **Unlocks:** Template library (J-templates)
 
@@ -122,7 +122,7 @@ Numbered footnotes and a references registry with hover previews and back-links.
 
 ### Math rendering (KaTeX, build-time)
 
-Render LaTeX math to static markup at build time — zero client JS.
+Render LaTeX math to static markup at build time, zero client JS.
 
 **How it works:** detect `$...$`/`$$...$$` (or a `math` block) and render with KaTeX during build.
 
@@ -165,7 +165,7 @@ Expose create/render/read-decisions as MCP tools so any agent can drive Dossier,
 
 **How it works:** an MCP server wrapping the generator: `create_dossier`, `render`, `read_decisions`, `apply_decisions`. The exported decisions JSON becomes a versioned contract.
 
-**Experience:** any MCP-capable agent (not just the Claude Code skill) plans, renders, reads your selections, and acts — programmatically.
+**Experience:** any MCP-capable agent (not just the Claude Code skill) plans, renders, reads your selections, and acts, programmatically.
 
 **Why:** doubles down on the agent-first thesis; turns Dossier from a generator into a human-and-agent decision protocol.
 
@@ -193,7 +193,7 @@ Scan a folder of dossiers into a master index, resolving `[[links]]` into a navi
 
 **Experience:** one command turns your dossiers into a shareable mini-site.
 
-**Why:** distribution — get documents in front of teams without attaching files.
+**Why:** distribution, get documents in front of teams without attaching files.
 
 - **Unlocks:** Public/internal knowledge sites; analytics
 - **Depends on:** Catalog (J1)
@@ -228,7 +228,7 @@ Register custom block types + renderers for both the Node and React paths.
 
 Charts (bar/line/area) rendered to static SVG at build time via an SSR chart lib.
 
-**How it works:** a `chart` block with data + spec, rendered to inline SVG (visx/Nivo SSR) — no client JS.
+**How it works:** a `chart` block with data + spec, rendered to inline SVG (visx/Nivo SSR), no client JS.
 
 **Experience:** metrics-heavy plans, postmortems, and reports show real charts inline.
 
@@ -245,7 +245,7 @@ Compute a block-level diff between two versions and render a changelog/diff view
 
 **Experience:** see exactly what changed between revisions of a plan or spec.
 
-**Why:** documents become tracked artifacts, not one-shot dumps — key for living plans.
+**Why:** documents become tracked artifacts, not one-shot dumps, key for living plans.
 
 - **Unlocks:** Review-of-changes workflows
 - **Depends on:** Stable ids (have)
@@ -258,7 +258,7 @@ Structured citations, source provenance, per-claim confidence, and a generation 
 
 **Experience:** readers see what's grounded vs asserted; agent-authored content becomes auditable.
 
-**Why:** trust is the bottleneck for acting on AI-written documents — this directly addresses it.
+**Why:** trust is the bottleneck for acting on AI-written documents, this directly addresses it.
 
 - **Unlocks:** Verified research; compliance use
 - **Depends on:** Footnotes/citations (M9)
@@ -301,4 +301,4 @@ If you only chase a few, chase these.
 > **Quick wins (low effort, noticeable).** Copy-for-LLM controls (M6), kind-specific starters (M7), $schema editor autocomplete (M8), accessibility + shortcuts polish (M11), and authoring lint (M3). Each is a day or less and immediately felt.
 
 
-> **Next.** Tick the items worth pursuing, add notes on any you want to discuss, and export the decisions — then we turn the selected set into a build plan.
+> **Next.** Tick the items worth pursuing, add notes on any you want to discuss, and export the decisions, then we turn the selected set into a build plan.

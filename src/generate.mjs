@@ -354,10 +354,10 @@ function blockMd(b) {
     lines.push((b.stats || []).map((s) => `**${s.value}** ${s.label}`).join(" · "));
   } else if (t === "flow") {
     if (b.title) lines.push(`### ${b.title}`, "");
-    (b.steps || []).forEach((s, i) => lines.push(`${i + 1}. **${s.title}** — ${s.body}`));
+    (b.steps || []).forEach((s, i) => lines.push(`${i + 1}. **${s.title}**, ${s.body}`));
   } else if (t === "timeline") {
     if (b.title) lines.push(`### ${b.title}`, "");
-    (b.phases || []).forEach((p) => lines.push(`- **${p.label}** ${p.status ? `(${p.status})` : ""} — ${p.body}`));
+    (b.phases || []).forEach((p) => lines.push(`- **${p.label}** ${p.status ? `(${p.status})` : ""}, ${p.body}`));
   } else if (t === "table" || t === "references" || t === "decision-matrix" || t === "risk-register") {
     let cols, rows;
     if (t === "table") { cols = b.columns; rows = b.rows; }
@@ -569,7 +569,7 @@ async function enrich(model, baseDir) {
         }
       }
     } catch {
-      /* highlighting unavailable — fall back to plain code */
+      /* highlighting unavailable, fall back to plain code */
     }
   }
 
@@ -585,7 +585,7 @@ async function enrich(model, baseDir) {
         }
       }
     } catch {
-      /* graphviz unavailable — fall back to source */
+      /* graphviz unavailable, fall back to source */
     }
   }
 
@@ -604,7 +604,7 @@ async function enrich(model, baseDir) {
         const mime = MIME[extname(file).toLowerCase()] || "application/octet-stream";
         b._src = `data:${mime};base64,${readFileSync(file).toString("base64")}`;
       } catch {
-        b._src = src; // unreadable — leave the path
+        b._src = src; // unreadable, leave the path
       }
     }
   }
@@ -620,7 +620,7 @@ async function enrich(model, baseDir) {
         }
       }
     } catch {
-      /* katex unavailable — fall back to source */
+      /* katex unavailable, fall back to source */
     }
   }
 }
@@ -641,7 +641,7 @@ export async function generate(model, opts = {}) {
   return { html: renderShell(model, { body, toc, md, digest }), md, digest };
 }
 
-// Shared HTML shell — used by the JS generator and the React SSR port so both
+// Shared HTML shell, used by the JS generator and the React SSR port so both
 // produce byte-identical scaffolding (single source of truth).
 export function renderShell(model, { body, toc, md, digest, generator = "dossier", footer = "Generated with Dossier" }) {
   const meta = model.meta || {};

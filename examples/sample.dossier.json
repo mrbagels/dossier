@@ -3,7 +3,7 @@
   "schema": "dossier/v1",
   "kind": "dossier",
   "meta": {
-    "title": "Dossier — System Overview",
+    "title": "Dossier, System Overview",
     "slug": "dossier-overview",
     "crumbs": ["Dossier", "Overview"],
     "status": "review",
@@ -43,7 +43,7 @@
       "type": "summary-cards",
       "cards": [
         { "title": "For humans", "body": "A polished, themed reading surface with TOC, search, command palette, and one-click export.", "tone": "accent" },
-        { "title": "For agents", "body": "The full structured model lives in `#dossier-model` — read one block, no DOM scraping.", "tone": "highlight" },
+        { "title": "For agents", "body": "The full structured model lives in `#dossier-model`, read one block, no DOM scraping.", "tone": "highlight" },
         { "title": "For your wiki", "body": "Self-contained files embed via iframe and link with `[[slug]]` cross-references.", "tone": "success" }
       ]
     },
@@ -169,7 +169,7 @@
     },
     {
       "type": "review-board",
-      "title": "Optional features — triage and decide",
+      "title": "Optional features, triage and decide",
       "candidates": [
         {
           "id": "command-palette",

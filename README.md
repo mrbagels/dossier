@@ -2,69 +2,64 @@
 
 # Dossier
 
-### Stop asking your AI for a Markdown file. Have it build you a Dossier — a self-contained, interactive HTML document for planning, documenting, and deciding *with* AI.
+### Stop asking your AI for a Markdown file. Have it build you a Dossier: a self-contained, interactive HTML document for planning, documenting, and deciding *with* AI.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
 [![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#how-it-works)
 [![Output](https://img.shields.io/badge/output-single%20.html%20file-7048e8.svg)](#how-it-works)
-[![Version](https://img.shields.io/badge/version-0.2.2-7048e8.svg)](#)
+[![Version](https://img.shields.io/badge/version-0.3.0-7048e8.svg)](#)
 [![Live demo](https://img.shields.io/badge/live%20demo-%E2%86%97-7048e8.svg)](https://mrbagels.github.io/dossier/)
 
 <a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="840"></a>
 
-**[See the live demo &rarr;](https://mrbagels.github.io/dossier/)** — every block type, in one self-contained file.
+**[See the live demo &rarr;](https://mrbagels.github.io/dossier/)** &nbsp;Every block type, in one self-contained file.
 
 </div>
 
-When you ask an AI assistant to "write up a plan," "summarize this," or "lay out the
-options," it dumps a wall of Markdown. **Dossier replaces that.** Your agent authors a
-Dossier instead and hands you **one self-contained, interactive HTML page** — something you
-can actually navigate, search, mark up, and hand *back* to the AI to act on.
+When you ask an AI to "write up a plan" or "lay out the options," it dumps a wall of
+Markdown. Dossier replaces that. Your agent builds you **one self-contained, interactive
+HTML page** you can navigate, search, mark up, and hand back to the AI to act on.
 
 ```
   "write me a markdown file"   →   a flat .md you skim once and lose
   "make me a dossier"          →   one interactive .html: navigable, markable, agent-readable
 ```
 
-It's built for the back-and-forth that real planning needs:
+Built for the back and forth that real planning needs:
 
-- **Your agent writes it.** It lays out plans, specs, research, and options — with as much
-  depth as the work needs — as a structured document, not a text dump. You don't hand-write anything.
-- **You work in it.** Navigate it, search it, expand the details that matter, **tick the
-  options you want, and leave notes** — right in the page.
-- **You hand it back.** Export your decisions as JSON; the agent implements them. The whole
-  document carries its own structured data inside it, so the AI reads it back perfectly — no
-  scraping, no lossy copy-paste.
+- **Your agent writes it.** Plans, specs, research, and options, as a structured document
+  instead of a text dump. You hand-write nothing.
+- **You work in it.** Navigate, search, expand the details that matter, tick the options you
+  want, leave notes, and edit text in place.
+- **You hand it back.** Export your decisions as JSON and the agent implements them. The
+  document carries its own structured data, so the AI reads it back exactly. No scraping, no
+  lossy copy-paste.
 
-One file. No server, no external assets, works offline. Open it, email it, or embed it in
-your wiki.
+One file. No server, no external assets, works offline. Open it, email it, or embed it.
 
 ## Get started
 
-The point of Dossier is to let your **agent** drive it. Install the CLI and the skill once:
+Let your **agent** drive it. Install the CLI and the skill once:
 
 ```bash
 npm install -g github:mrbagels/dossier                 # one line, any platform (Node 18+)
 ln -s "$(pwd)/dossier/skill" ~/.claude/skills/dossier  # if cloned; see "Use it from an agent"
 ```
 
-Then just ask your assistant:
+Then ask your assistant:
 
 > *"Make me a dossier planning the Q3 migration."*
 > *"Turn these five options into a review board I can triage."*
-> *"Write this up as a dossier instead of a markdown file."*
 
-It authors a `*.dossier.json` and runs `dossier build` — you get `my-doc.html` (+ `.md`).
-[More on the skill ↓](#use-it-from-an-agent)
+It writes a `*.dossier.json`, runs `dossier build`, and you get `my-doc.html` (+ `.md`).
 
-**Driving it yourself?** Same tool, by hand:
+Driving it yourself:
 
 ```bash
-dossier init my-doc                  # creates my-doc.dossier.json from a starter
-#    ...edit my-doc.dossier.json...
-dossier build my-doc.dossier.json    # writes my-doc.html  (+ my-doc.md)
-open my-doc.html                     # macOS  (Linux: xdg-open · Windows: start)
+dossier init my-doc                # scaffold my-doc.dossier.json from a starter
+dossier build my-doc.dossier.json  # writes my-doc.html (+ .md)
+open my-doc.html                   # Linux: xdg-open, Windows: start
 ```
 
 <div align="center">
@@ -73,9 +68,9 @@ open my-doc.html                     # macOS  (Linux: xdg-open · Windows: start
 
 **Documentation**
 
-[How it works](#how-it-works) · [Use it from an agent](#use-it-from-an-agent) ·
+[How it works](#how-it-works) · [From an agent](#use-it-from-an-agent) ·
 [Authoring](#authoring) · [Block types](#block-types) · [Review / triage](#review--triage) ·
-[React](#react) · [Embedding](#embedding) · [Development](#development) · [Contributing](#contributing)
+[React](#react) · [Plugins & CLI](#plugins--cli) · [Embedding](#embedding) · [Development](#development)
 
 ---
 
@@ -83,10 +78,9 @@ open my-doc.html                     # macOS  (Linux: xdg-open · Windows: start
 
 ## How it works
 
-A Dossier is generated from one JSON document model (which the agent writes). The page you
-open is a **projection of that model** — the full model is embedded back into the file as a
-`#dossier-model` data island, which is exactly what an agent reads. Everything else is
-inlined at build time, so the result needs nothing at view time:
+The page you open is a projection of one JSON model (which the agent writes). The full model
+is embedded back into the file as a `#dossier-model` island, which is what an agent reads.
+Everything else is inlined at build time, so the result needs nothing at view time:
 
 ```
 my-doc.dossier.json ──► enrich ──► render ──► self-contained .html  (+ .md, + agent digest)
@@ -97,22 +91,23 @@ my-doc.dossier.json ──► enrich ──► render ──► self-contained .
 ```
 
 - **Zero runtime dependencies in the output.** Shiki (highlighting), Graphviz-WASM
-  (diagrams), and React (the optional port) run only at build time — none ship to the viewer.
-- **One design system.** Tokens, the small inlined client runtime, and the HTML shell are
-  shared by both renderers (`renderShell()` is the single source of truth).
-- **It round-trips.** The agent edits the JSON and rebuilds; the HTML stays in sync, and the
-  island always deserializes back to the exact model — so the human-and-agent loop is lossless.
+  (diagrams), KaTeX (math), and React (the optional port) run at build time only. None ship
+  to the viewer.
+- **One design system.** Tokens, the inlined client runtime, and the HTML shell are shared by
+  both renderers (`renderShell()`).
+- **It round-trips.** Edit the JSON, rebuild, and the island always deserializes back to the
+  exact model. The human-and-agent loop stays lossless.
 
-Every page comes with a sticky table of contents + scroll-spy, in-page search, a command
+Each page includes a sticky table of contents with scroll-spy, in-page search, a command
 palette, light/dark theme, reading progress, per-block copy, heading anchors, collapsible
-sections, glossary tooltips, and one-click export to Markdown / JSON / agent-digest — all
-inlined, all offline, fully responsive down to mobile.
+sections, glossary tooltips, in-place text editing, and one-click export to Markdown, JSON,
+or agent digest. All inlined, all offline, responsive to mobile.
 
 ## Use it from an agent
 
-Dossier ships a [Claude Code](https://claude.com/claude-code) skill in [`skill/`](skill/) so
-an agent reaches for it automatically whenever you ask for a plan, write-up, report, or
-"options to decide on." Install it by linking it into your skills directory:
+Dossier ships a [Claude Code](https://claude.com/claude-code) skill in [`skill/`](skill/), so
+an agent reaches for it whenever you ask for a plan, write-up, report, or options to decide
+on. Link it into your skills directory:
 
 ```bash
 ln -s "$(pwd)/skill" ~/.claude/skills/dossier
@@ -120,14 +115,14 @@ ln -s "$(pwd)/skill" ~/.claude/skills/dossier
 
 It bundles a [block cheatsheet](skill/references/blocks.md) and a
 [starter template](skill/references/starter.dossier.json), and tells the agent to author a
-`*.dossier.json` and run `dossier build`. From then on, "make me a dossier…" is all you need.
+`*.dossier.json` and run `dossier build`. After that, "make me a dossier" is all you need.
 
 ### Any agent, via MCP
 
 `dossier mcp` runs a [Model Context Protocol](https://modelcontextprotocol.io) server over
-stdio, so **any** MCP-capable agent can drive Dossier — including the full human-and-agent
-loop. Tools: `dossier_render`, `dossier_validate`, `dossier_read_decisions` (read back the
-options a human selected on a review board), `dossier_get_schema`, `dossier_get_starter`.
+stdio, so any MCP-capable agent can drive Dossier, including the full human-and-agent loop.
+Tools: `dossier_render`, `dossier_validate`, `dossier_read_decisions` (read back the options a
+human selected on a review board), `dossier_get_schema`, `dossier_get_starter`.
 
 ```jsonc
 // e.g. an MCP client config
@@ -136,8 +131,8 @@ options a human selected on a review board), `dossier_get_schema`, `dossier_get_
 
 ## Authoring
 
-You normally let the agent write this, but the model is simple and worth knowing. A dossier
-is `{ dossierVersion, kind, meta, blocks[] }`:
+You normally let the agent write this, but the model is small. A dossier is
+`{ dossierVersion, kind, meta, blocks[] }`:
 
 ```json
 {
@@ -153,68 +148,68 @@ is `{ dossierVersion, kind, meta, blocks[] }`:
 }
 ```
 
-- **`kind`** — `reader | review-board | dossier | adr | runbook | research | comparison`; selects sensible defaults.
-- **`meta`** — `title` (required), `slug`, `eyebrow`, `lede`, `crumbs`, `status`, `owner`,
-  `updated`, `version`, `tags`, `baseUrl` (for hosted cross-links), `theme` (token
-  overrides), `lifecycle` (status banner), `changelog`.
-- **`blocks`** — ordered; `section`, `two-col`, and `tabs` nest other blocks. Text fields
-  accept inline markdown: `**bold**`, `` `code` ``, `[label](url)`, `[[slug]]`
-  cross-document links, and `[[Term]]` glossary tooltips.
+- **`kind`**: `reader | review-board | dossier | adr | runbook | research | comparison`. Selects defaults.
+- **`meta`**: `title` (required), `slug`, `eyebrow`, `lede`, `crumbs`, `status`, `owner`,
+  `updated`, `version`, `tags`, `baseUrl` (for hosted cross-links), `theme` (token overrides),
+  `lifecycle`, `changelog`.
+- **`blocks`**: ordered. `section`, `two-col`, and `tabs` nest other blocks. Text fields take
+  inline markdown: `**bold**`, `` `code` ``, `[label](url)`, `[[slug]]` cross-document links,
+  and `[[Term]]` glossary tooltips.
 
 Full contract: [`schema/dossier.schema.json`](schema/dossier.schema.json).
 
 ## Block types
 
-26 built-in (plus your own — see [plugins](#plugins--cli)) — each documented with a
-copy-paste JSON example in [`skill/references/blocks.md`](skill/references/blocks.md):
+26 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
+example in [`skill/references/blocks.md`](skill/references/blocks.md):
 
 | Group | Blocks |
 |---|---|
 | **Structure** | `hero`, `section`, `two-col`, `tabs`, `prose` |
 | **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
-| **Reference** | `table`, `code` (Shiki), `diagram` (DOT→SVG), `references`, `faq`, `glossary` |
-| **Media & data** | `figure` (inlined), `math` (KaTeX→MathML), `chart` (bar/line/area SVG), `footnotes` |
+| **Reference** | `table`, `code` (Shiki), `diagram` (DOT to SVG), `references`, `faq`, `glossary` |
+| **Media & data** | `figure` (inlined), `math` (KaTeX to MathML), `chart` (bar/line/area SVG), `footnotes` |
 | **Decisions & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `receipt` |
 
 ## Review / triage
 
-This is where deciding *with* AI happens. Use one `review-board` block for "here are the
-options — let's decide." Each candidate is an **expandable row**: collapsed it's scannable
-(title, summary, chips, status, a select checkbox); expanded it reveals the full technical
-reference the agent loaded (`body` markdown and/or nested `blocks`) plus a notes field.
+Deciding *with* AI happens here. Use one `review-board` block for "here are the options,
+let's decide." Each candidate is an expandable row: collapsed it's scannable (title, summary,
+chips, status, a checkbox); expanded it shows the full reference the agent loaded (`body`
+markdown and/or nested `blocks`) plus a notes field.
 
-You filter, search, **tick what to do, and write notes** — then **export a decisions JSON**
-(and can re-import to resume). The agent reads the rich reference from the model plus your
-decisions and implements them. That's the human-to-agent loop, in one file.
+You filter, search, tick what to do, and write notes, then export a decisions JSON (re-import
+to resume). The agent reads the reference plus your decisions and implements them. The human
+to agent loop, in one file.
 
 ## React
 
-Dossier also ships as typed React/TSX components ([`react/`](react/), `@mrbagels/dossier-react`), for
-teams that want to render the same design from a React/Next app.
+Dossier also ships as typed React/TSX components ([`react/`](react/),
+`@mrbagels/dossier-react`), for teams that render the same design from a React or Next app.
 
 ```ts
 import { renderDossier } from "@mrbagels/dossier-react";
-const { html, md } = await renderDossier(model);   // -> the same self-contained file
+const { html, md } = await renderDossier(model);   // the same self-contained file
 ```
 
 ```tsx
-// or render blocks live inside an app (optional Motion entrance animation when hydrated)
+// or render blocks live inside an app (optional Motion entrance when hydrated)
 import { DossierDocument } from "@mrbagels/dossier-react";
 <DossierDocument model={model} animate />
 ```
 
-The `<Block>` dispatcher covers all 21 block types and reuses the core's CSS, runtime, and
+The `<Block>` dispatcher covers all 26 block types and reuses the core's CSS, runtime, and
 enrichment, so SSR output matches the Node generator. See [`react/README.md`](react/README.md).
 
 ## Plugins & CLI
 
-Add custom block types without forking — a plugin registers a renderer:
+Add custom block types without forking. A plugin registers a renderer:
 
 ```bash
 dossier build my.dossier.json --plugin ./my-plugin.mjs
 ```
 ```js
-// my-plugin.mjs — default-export receives the authoring API
+// my-plugin.mjs; the default export receives the authoring API
 export default function ({ registerBlock, esc }) {
   registerBlock("badge-row", (b) =>
     `<section class="ds-block" data-block="badge-row"><div class="ds-chips">` +
@@ -223,19 +218,20 @@ export default function ({ registerBlock, esc }) {
 }
 ```
 
-The same plugin can also `registerComponent(type, Component)` for the React port, so a
-single plugin reaches **full parity** across both renderers (and the Node renderer is used
-as a fallback otherwise). See [`examples/plugins/badge-row.plugin.mjs`](examples/plugins/badge-row.plugin.mjs).
+The same plugin can also `registerComponent(type, Component)` for the React port, so one
+plugin reaches full parity across both renderers (the Node renderer is the fallback
+otherwise). See [`examples/plugins/badge-row.plugin.mjs`](examples/plugins/badge-row.plugin.mjs).
 
 The full CLI:
 
 | Command | What it does |
 |---|---|
 | `dossier init [name] --kind <kind>` | scaffold from a starter (`dossier`, `adr`, `runbook`, `postmortem`, `review-board`) |
-| `dossier build <file> [--watch] [--plugin a,b]` | validate + render to `<slug>.html` (+ `.md`) |
-| `dossier serve <file> [--open] [--port]` | build + live-reload dev server |
+| `dossier build <file> [--watch] [--plugin a,b]` | validate and render to `<slug>.html` (+ `.md`) |
+| `dossier serve <file> [--open] [--port]` | build and live-reload dev server |
 | `dossier validate <file>` | check a model without rendering |
 | `dossier diff <old> <new>` | structural diff between two versions |
+| `dossier catalog <dir>` | index a folder of dossiers, with a link graph |
 | `dossier mcp` | run the MCP server (stdio) |
 
 ## Embedding
@@ -246,19 +242,19 @@ Every page is a complete, style-isolated HTML document, so it embeds anywhere:
 <iframe src="my-doc.html" style="width:100%;height:80vh;border:0"></iframe>
 ```
 
-Cross-link dossiers with `[[other-slug]]` — a relative file link when they sit together, or
-an absolute URL when you set `meta.baseUrl` for a hosted site. Dossier is a *companion* to
-your docs site, not a replacement for it.
+Cross-link dossiers with `[[other-slug]]`: a relative file link when they sit together, or an
+absolute URL when you set `meta.baseUrl` for a hosted site. Dossier is a *companion* to your
+docs site, not a replacement.
 
 ## Development
 
 ```
 src/            zero-dependency Node generator (generate.mjs, theme, runtime, renderers)
 react/          typed React/TSX port (SSR + live components)
-schema/         dossier.schema.json — the document contract
+schema/         dossier.schema.json, the document contract
 skill/          Claude Code skill (SKILL.md + references + starter)
-examples/       sample.dossier.json
-docs/DESIGN.md  the design system + decisions
+examples/       sample.dossier.json, showcase.dossier.json
+docs/DESIGN.md  the design system and decisions
 ```
 
 ```bash
@@ -279,12 +275,12 @@ Node.js >= 18 to build. The generated pages need only a browser.
 Issues and PRs welcome. Keep the output self-contained (no view-time network) and keep one
 accent in the design.
 
-**When you add a block type, update all of:** the Node renderer (`src/generate.mjs`) + the
-React component (`react/src/blocks.tsx`), the schema (`schema/dossier.schema.json`), the
-validator (`src/validate.mjs`), the cheatsheet (`skill/references/blocks.md`), **the live
-demo (`examples/showcase.dossier.json`)**, and a test. CI and the
+When you add a block type, update all of: the Node renderer (`src/generate.mjs`), the React
+component (`react/src/blocks.tsx`), the schema (`schema/dossier.schema.json`), the validator
+(`src/validate.mjs`), the cheatsheet (`skill/references/blocks.md`), the live demo
+(`examples/showcase.dossier.json`), and a test. CI and the
 [Pages demo](https://mrbagels.github.io/dossier/) redeploy automatically on push to `next`.
 
 ## License
 
-[MIT](LICENSE) — do whatever you want with it.
+[MIT](LICENSE). Do whatever you want with it.

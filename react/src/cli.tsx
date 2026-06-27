@@ -22,8 +22,8 @@ if (!path) {
   process.exit(1);
 }
 
-// Load plugins. They receive both registries — registerBlock (Node/static string renderer)
-// and registerComponent (native React) — so a single plugin reaches full parity.
+// Load plugins. They receive both registries, registerBlock (Node/static string renderer)
+// and registerComponent (native React), so a single plugin reaches full parity.
 for (const p of plugins.map((s) => s.trim()).filter(Boolean)) {
   const mod = await import(pathToFileURL(resolve(p)).href);
   if (typeof mod.default === "function") mod.default({ registerBlock, registerComponent, esc, inlineMd, slugify, React });

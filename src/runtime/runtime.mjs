@@ -117,7 +117,7 @@ export const RUNTIME = `
   var __editBtn=$("[data-edit-toggle]"),__editFields=$$("[data-edit]");
   if(__editBtn&&__editFields.length){
     __editFields.forEach(function(el){el.addEventListener("input",function(){if(!__editing)return;var p=el.getAttribute("data-edit"),i=p.indexOf(":"),b=__findBlock(model.blocks,p.slice(0,i));if(b)b[p.slice(i+1)]=el.innerText.trim();});});
-    __editBtn.addEventListener("click",function(){__editing=!__editing;document.documentElement.classList.toggle("ds-editing",__editing);__editFields.forEach(function(el){el.contentEditable=__editing?"true":"false";});__editBtn.textContent=__editing?"Done":"Edit";if(__editing&&!__hinted){__hinted=true;toast("Edit text in place — then Export \\u25b8 Download JSON to save");}});
+    __editBtn.addEventListener("click",function(){__editing=!__editing;document.documentElement.classList.toggle("ds-editing",__editing);__editFields.forEach(function(el){el.contentEditable=__editing?"true":"false";});__editBtn.textContent=__editing?"Done":"Edit";if(__editing&&!__hinted){__hinted=true;toast("Edit text in place, then Export \\u25b8 Download JSON to save");}});
   }
 })();
 `;

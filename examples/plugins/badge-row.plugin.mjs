@@ -1,4 +1,4 @@
-// Example Dossier plugin — a custom `badge-row` block, with FULL PARITY across both
+// Example Dossier plugin, a custom `badge-row` block, with FULL PARITY across both
 // renderers. A plugin's default export receives the authoring API and registers:
 //   - registerBlock(type, fn)        → Node generator (and the static artifact)
 //   - registerComponent(type, Comp)  → React port (native component; present in the React CLI)
