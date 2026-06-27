@@ -17,9 +17,21 @@ export function setCtx(ctx: any) {
 const md = (t?: string) => ({ __html: inlineMd(t ?? "", CTX) });
 const raw = (h?: string) => ({ __html: h ?? "" });
 
+const CopyIcon = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+);
+const ChevronIcon = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
 const Wrap: React.FC<{ type: string; id?: string; children: React.ReactNode }> = ({ type, id, children }) => (
   <section className="ds-block" data-block={type} data-id={id}>
-    <button className="ds-copy" type="button" data-copy aria-label="Copy block">Copy</button>
+    <button className="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy">{CopyIcon}</button>
     {children}
   </section>
 );
@@ -54,7 +66,7 @@ const Section: React.FC<{ b: B }> = ({ b }) => (
         <h2 id={b.id}>{b.title}</h2>
         {b.subtitle && <p className="ds-muted" dangerouslySetInnerHTML={md(b.subtitle)} />}
       </div>
-      <button className="ds-toggle" type="button" data-toggle aria-label="Collapse section">–</button>
+      <button className="ds-toggle" type="button" data-toggle aria-label="Toggle section">{ChevronIcon}</button>
     </div>
     <div className="ds-section-body">
       {(b.blocks || []).map((c: B, i: number) => <Block b={c} key={c.id || i} />)}

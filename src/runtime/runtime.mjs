@@ -36,7 +36,7 @@ export const RUNTIME = `
 
   $$("[data-copy]").forEach(function(btn){btn.addEventListener("click",function(e){e.stopPropagation();var blk=btn.closest(".ds-block");var txt=blk?blk.innerText.replace(/^Copy\\s*/,""):"";copy(txt,"Block copied");});});
 
-  $$("[data-toggle]").forEach(function(btn){btn.addEventListener("click",function(){var sec=btn.closest(".ds-section");var c=sec.getAttribute("data-collapsed")==="1";sec.setAttribute("data-collapsed",c?"0":"1");btn.textContent=c?"–":"+";});});
+  $$("[data-toggle]").forEach(function(btn){btn.addEventListener("click",function(){var sec=btn.closest(".ds-section");var c=sec.getAttribute("data-collapsed")==="1";sec.setAttribute("data-collapsed",c?"0":"1");});});
 
   $$(".ds-tabs").forEach(function(w){var tabs=$$(".ds-tab",w),panes=$$(".ds-pane",w);tabs.forEach(function(tb){tb.addEventListener("click",function(){var i=tb.getAttribute("data-tab");tabs.forEach(function(x){x.classList.toggle("active",x===tb)});panes.forEach(function(p){p.classList.toggle("active",p.getAttribute("data-pane")===i)});});});});
 

@@ -38,9 +38,12 @@ function inlineMd(s, ctx) {
   return t;
 }
 
+const COPY_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+const CHEVRON_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>`;
+
 const wrap = (type, id, inner, extra = "") =>
   `<section class="ds-block" data-block="${esc(type)}" data-id="${esc(id)}"${extra}>` +
-  `<button class="ds-copy" type="button" data-copy aria-label="Copy block">Copy</button>${inner}</section>`;
+  `<button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy">${COPY_ICON}</button>${inner}</section>`;
 
 // ---- block renderers -------------------------------------------------------
 
@@ -72,7 +75,7 @@ const renderers = {
       `</div>`;
     const inner =
       `<div class="ds-section-head">${titles}` +
-      `<button class="ds-toggle" type="button" data-toggle aria-label="Collapse section">–</button></div>` +
+      `<button class="ds-toggle" type="button" data-toggle aria-label="Toggle section">${CHEVRON_ICON}</button></div>` +
       `<div class="ds-section-body">${(b.blocks || []).map((c) => renderBlock(c, ctx)).join("")}</div>`;
     const cls = b.framed === false ? "ds-section unframed" : "ds-section";
     return `<section class="${cls} ds-block" data-block="section" data-id="${esc(b.id)}"${b.collapsed ? ' data-collapsed="1"' : ""}>${inner}</section>`;
