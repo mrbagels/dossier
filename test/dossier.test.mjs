@@ -63,6 +63,16 @@ test("renderer sanitizes hostile input (href schemes, theme vars, ragged rows)",
   assert.ok(html.includes("<td>fine</td>"), "valid row renders; non-array rows do not crash");
 });
 
+test("author-supplied _svg/_math fields are dropped (no raw HTML injection)", async () => {
+  const { html } = await generate({
+    dossierVersion: "1.0",
+    meta: { title: "X" },
+    blocks: [{ type: "diagram", format: "mermaid", spec: "graph", _svg: "<script>alert(1)</script>" }, { type: "math", tex: "x", _math: "<img src=x onerror=alert(1)>" }],
+  });
+  assert.ok(!/<script>alert\(1\)<\/script>/.test(html), "smuggled _svg is not injected");
+  assert.ok(!/onerror=alert/.test(html), "smuggled _math is not injected");
+});
+
 test("markdown frontmatter survives titles with colons and newlines", async () => {
   const { md } = await generate({ dossierVersion: "1.0", meta: { title: "a: b\n---\nx: y" }, blocks: [] });
   assert.ok(md.includes('title: "a: b\\n---\\nx: y"'), "title is a single quoted YAML scalar (newlines/colons escaped)");
