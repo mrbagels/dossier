@@ -1,0 +1,130 @@
+{
+  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "dossierVersion": "1.0",
+  "kind": "dossier",
+  "meta": {
+    "title": "Dossier — capabilities showcase",
+    "slug": "showcase",
+    "eyebrow": "Live demo",
+    "crumbs": ["Dossier", "Showcase"],
+    "status": "durable",
+    "owner": "Kyle",
+    "updated": "2026-06-26",
+    "tags": ["demo", "blocks"],
+    "baseUrl": "https://mrbagels.github.io/dossier",
+    "lifecycle": { "stage": "durable", "note": "Every block type, in one self-contained file." }
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "eyebrow": "Live demo",
+      "title": "One JSON file becomes this",
+      "lede": "Everything below — navigation, search, theme, code, diagrams, charts, math, and an interactive review board — lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.",
+      "pills": ["26 block types", "Self-contained", "Agent-readable", "Light + dark"],
+      "sideCards": [
+        { "label": "Source", "value": "one .dossier.json" },
+        { "label": "Output", "value": "one .html" },
+        { "label": "Runtime deps", "value": "0" }
+      ]
+    },
+    {
+      "type": "stat-strip",
+      "stats": [
+        { "value": "26", "label": "Block types" },
+        { "value": "0", "label": "Runtime deps" },
+        { "value": "2", "label": "Renderers (Node + React)" },
+        { "value": "100%", "label": "Self-contained" }
+      ]
+    },
+    {
+      "type": "summary-cards",
+      "cards": [
+        { "title": "For humans", "body": "A navigable, searchable, themeable page — not a wall of Markdown.", "tone": "accent" },
+        { "title": "For agents", "body": "The full model is embedded as `#dossier-model`; read one block, no scraping.", "tone": "highlight" },
+        { "title": "For your wiki", "body": "One portable file — link it, email it, or `<iframe>` it anywhere.", "tone": "success" }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Structure & prose",
+      "subtitle": "Sections nest other blocks; text fields take inline markdown.",
+      "blocks": [
+        { "type": "prose", "markdown": "This is a **prose** block with `inline code`, a [link](https://github.com/mrbagels/dossier), and a footnote.[^island]\n\nA second paragraph to show vertical rhythm." },
+        {
+          "type": "flow",
+          "title": "How it's built",
+          "steps": [
+            { "title": "Author", "body": "An agent writes a `*.dossier.json`." },
+            { "title": "Validate", "body": "`dossier build` validates and lints." },
+            { "title": "Render", "body": "JSON becomes HTML + the data island + Markdown." },
+            { "title": "Use", "body": "Read, decide, export, embed." }
+          ]
+        },
+        { "type": "timeline", "title": "Roadmap", "phases": [ { "label": "0.1", "body": "Generator, catalog, features.", "status": "done" }, { "label": "0.2", "body": "MCP, plugins, new blocks.", "status": "done" }, { "label": "next", "body": "Hosting + in-browser editor.", "status": "planned" } ] },
+        {
+          "type": "two-col",
+          "left": [{ "type": "callout", "tone": "tip", "title": "Composable.", "body": "Sections, two-col, and tabs nest other blocks." }],
+          "right": [{ "type": "callout", "tone": "warn", "title": "Self-contained.", "body": "No external fonts, scripts, or images. Works offline." }]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Reference blocks",
+      "blocks": [
+        {
+          "type": "tabs",
+          "tabs": [
+            { "label": "Code", "blocks": [ { "type": "code", "lang": "ts", "filename": "render.ts", "code": "import { renderDossier } from \"@dossier/react\";\nconst { html, md } = await renderDossier(model); // one self-contained file" } ] },
+            { "label": "Shell", "blocks": [ { "type": "code", "lang": "bash", "code": "dossier init my-doc\ndossier build my-doc.dossier.json && open my-doc.html" } ] }
+          ]
+        },
+        { "type": "diagram", "title": "Pipeline", "format": "dot", "spec": "digraph { rankdir=LR; bgcolor=\"transparent\"; node [shape=box style=rounded fontname=\"Inter\" fontsize=12 color=\"#c81e4a\" fontcolor=\"#1a1822\"]; edge [color=\"#8b8698\"]; \"doc.json\" -> \"build\" -> \"doc.html\"; \"build\" -> \"doc.md\"; }" },
+        { "type": "table", "title": "Exports", "columns": ["Format", "Use"], "rows": [["HTML", "The page humans open"], ["Markdown", "Plain-text copy"], ["JSON / digest", "What agents read"]] },
+        { "type": "references", "items": [ { "label": "Repository", "url": "https://github.com/mrbagels/dossier", "signal": "Source + docs", "use": "Clone, star, contribute" } ] },
+        { "type": "faq", "title": "FAQ", "items": [ { "q": "Does it replace my docs site?", "a": "No — it's a companion: linkable, embeddable, exportable artifacts." } ] }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Media & data",
+      "blocks": [
+        { "type": "chart", "title": "Adoption (bar)", "chartType": "bar", "data": [ { "label": "Q1", "value": 12 }, { "label": "Q2", "value": 19 }, { "label": "Q3", "value": 27 }, { "label": "Q4", "value": 41 } ] },
+        { "type": "chart", "title": "Trend (area)", "chartType": "area", "data": [ { "label": "Jan", "value": 4 }, { "label": "Feb", "value": 9 }, { "label": "Mar", "value": 7 }, { "label": "Apr", "value": 15 } ] },
+        { "type": "math", "tex": "E = mc^2 \\quad\\text{and}\\quad \\int_0^\\infty e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}" },
+        { "type": "figure", "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='90'%3E%3Crect width='320' height='90' rx='10' fill='%23c81e4a'/%3E%3Ctext x='160' y='54' font-family='Inter,sans-serif' font-size='22' fill='white' text-anchor='middle'%3EFigure block%3C/text%3E%3C/svg%3E", "caption": "Images are inlined as data URIs at build time." }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Decisions & trust",
+      "blocks": [
+        { "type": "decision-matrix", "title": "Where it lives", "criteria": ["Cross-project", "Public later"], "options": [ { "name": "Standalone repo", "scores": ["Yes", "One-line flip"], "recommended": true }, { "name": "Inside a monorepo", "scores": ["No", "Hard"] } ] },
+        { "type": "risk-register", "title": "Risks", "risks": [ { "risk": "Scope creep", "likelihood": "medium", "impact": "medium", "mitigation": "Freeze the schema, then build." } ] },
+        { "type": "action-items", "title": "Try it", "items": [ { "title": "Install: npm i -g github:mrbagels/dossier", "status": "todo" }, { "title": "Run: dossier init demo && dossier build demo.dossier.json", "status": "todo" } ] },
+        { "type": "assumptions", "items": [ { "statement": "One file beats a folder of assets for sharing.", "kind": "assumption", "status": "verified" } ] },
+        { "type": "receipt", "title": "Provenance", "generatedBy": "Dossier", "model": "n/a", "date": "2026-06-26", "confidence": "high", "tools": ["shiki", "graphviz", "katex"], "notes": "Rendered entirely at build time; nothing loads at view time." }
+      ]
+    },
+    {
+      "type": "review-board",
+      "title": "Interactive review board — try it",
+      "candidates": [
+        { "id": "navigation", "title": "Navigation", "summary": "Sticky TOC + scroll-spy, search, and a command palette (Cmd/Ctrl-K).", "category": "Reader", "status": "shipped", "impact": "High", "effort": "—", "body": "Expand a row, tick the checkbox, leave a note, then **Export JSON** — that decisions packet is what an agent reads back.", "details": { "Shortcut": "Cmd/Ctrl-K" } },
+        { "id": "themeable", "title": "Themeable", "summary": "Light + dark, per-project token overrides, fully responsive to mobile.", "category": "Design", "status": "shipped", "impact": "High", "effort": "—", "body": "The whole design is a small token system; one accent, near-monochrome neutrals." }
+      ]
+    },
+    {
+      "type": "glossary",
+      "terms": [
+        { "term": "island", "definition": "The embedded `#dossier-model` JSON that is the source of truth for the page." }
+      ]
+    },
+    {
+      "type": "footnotes",
+      "items": [
+        { "id": "island", "text": "Reference a note inline with `[^id]`; it links here and back." }
+      ]
+    }
+  ]
+}
