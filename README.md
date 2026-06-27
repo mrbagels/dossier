@@ -238,17 +238,17 @@ The full CLI:
 ### Optional: Mermaid and PDF
 
 DOT diagrams, syntax highlighting, math, charts, and Word export work out of the box.
-Two features render through a headless browser and need Playwright, which is an optional
-dependency:
+Two features render through a headless browser: Mermaid diagrams (`format: "mermaid"`) and
+`dossier export --format pdf`. They use Playwright and the mermaid library, declared as
+**optional dependencies** and installed by default (Playwright fetches Chromium on install).
+To keep the install lean, skip them with `--omit=optional`; Mermaid then falls back to its
+source and PDF export tells you what to add. To install them later:
 
 ```bash
-npm i playwright && npx playwright install chromium
+npm i playwright mermaid && npx playwright install chromium
 ```
 
-With it, `diagram` blocks using `format: "mermaid"` render to inline SVG at build time,
-and `dossier export --format pdf` works. Without it, Mermaid diagrams fall back to their
-source and PDF export reports what to install. Word export (`--format docx`) embeds charts
-and diagrams as images and needs no browser.
+Word export (`--format docx`) embeds charts and diagrams as images and needs no browser.
 
 ## Embedding
 
