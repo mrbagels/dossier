@@ -47,6 +47,19 @@ test("plugins: a registered block validates and renders", async () => {
   assert.ok(/data-block="badge-test"/.test(html), "registered block renders");
 });
 
+test("catalog indexes a folder and finds cross-links", async () => {
+  const { buildCatalogModel } = await import("../src/catalog.mjs");
+  const { mkdtempSync, writeFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const d = mkdtempSync(join(tmpdir(), "dossier-cat-"));
+  writeFileSync(join(d, "a.dossier.json"), JSON.stringify({ meta: { title: "A", slug: "a" }, blocks: [{ type: "prose", markdown: "see [[b]]" }] }));
+  writeFileSync(join(d, "b.dossier.json"), JSON.stringify({ meta: { title: "B", slug: "b" }, blocks: [] }));
+  const { docs, model } = buildCatalogModel(d, {});
+  assert.equal(docs.length, 2);
+  assert.ok(docs.find((x) => x.slug === "a").links.includes("b"), "cross-link found");
+  assert.ok(model.blocks.some((b) => b.type === "table"), "catalog has a document table");
+});
+
 test("diff detects added and changed blocks", () => {
   const a = { meta: { title: "A" }, blocks: [{ id: "x", type: "callout", body: "1" }] };
   const b = { meta: { title: "A" }, blocks: [{ id: "x", type: "callout", body: "2" }, { id: "y", type: "callout", body: "new" }] };

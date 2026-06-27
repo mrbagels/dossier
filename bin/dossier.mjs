@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateFile, validateModel, registerBlock, esc, inlineMd, slugify } from "../src/index.mjs";
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
 // pull out --flags; rest are positional
-const VALUE_FLAGS = new Set(["kind", "out", "plugin", "port"]);
+const VALUE_FLAGS = new Set(["kind", "out", "plugin", "port", "title", "base-url", "format", "theme"]);
 const flags = {};
 const args = [];
 const rest = argv.slice(1);
@@ -39,6 +39,7 @@ const USAGE = [
   "  dossier serve <file.dossier.json>        build + live-reload dev server (--open, --port)",
   "  dossier validate <file.dossier.json> ... check a model without rendering",
   "  dossier diff <old.json> <new.json>      structural diff between two versions",
+  "  dossier catalog <dir>                    index a folder of dossiers (+ link graph)",
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
@@ -112,6 +113,19 @@ if (cmd === "build" && args.length) {
     const newM = JSON.parse(readFileSync(args[1], "utf8"));
     console.log(`diff ${args[0]} → ${args[1]}`);
     console.log(formatDiff(diffModels(oldM, newM)));
+  } catch (e) {
+    console.error("✗ " + e.message);
+    process.exitCode = 1;
+  }
+} else if (cmd === "catalog" && args.length) {
+  const { buildCatalogModel } = await import("../src/catalog.mjs");
+  try {
+    const dir = args[0];
+    const { model, docs } = buildCatalogModel(dir, { title: flags.title, baseUrl: flags["base-url"] });
+    const outPath = flags.out || join(dir, "index.dossier.json");
+    writeFileSync(outPath, JSON.stringify(model, null, 2) + "\n");
+    const r = await generateFile(outPath);
+    console.log(`✓ ${r.htmlPath}  (${docs.length} documents)`);
   } catch (e) {
     console.error("✗ " + e.message);
     process.exitCode = 1;
