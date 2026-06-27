@@ -39,8 +39,8 @@ const Wrap: React.FC<{ type: string; id?: string; children: React.ReactNode }> =
 const Hero: React.FC<{ b: B }> = ({ b }) => (
   <section className="ds-hero ds-block" data-block="hero" data-id={b.id}>
     {b.eyebrow && <p className="ds-eyebrow">{b.eyebrow}</p>}
-    <h1 id={b.id}>{b.title}</h1>
-    {b.lede && <p className="ds-lede" dangerouslySetInnerHTML={md(b.lede)} />}
+    <h1 id={b.id} data-edit={`${b.id}:title`}>{b.title}</h1>
+    {b.lede && <p className="ds-lede" data-edit={`${b.id}:lede`} dangerouslySetInnerHTML={md(b.lede)} />}
     {b.pills?.length > 0 && (
       <div className="ds-pillrow">
         {b.pills.map((p: string, i: number) => <span className="ds-pill" key={i}>{p}</span>)}
@@ -63,8 +63,8 @@ const Section: React.FC<{ b: B }> = ({ b }) => (
   <section className={`${b.framed === false ? "ds-section unframed" : "ds-section"} ds-block`} data-block="section" data-id={b.id} {...(b.collapsed ? { "data-collapsed": "1" } : {})}>
     <div className="ds-section-head">
       <div className="ds-section-titles">
-        <h2 id={b.id}>{b.title}</h2>
-        {b.subtitle && <p className="ds-muted" dangerouslySetInnerHTML={md(b.subtitle)} />}
+        <h2 id={b.id} data-edit={`${b.id}:title`}>{b.title}</h2>
+        {b.subtitle && <p className="ds-muted" data-edit={`${b.id}:subtitle`} dangerouslySetInnerHTML={md(b.subtitle)} />}
       </div>
       <button className="ds-toggle" type="button" data-toggle aria-label="Toggle section">{ChevronIcon}</button>
     </div>
@@ -158,8 +158,8 @@ const Table: React.FC<{ b: B }> = ({ b }) => (
 const Callout: React.FC<{ b: B }> = ({ b }) => (
   <Wrap type="callout" id={b.id}>
     <div className={`ds-callout tone-${b.tone || "info"}`}>
-      {b.title && <strong>{b.title} </strong>}
-      <span dangerouslySetInnerHTML={md(b.body)} />
+      {b.title && <strong data-edit={`${b.id}:title`}>{b.title} </strong>}
+      <span data-edit={`${b.id}:body`} dangerouslySetInnerHTML={md(b.body)} />
     </div>
   </Wrap>
 );
@@ -387,8 +387,10 @@ const ReviewBoard: React.FC<{ b: B }> = ({ b }) => (
 
 const Prose: React.FC<{ b: B }> = ({ b }) => (
   <Wrap type="prose" id={b.id}>
-    {b.heading && <h2 id={b.id}>{b.heading}</h2>}
-    {String(b.markdown || "").split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
+    {b.heading && <h2 id={b.id} data-edit={`${b.id}:heading`}>{b.heading}</h2>}
+    <div data-edit={`${b.id}:markdown`}>
+      {String(b.markdown || "").split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
+    </div>
   </Wrap>
 );
 

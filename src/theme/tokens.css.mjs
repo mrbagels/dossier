@@ -103,6 +103,12 @@ code{font-family:var(--ds-mono);font-size:.86em;background:var(--ds-bg-2);border
 .ds-copy:hover{color:var(--ds-ink);background:var(--ds-bg-2);border-color:var(--ds-line-strong)}
 .ds-copy svg{display:block}
 .ds-block[data-block="code"]>.ds-copy,.ds-block[data-block="diagram"]>.ds-copy{display:none}
+
+/* in-place edit mode */
+html.ds-editing .ds-btn[data-edit-toggle]{background:var(--ds-accent-tint);color:var(--ds-accent)}
+.ds-editing [data-edit]{outline:1px dashed var(--ds-line-strong);outline-offset:3px;border-radius:4px;cursor:text}
+.ds-editing [data-edit]:hover{outline-color:var(--ds-accent)}
+.ds-editing [data-edit]:focus{outline:2px solid var(--ds-accent);outline-offset:3px}
 mark{background:var(--ds-accent-tint);color:inherit;border-radius:3px;padding:0 2px}
 
 /* hero — no background wash */

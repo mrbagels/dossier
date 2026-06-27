@@ -109,6 +109,15 @@ export const RUNTIME = `
   if(window.IntersectionObserver){var ro=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");ro.unobserve(en.target);}});},{rootMargin:"0px 0px -6% 0px"});$$(".ds-content>.ds-block").forEach(function(b){if(b.getBoundingClientRect().top<window.innerHeight*0.92)return;b.classList.add("ds-reveal");ro.observe(b);});}
 
   // shortcuts: "/" focuses search, "t" toggles theme, Esc closes modal
-  document.addEventListener("keydown",function(e){if(e.key==="Escape"){var m=$("[data-source-modal]");if(m)m.hidden=true;}var tag=((e.target&&e.target.tagName)||"").toLowerCase();if(tag==="input"||tag==="textarea"||e.metaKey||e.ctrlKey||e.altKey)return;if(e.key==="/"){e.preventDefault();var s=$("[data-search]");if(s)s.focus();else openPal();}else if(e.key==="t"){toggleTheme();}});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){var m=$("[data-source-modal]");if(m)m.hidden=true;}var tag=((e.target&&e.target.tagName)||"").toLowerCase();if(tag==="input"||tag==="textarea"||(e.target&&e.target.isContentEditable)||e.metaKey||e.ctrlKey||e.altKey)return;if(e.key==="/"){e.preventDefault();var s=$("[data-search]");if(s)s.focus();else openPal();}else if(e.key==="t"){toggleTheme();}});
+
+  // in-place text editing: toggle edit mode, sync edits into the model (Export -> Download JSON to save)
+  var __editing=false,__hinted=false;
+  function __findBlock(blocks,id){if(!blocks)return null;for(var i=0;i<blocks.length;i++){var b=blocks[i],r;if(b&&b.id===id)return b;if(b){if((r=__findBlock(b.blocks,id)))return r;if((r=__findBlock(b.left,id)))return r;if((r=__findBlock(b.right,id)))return r;if(b.tabs){for(var j=0;j<b.tabs.length;j++){if((r=__findBlock(b.tabs[j].blocks,id)))return r;}}}}return null;}
+  var __editBtn=$("[data-edit-toggle]"),__editFields=$$("[data-edit]");
+  if(__editBtn&&__editFields.length){
+    __editFields.forEach(function(el){el.addEventListener("input",function(){if(!__editing)return;var p=el.getAttribute("data-edit"),i=p.indexOf(":"),b=__findBlock(model.blocks,p.slice(0,i));if(b)b[p.slice(i+1)]=el.innerText.trim();});});
+    __editBtn.addEventListener("click",function(){__editing=!__editing;document.documentElement.classList.toggle("ds-editing",__editing);__editFields.forEach(function(el){el.contentEditable=__editing?"true":"false";});__editBtn.textContent=__editing?"Done":"Edit";if(__editing&&!__hinted){__hinted=true;toast("Edit text in place — then Export \\u25b8 Download JSON to save");}});
+  }
 })();
 `;

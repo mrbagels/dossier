@@ -56,22 +56,22 @@ const renderers = {
     return (
       `<section class="ds-hero ds-block" data-block="hero" data-id="${esc(b.id)}">` +
       (b.eyebrow ? `<p class="ds-eyebrow">${esc(b.eyebrow)}</p>` : "") +
-      `<h1 id="${esc(b.id)}">${esc(b.title)}</h1>` +
-      (b.lede ? `<p class="ds-lede">${inlineMd(b.lede, ctx)}</p>` : "") +
+      `<h1 id="${esc(b.id)}" data-edit="${esc(b.id)}:title">${esc(b.title)}</h1>` +
+      (b.lede ? `<p class="ds-lede" data-edit="${esc(b.id)}:lede">${inlineMd(b.lede, ctx)}</p>` : "") +
       (pills ? `<div class="ds-pillrow">${pills}</div>` : "") +
       (meta ? `<div class="ds-meta">${meta}</div>` : "") +
       `</section>`
     );
   },
   prose(b, ctx) {
-    const h = b.heading ? `<h2 id="${esc(b.id)}">${esc(b.heading)}</h2>` : "";
+    const h = b.heading ? `<h2 id="${esc(b.id)}" data-edit="${esc(b.id)}:heading">${esc(b.heading)}</h2>` : "";
     const paras = String(b.markdown).split(/\n{2,}/).map((p) => `<p>${inlineMd(p, ctx)}</p>`).join("");
-    return wrap("prose", b.id, h + paras);
+    return wrap("prose", b.id, h + `<div data-edit="${esc(b.id)}:markdown">${paras}</div>`);
   },
   section(b, ctx) {
     const titles =
-      `<div class="ds-section-titles"><h2 id="${esc(b.id)}">${esc(b.title)}</h2>` +
-      (b.subtitle ? `<p class="ds-muted">${inlineMd(b.subtitle, ctx)}</p>` : "") +
+      `<div class="ds-section-titles"><h2 id="${esc(b.id)}" data-edit="${esc(b.id)}:title">${esc(b.title)}</h2>` +
+      (b.subtitle ? `<p class="ds-muted" data-edit="${esc(b.id)}:subtitle">${inlineMd(b.subtitle, ctx)}</p>` : "") +
       `</div>`;
     const inner =
       `<div class="ds-section-head">${titles}` +
@@ -125,7 +125,7 @@ const renderers = {
     return wrap(
       "callout",
       b.id,
-      `<div class="ds-callout tone-${esc(b.tone || "info")}">${b.title ? `<strong>${esc(b.title)}</strong> ` : ""}${inlineMd(b.body, ctx)}</div>`
+      `<div class="ds-callout tone-${esc(b.tone || "info")}">${b.title ? `<strong data-edit="${esc(b.id)}:title">${esc(b.title)}</strong> ` : ""}<span data-edit="${esc(b.id)}:body">${inlineMd(b.body, ctx)}</span></div>`
     );
   },
   code(b) {
@@ -680,6 +680,7 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
 <div class="ds-brand"><span class="ds-mark"></span><span class="ds-crumbs">${esc(crumbs || meta.title || "")}</span></div>
 <div class="ds-tools">
 <button class="ds-btn ds-search-btn" type="button" data-palette-open><span class="ds-i"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.4-3.4"></path></svg></span><span class="ds-search-label">Search</span><kbd>⌘K</kbd></button>
+<button class="ds-btn" type="button" data-edit-toggle title="Edit text in place">Edit</button>
 <button class="ds-btn" type="button" data-theme-toggle aria-label="Toggle theme">◐</button>
 <details class="ds-menu"><summary>Export</summary><div class="ds-menu-list">
 <button class="ds-btn" type="button" data-action="copy-md">Copy Markdown</button>
