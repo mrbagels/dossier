@@ -167,7 +167,7 @@ example in [`skill/references/blocks.md`](skill/references/blocks.md):
 |---|---|
 | **Structure** | `hero`, `section`, `two-col`, `tabs`, `prose` |
 | **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
-| **Reference** | `table`, `code` (Shiki), `diagram` (DOT to SVG), `references`, `faq`, `glossary` |
+| **Reference** | `table`, `code` (Shiki), `diagram` (DOT or Mermaid to SVG), `references`, `faq`, `glossary` |
 | **Media & data** | `figure` (inlined), `math` (KaTeX to MathML), `chart` (bar/line/area SVG), `footnotes` |
 | **Decisions & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `receipt` |
 
@@ -232,7 +232,23 @@ The full CLI:
 | `dossier validate <file>` | check a model without rendering |
 | `dossier diff <old> <new>` | structural diff between two versions |
 | `dossier catalog <dir>` | index a folder of dossiers, with a link graph |
+| `dossier export <file> --format docx\|md\|pdf` | export to Word, Markdown, or PDF |
 | `dossier mcp` | run the MCP server (stdio) |
+
+### Optional: Mermaid and PDF
+
+DOT diagrams, syntax highlighting, math, charts, and Word export work out of the box.
+Two features render through a headless browser and need Playwright, which is an optional
+dependency:
+
+```bash
+npm i playwright && npx playwright install chromium
+```
+
+With it, `diagram` blocks using `format: "mermaid"` render to inline SVG at build time,
+and `dossier export --format pdf` works. Without it, Mermaid diagrams fall back to their
+source and PDF export reports what to install. Word export (`--format docx`) embeds charts
+and diagrams as images and needs no browser.
 
 ## Embedding
 

@@ -116,12 +116,13 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 { "type": "glossary", "terms": [ { "term": "dossier-model", "definition": "The embedded source-of-truth JSON island." } ] }
 ```
 
-## diagram, Graphviz DOT → inline SVG (build-time, browserless)
+## diagram, Graphviz DOT or Mermaid → inline SVG (build-time)
 ```json
 { "type": "diagram", "title": "Pipeline", "format": "dot",
   "spec": "digraph { rankdir=LR; a -> b; b -> c; }" }
 ```
-Use DOT. (Mermaid `format` falls back to showing source.)
+`format: "dot"` renders browserless (default). `format: "mermaid"` renders to SVG when
+Playwright is installed, otherwise falls back to showing the source.
 
 ## figure, image with caption (inlined as a data URI at build time)
 ```json

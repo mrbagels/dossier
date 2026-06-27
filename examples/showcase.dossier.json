@@ -54,7 +54,7 @@
       "type": "callout",
       "tone": "tip",
       "title": "Try the toolbar (top right).",
-      "body": "Hit **Edit** to change any text in place, tap the color swatch to restyle live in the **Theme Studio**, or open **Export** for Markdown, JSON, or the agent digest. From the CLI, `dossier export --format docx` writes a Word file."
+      "body": "Hit **Edit** to change any text in place, tap the color swatch to restyle live in the **Theme Studio**, or open **Export** for Markdown, JSON, or the agent digest. From the CLI, `dossier export` also writes **Word** (charts and diagrams embedded as images) or **PDF**."
     },
     {
       "type": "stat-strip",
@@ -205,6 +205,12 @@
           "title": "Pipeline",
           "format": "dot",
           "spec": "digraph { rankdir=LR; bgcolor=\"transparent\"; node [shape=box style=rounded fontname=\"Inter\" fontsize=12 color=\"#c81e4a\" fontcolor=\"#1a1822\"]; edge [color=\"#8b8698\"]; \"doc.json\" -> \"build\" -> \"doc.html\"; \"build\" -> \"doc.md\"; }"
+        },
+        {
+          "type": "diagram",
+          "format": "mermaid",
+          "title": "The loop (Mermaid)",
+          "spec": "flowchart LR\n  A([Ask your AI]) --> B[Dossier JSON]\n  B --> C{Render}\n  C --> D[Self-contained HTML]\n  C --> E[Word / PDF]\n  D --> F([You triage]) --> G([Agent implements])"
         },
         {
           "type": "table",
