@@ -44,11 +44,17 @@
   "dependencies": {
     "@hpcc-js/wasm-graphviz": "^1.22.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@resvg/resvg-js": "^2.6.2",
     "docx": "^9.7.1",
+    "image-size": "^2.0.2",
     "katex": "^0.17.0",
     "shiki": "^4.3.0"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "optionalDependencies": {
+    "mermaid": "^11.16.0",
+    "playwright": "^1.61.1"
   }
 }

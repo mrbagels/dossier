@@ -172,3 +172,10 @@ if (cmd === "build" && args.length) {
   console.log(USAGE);
   process.exit(cmd ? 0 : 1);
 }
+
+// Release the optional headless browser (if Mermaid/PDF launched one) so the
+// process can exit. A no-op when nothing launched it. Skip long-lived commands.
+if (cmd !== "serve" && cmd !== "mcp" && !flags.watch) {
+  const { closeBrowser } = await import("../src/headless.mjs");
+  await closeBrowser();
+}
