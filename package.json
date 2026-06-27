@@ -44,6 +44,7 @@
   "dependencies": {
     "@hpcc-js/wasm-graphviz": "^1.22.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "docx": "^9.7.1",
     "katex": "^0.17.0",
     "shiki": "^4.3.0"
   },

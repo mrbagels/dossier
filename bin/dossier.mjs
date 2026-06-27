@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { resolve, join } from "node:path";
+import { resolve, join, basename } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateFile, validateModel, registerBlock, esc, inlineMd, slugify } from "../src/index.mjs";
 
@@ -40,6 +40,7 @@ const USAGE = [
   "  dossier validate <file.dossier.json> ... check a model without rendering",
   "  dossier diff <old.json> <new.json>      structural diff between two versions",
   "  dossier catalog <dir>                    index a folder of dossiers (+ link graph)",
+  "  dossier export <file> --format docx|md   export to another format (PDF: print the .html)",
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
@@ -126,6 +127,31 @@ if (cmd === "build" && args.length) {
     writeFileSync(outPath, JSON.stringify(model, null, 2) + "\n");
     const r = await generateFile(outPath);
     console.log(`✓ ${r.htmlPath}  (${docs.length} documents)`);
+  } catch (e) {
+    console.error("✗ " + e.message);
+    process.exitCode = 1;
+  }
+} else if (cmd === "export" && args.length) {
+  const f = args[0];
+  const fmt = String(flags.format || "docx").toLowerCase();
+  try {
+    const model = JSON.parse(readFileSync(f, "utf8"));
+    const slug = (model.meta && model.meta.slug) || basename(f).replace(/\.(dossier\.)?json$/i, "");
+    if (fmt === "docx") {
+      const { exportDocx } = await import("../src/export.mjs");
+      const out = flags.out || slug + ".docx";
+      writeFileSync(out, await exportDocx(model));
+      console.log("✓ " + out);
+    } else if (fmt === "md") {
+      const { generate } = await import("../src/index.mjs");
+      const { md } = await generate(model, {});
+      const out = flags.out || slug + ".md";
+      writeFileSync(out, md);
+      console.log("✓ " + out);
+    } else {
+      console.error("✗ unknown format: " + fmt + " (supported: docx, md; for PDF open the .html and print)");
+      process.exitCode = 1;
+    }
   } catch (e) {
     console.error("✗ " + e.message);
     process.exitCode = 1;

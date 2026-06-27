@@ -47,6 +47,13 @@ test("plugins: a registered block validates and renders", async () => {
   assert.ok(/data-block="badge-test"/.test(html), "registered block renders");
 });
 
+test("export to docx produces a valid Word document", async () => {
+  const { exportDocx } = await import("../src/export.mjs");
+  const buf = await exportDocx({ meta: { title: "X" }, blocks: [{ type: "hero", title: "H" }, { type: "prose", markdown: "hi" }, { type: "table", columns: ["A"], rows: [["1"]] }] });
+  assert.ok(Buffer.isBuffer(buf) && buf.length > 0, "returns a buffer");
+  assert.equal(buf.slice(0, 2).toString(), "PK", "is a zip (docx) file");
+});
+
 test("catalog indexes a folder and finds cross-links", async () => {
   const { buildCatalogModel } = await import("../src/catalog.mjs");
   const { mkdtempSync, writeFileSync } = await import("node:fs");
