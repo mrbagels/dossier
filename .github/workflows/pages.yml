@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - run: npx playwright install --with-deps chromium # for Mermaid rendering in the demo
       - run: npm run site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

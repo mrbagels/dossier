@@ -8,7 +8,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
 [![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#how-it-works)
 [![Output](https://img.shields.io/badge/output-single%20.html%20file-7048e8.svg)](#how-it-works)
-[![Version](https://img.shields.io/badge/version-0.4.0-7048e8.svg)](#)
+[![Version](https://img.shields.io/badge/version-0.4.1-7048e8.svg)](#)
 [![Live demo](https://img.shields.io/badge/live%20demo-%E2%86%97-7048e8.svg)](https://mrbagels.github.io/dossier/)
 
 <a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="840"></a>
@@ -237,18 +237,19 @@ The full CLI:
 
 ### Optional: Mermaid and PDF
 
-DOT diagrams, syntax highlighting, math, charts, and Word export work out of the box.
-Two features render through a headless browser: Mermaid diagrams (`format: "mermaid"`) and
-`dossier export --format pdf`. They use Playwright and the mermaid library, declared as
-**optional dependencies** and installed by default (Playwright fetches Chromium on install).
-To keep the install lean, skip them with `--omit=optional`; Mermaid then falls back to its
-source and PDF export tells you what to add. To install them later:
+DOT diagrams, syntax highlighting, math, charts, and Word export (with charts and diagrams
+embedded as images) all work out of the box. Two features render through a headless browser
+and are opt-in: Mermaid diagrams (`format: "mermaid"`) and `dossier export --format pdf`. To
+keep the install lightweight, Playwright and the mermaid library are **not bundled**. Add them
+when you want those features:
 
 ```bash
 npm i playwright mermaid && npx playwright install chromium
+# installed Dossier globally? use: npm i -g playwright mermaid && npx playwright install chromium
 ```
 
-Word export (`--format docx`) embeds charts and diagrams as images and needs no browser.
+Until then, Mermaid diagrams render as their source (the build prints how to enable it) and
+PDF export tells you what to install. Word export needs no browser.
 
 ## Embedding
 
