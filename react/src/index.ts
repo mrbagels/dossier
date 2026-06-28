@@ -13,6 +13,8 @@ export type {
   DossierMeta,
   Block as BlockModel,
   BlockType,
+  PatchItem,
+  ProcessItem,
   ReviewCandidate,
   SideCard,
   Lifecycle,

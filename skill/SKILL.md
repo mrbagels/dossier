@@ -91,7 +91,7 @@ Top-level shape:
   `owner`, `updated`, `version`, `tags[]`, `baseUrl` (for hosted cross-links),
   `theme` (per-project token overrides), `lifecycle` (banner), `changelog`.
 - **`blocks[]`**: ordered. `section`, `two-col`, and `tabs` nest other blocks. Lead with
-  a `hero`. See `references/blocks.md` for all 27 types.
+  a `hero`. See `references/blocks.md` for all 29 types.
 - **Inline markdown** in text fields: `**bold**`, `` `code` ``, `[label](url)`,
   `[[other-slug]]` (cross-artifact link), `[[Term]]` (glossary tooltip).
 - **Code**: `{ "type": "code", "lang": "ts", "code": "..." }`, highlighted at build
@@ -119,9 +119,9 @@ Use process starters when the user wants to steer the actual work, not only read
 - `release`: release readiness, checks, risks, approvals, and closeout.
 - `incident`: timeline, mitigation decisions, evidence, and follow-ups.
 
-These starters use today's blocks plus `process-board` for work items, verdicts, notes,
-process JSON export/import, and MCP readback while deeper patch/diff/editor blocks are
-developed.
+These starters use today's blocks plus `process-board` for work items, `patch-set` for
+proposed edit packets, `diff-view` for unified diff review, and MCP readback. The richer
+embedded editor surface is the next layer.
 
 ## What the reader gets (built in)
 

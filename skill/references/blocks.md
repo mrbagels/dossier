@@ -38,7 +38,7 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 
 ## stat-strip, KPI figures
 ```json
-{ "type": "stat-strip", "stats": [ { "value": "27", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
+{ "type": "stat-strip", "stats": [ { "value": "29", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
 ```
 
 ## flow, numbered steps
@@ -68,6 +68,32 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 ## code, syntax-highlighted (Shiki, build-time)
 ```json
 { "type": "code", "lang": "ts", "filename": "optional.ts", "code": "const x = 1" }
+```
+
+## patch-set, proposed edit packets
+Use for implementation dossiers when an agent is proposing or recording concrete edits.
+Each patch can link back to `process-board` item ids, list files and verification, and
+carry an optional unified diff.
+```json
+{ "type": "patch-set", "title": "Patch set",
+  "patches": [
+    { "id": "extract-token-store", "title": "Extract token store",
+      "summary": "Move token persistence behind a narrow helper.",
+      "operation": "modify", "status": "proposed", "risk": "medium",
+      "files": ["src/auth/session.ts"], "workItems": ["extract-token-store"],
+      "verification": ["npm test -- auth"],
+      "diff": "diff --git a/src/auth/session.ts b/src/auth/session.ts\n--- a/src/auth/session.ts\n+++ b/src/auth/session.ts\n@@ -1,2 +1,2 @@\n-const token = localStorage.getItem(\"token\");\n+const token = tokenStore.read();" } ] }
+```
+`patch.id` must be kebab-case. `operation`: `add | modify | delete | rename | mixed`.
+`status`: `proposed | accepted | needs-revision | applied | skipped`. `risk`: `low | medium | high`.
+
+## diff-view, parsed unified diff
+Use for a file-first patch review surface. The renderer parses files, hunks, additions,
+and deletions from the unified diff and renders a static reviewable view.
+```json
+{ "type": "diff-view", "title": "Full diff",
+  "summary": "Standalone diff for file-first review.",
+  "diff": "diff --git a/src/auth/session.ts b/src/auth/session.ts\n--- a/src/auth/session.ts\n+++ b/src/auth/session.ts\n@@ -1,2 +1,2 @@\n-const token = localStorage.getItem(\"token\");\n+const token = tokenStore.read();" }
 ```
 
 ## tabs, tabbed panes (each nests blocks)

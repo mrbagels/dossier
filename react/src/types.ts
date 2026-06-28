@@ -30,7 +30,7 @@ export type BlockType =
   | "flow" | "timeline" | "table" | "callout" | "code" | "tabs" | "faq"
   | "references" | "decision-matrix" | "risk-register" | "action-items"
   | "assumptions" | "glossary" | "diagram" | "review-board" | "process-board"
-  | "figure" | "math" | "chart" | "footnotes" | "receipt";
+  | "patch-set" | "diff-view" | "figure" | "math" | "chart" | "footnotes" | "receipt";
 
 // A block is discriminated by `type`; variant fields are loosely typed for the dispatcher.
 // `_hl` / `_svg` are populated by the build-time enrichment pass.
@@ -77,6 +77,20 @@ export interface ProcessItem {
   blocks?: Block[];
   details?: Record<string, string>;
   badges?: string[];
+}
+
+export interface PatchItem {
+  id: string;
+  title: string;
+  summary?: string;
+  operation?: "add" | "modify" | "delete" | "rename" | "mixed";
+  status?: "proposed" | "accepted" | "needs-revision" | "applied" | "skipped";
+  risk?: "low" | "medium" | "high";
+  files?: string[];
+  workItems?: string[];
+  verification?: string[];
+  details?: Record<string, string>;
+  diff?: string;
 }
 
 export interface DossierModel {

@@ -17,6 +17,8 @@ const REQUIRED = {
   table: ["columns", "rows"],
   callout: ["body"],
   code: ["code"],
+  "patch-set": ["patches"],
+  "diff-view": ["diff"],
   tabs: ["tabs"],
   faq: ["items"],
   references: ["items"],

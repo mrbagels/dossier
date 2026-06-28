@@ -6,7 +6,7 @@ import { THEMES } from "./themes.mjs";
 
 export { generate, validateModel };
 // Plugin authoring surface.
-export { registerBlock, esc, inlineMd, slugify, chartSvg, knownBlockTypes } from "./generate.mjs";
+export { registerBlock, esc, inlineMd, slugify, chartSvg, knownBlockTypes, parseUnifiedDiff } from "./generate.mjs";
 
 export async function generateFile(path, opts = {}) {
   const model = JSON.parse(readFileSync(path, "utf8"));

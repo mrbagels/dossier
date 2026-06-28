@@ -12,6 +12,7 @@ declare module "*/generate.mjs" {
   export const enrich: (model: any, baseDir?: string) => Promise<void>;
   export const renderBlock: (b: any, ctx: any) => string;
   export const chartSvg: (b: any) => string;
+  export const parseUnifiedDiff: (diff: string, label?: string) => any[];
   export const registerBlock: (type: string, fn: (b: any, ctx: any) => string) => void;
   export const knownBlockTypes: () => string[];
   export const generate: (model: any) => Promise<{ html: string; md: string; digest: string }>;

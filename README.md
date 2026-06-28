@@ -166,14 +166,14 @@ Full contract: [`schema/dossier.schema.json`](schema/dossier.schema.json).
 
 ## Block types
 
-27 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
+29 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
 example in [`skill/references/blocks.md`](skill/references/blocks.md):
 
 | Group | Blocks |
 |---|---|
 | **Structure** | `hero`, `section`, `two-col`, `tabs`, `prose` |
 | **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
-| **Reference** | `table`, `code` (Shiki), `diagram` (DOT or Mermaid to SVG), `references`, `faq`, `glossary` |
+| **Reference** | `table`, `code` (Shiki), `patch-set`, `diff-view`, `diagram` (DOT or Mermaid to SVG), `references`, `faq`, `glossary` |
 | **Media & data** | `figure` (inlined), `math` (KaTeX to MathML), `chart` (bar/line/area SVG), `footnotes` |
 | **Decisions, process & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `process-board`, `receipt` |
 
@@ -203,9 +203,9 @@ work loop:
 | `release` | Release readiness, checks, risks, approvals, and closeout. |
 | `incident` | Timeline, mitigation decisions, evidence, and follow-ups. |
 
-They use the existing block catalog plus the dedicated `process-board` block for work items,
-verdicts, notes, process JSON export/import, and MCP readback. Follow-on process blocks for
-patchsets, diffs, embedded editors, verification runs, and process receipts are tracked in
+They use the existing block catalog plus `process-board` for work items, `patch-set` for
+proposed edit packets, and `diff-view` for static unified diff review. Follow-on process
+blocks for embedded editors, verification runs, and process receipts are tracked in
 [`docs/product/process-dossiers/process-dossiers-scope.md`](docs/product/process-dossiers/process-dossiers-scope.md).
 
 ## React
@@ -224,7 +224,7 @@ import { DossierDocument } from "@mrbagels/dossier-react";
 <DossierDocument model={model} animate />
 ```
 
-The `<Block>` dispatcher covers all 27 block types and reuses the core's CSS, runtime, and
+The `<Block>` dispatcher covers all 29 block types and reuses the core's CSS, runtime, and
 enrichment, so SSR output matches the Node generator. See [`react/README.md`](react/README.md).
 
 ## Plugins & CLI

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { generate, validateModel } from "../src/index.mjs";
+import { generate, parseUnifiedDiff, validateModel } from "../src/index.mjs";
 import { diffModels } from "../src/diff.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -83,6 +83,48 @@ test("process-board renders controls and nested reference blocks", async () => {
   assert.ok(html.includes("dossier.process/v1"), "runtime can export a process packet");
   assert.ok(html.includes("const ok"), "renders nested reference blocks");
   assert.ok(md.includes("### Work one ("), "exports process items to Markdown");
+});
+
+test("patch-set and diff-view render parsed unified diffs", async () => {
+  const diff = "diff --git a/src/file.ts b/src/file.ts\n--- a/src/file.ts\n+++ b/src/file.ts\n@@ -1,2 +1,2 @@\n-const oldValue = true;\n+const newValue = true;";
+  const files = parseUnifiedDiff(diff, "preview.diff");
+  assert.equal(files.length, 1);
+  assert.equal(files[0].additions, 1);
+  assert.equal(files[0].deletions, 1);
+  assert.equal(files[0].newPath, "src/file.ts");
+  const model = {
+    dossierVersion: "1.0",
+    kind: "implementation",
+    meta: { title: "Implementation", slug: "impl" },
+    blocks: [
+      {
+        type: "patch-set",
+        title: "Patches",
+        patches: [
+          {
+            id: "patch-one",
+            title: "Patch one",
+            operation: "modify",
+            status: "proposed",
+            risk: "low",
+            files: ["src/file.ts"],
+            workItems: ["work-one"],
+            verification: ["npm test"],
+            diff,
+          },
+        ],
+      },
+      { type: "diff-view", title: "Diff", diff },
+    ],
+  };
+  const result = validateModel(model);
+  assert.deepEqual(result.errors, []);
+  const { html, md } = await generate(structuredClone(model), {});
+  assert.ok(html.includes('data-block="patch-set"'), "renders patch-set");
+  assert.ok(html.includes('data-block="diff-view"'), "renders diff-view");
+  assert.ok(html.includes("ds-diff-line add"), "renders additions");
+  assert.ok(html.includes("ds-diff-line del"), "renders deletions");
+  assert.ok(md.includes("```diff"), "exports diff markdown");
 });
 
 test("plugins: a registered block validates and renders", async () => {

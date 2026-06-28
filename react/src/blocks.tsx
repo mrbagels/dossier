@@ -1,5 +1,5 @@
 import React from "react";
-import { inlineMd, slugify, chartSvg, renderBlock, knownBlockTypes } from "../../src/generate.mjs";
+import { inlineMd, slugify, chartSvg, renderBlock, knownBlockTypes, parseUnifiedDiff } from "../../src/generate.mjs";
 
 // React-side plugin registry, register a component for a custom block type so it renders
 // natively in the React port (parity with the Node generator's registerBlock).
@@ -7,7 +7,7 @@ const componentRegistry = new Map<string, React.FC<{ b: any }>>();
 export function registerComponent(type: string, Component: React.FC<{ b: any }>) {
   componentRegistry.set(type, Component);
 }
-import type { Block as B, ProcessItem as ProcessItemModel, ReviewCandidate } from "./types.js";
+import type { Block as B, PatchItem as PatchItemModel, ProcessItem as ProcessItemModel, ReviewCandidate } from "./types.js";
 
 // Render context (glossary + baseUrl) for inline-markdown resolution. Set once per render.
 let CTX: any = { glossary: new Map<string, string>(), baseUrl: "" };
@@ -176,6 +176,90 @@ const Code: React.FC<{ b: B }> = ({ b }) => (
     </div>
   </Wrap>
 );
+
+const diffFileLabel = (file: any) => (file.newPath && file.newPath !== "/dev/null" ? file.newPath : file.oldPath || "diff");
+
+const DiffViewInner: React.FC<{ b: B; nested?: boolean }> = ({ b, nested = false }) => {
+  const files = parseUnifiedDiff(b.diff || "", b.filename || b.title || "diff");
+  const additions = files.reduce((sum: number, file: any) => sum + file.additions, 0);
+  const deletions = files.reduce((sum: number, file: any) => sum + file.deletions, 0);
+  return (
+    <section className={nested ? "ds-diffview nested" : "ds-block ds-diffview"} data-block="diff-view" data-id={b.id}>
+      {!nested && <button className="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy">{CopyIcon}</button>}
+      {b.title && (nested ? <h4>{b.title}</h4> : <h3 id={b.id}>{b.title}</h3>)}
+      {b.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(b.summary)} />}
+      <div className="ds-diff-summary"><span>{files.length} file{files.length === 1 ? "" : "s"}</span><span className="add">+{additions}</span><span className="del">-{deletions}</span></div>
+      {files.length > 0 && (
+        <nav className="ds-diff-files">
+          {files.map((file: any, i: number) => {
+            const label = diffFileLabel(file);
+            return <a href={`#${b.id}-${slugify(label)}`} className="ds-diff-filelink" key={i}><span>{label}</span><b>+{file.additions} -{file.deletions}</b></a>;
+          })}
+        </nav>
+      )}
+      <div className="ds-diff-body">
+        {files.length > 0 ? files.map((file: any, i: number) => {
+          const label = diffFileLabel(file);
+          return (
+            <details className="ds-diff-file" id={`${b.id}-${slugify(label)}`} open key={i}>
+              <summary><span className="ds-diff-path">{label}</span><span className="ds-diff-stat">+{file.additions} -{file.deletions}</span></summary>
+              {file.meta.length > 0 && <div className="ds-diff-meta-lines">{file.meta.map((line: string, j: number) => <code key={j}>{line}</code>)}</div>}
+              {file.hunks.map((hk: any, h: number) => (
+                <div className="ds-hunk" key={h}>
+                  <div className="ds-hunk-head">{hk.header}</div>
+                  <pre className="ds-diff-lines"><code>{hk.lines.map((line: any, j: number) => (
+                      <span className={`ds-diff-line ${line.type}`} key={j}>
+                        <span className="ds-diff-num">{line.oldNumber}</span>
+                        <span className="ds-diff-num">{line.newNumber}</span>
+                        <span className="ds-diff-mark">{line.mark}</span>
+                        <span className="ds-diff-code">{line.text}</span>
+                      </span>
+                    ))}</code></pre>
+                </div>
+              ))}
+            </details>
+          );
+        }) : <pre className="ds-diff-empty"><code>{b.diff || ""}</code></pre>}
+      </div>
+    </section>
+  );
+};
+
+const PatchSet: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="patch-set" id={b.id}>
+    {b.title && <h3 id={b.id}>{b.title}</h3>}
+    {b.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(b.summary)} />}
+    <div className="ds-patchlist">
+      {(b.patches || []).map((p: PatchItemModel, i: number) => {
+        const chips: string[] = [];
+        if (p.operation) chips.push(p.operation);
+        if (p.status) chips.push(p.status);
+        if (p.risk) chips.push(`Risk · ${p.risk}`);
+        const rows: [string, string][] = [];
+        if (p.files?.length) rows.push(["Files", p.files.join(", ")]);
+        if (p.workItems?.length) rows.push(["Work items", p.workItems.join(", ")]);
+        if (p.verification?.length) rows.push(["Verification", p.verification.join(", ")]);
+        Object.entries(p.details || {}).forEach(([k, v]) => rows.push([k, v]));
+        return (
+          <article className="ds-patch" data-patch={p.id} key={p.id || i}>
+            <div className="ds-patch-head">
+              <div><h4>{p.title || p.id || "Patch"}</h4>{p.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(p.summary)} />}</div>
+              {chips.length > 0 && <div className="ds-chips">{chips.map((x, j) => <span className="ds-chip" key={j}>{x}</span>)}</div>}
+            </div>
+            {rows.length > 0 && (
+              <dl className="ds-detailgrid">
+                {rows.map(([k, v], j) => <div className="ds-detail" key={j}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>)}
+              </dl>
+            )}
+            {p.diff && <DiffViewInner b={{ type: "diff-view", id: `${p.id || slugify(p.title || "patch")}-diff`, title: "Diff", diff: p.diff }} nested />}
+          </article>
+        );
+      })}
+    </div>
+  </Wrap>
+);
+
+const DiffView: React.FC<{ b: B }> = ({ b }) => <DiffViewInner b={b} />;
 
 const Tabs: React.FC<{ b: B }> = ({ b }) => (
   <Wrap type="tabs" id={b.id}>
@@ -556,6 +640,8 @@ export const Block: React.FC<{ b: B }> = ({ b }) => {
     case "table": return <Table b={b} />;
     case "callout": return <Callout b={b} />;
     case "code": return <Code b={b} />;
+    case "patch-set": return <PatchSet b={b} />;
+    case "diff-view": return <DiffView b={b} />;
     case "tabs": return <Tabs b={b} />;
     case "faq": return <Faq b={b} />;
     case "references": return <References b={b} />;

@@ -222,6 +222,42 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-diagram-svg{display:flex;justify-content:center;padding:18px;background:#fff;border:0}
 .ds-diagram-svg svg{max-width:100%;height:auto}
 
+/* patch and diff blocks */
+.ds-patchlist{display:grid;gap:12px;margin-top:14px}
+.ds-patch{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);padding:15px 17px}
+.ds-patch-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.ds-patch h4{margin:0 0 4px;font-size:15.5px}
+.ds-patch .ds-detailgrid{margin-top:12px}
+.ds-diffview{margin-top:15px}
+.ds-diffview.nested{border-top:1px solid var(--ds-line);padding-top:14px}
+.ds-diff-summary{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;color:var(--ds-ink-2);font-size:12.5px;font-weight:650;font-variant-numeric:tabular-nums}
+.ds-diff-summary span{border:1px solid var(--ds-line-2);border-radius:999px;padding:3px 9px;background:var(--ds-bg)}
+.ds-diff-summary .add{color:var(--ds-ok);border-color:rgba(18,161,104,.3)}
+.ds-diff-summary .del{color:var(--ds-danger);border-color:rgba(214,48,49,.3)}
+.ds-diff-files{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.ds-diff-filelink{display:inline-flex;gap:8px;align-items:center;max-width:100%;border:1px solid var(--ds-line-2);border-radius:8px;padding:6px 9px;color:var(--ds-ink-2);font-size:12px;text-decoration:none}
+.ds-diff-filelink span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px}
+.ds-diff-filelink b{color:var(--ds-ink-3);font-weight:650;font-variant-numeric:tabular-nums}
+.ds-diff-file{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);overflow:hidden;margin-top:10px}
+.ds-diff-file summary{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 14px;cursor:pointer;background:var(--ds-bg-2);font-weight:650}
+.ds-diff-path{font-family:var(--ds-mono);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ds-diff-stat{font-size:12px;color:var(--ds-ink-3);font-variant-numeric:tabular-nums}
+.ds-diff-meta-lines{display:grid;gap:2px;padding:9px 14px;border-top:1px solid var(--ds-line);font-family:var(--ds-mono);font-size:12px;color:var(--ds-ink-3);background:var(--ds-bg)}
+.ds-hunk{border-top:1px solid var(--ds-line)}
+.ds-hunk-head{padding:7px 14px;background:var(--ds-accent-tint);color:var(--ds-accent);font-family:var(--ds-mono);font-size:12px;font-weight:650}
+.ds-diff-lines{margin:0;overflow:auto;background:var(--ds-bg);font-family:var(--ds-mono);font-size:12.5px;line-height:1.5}
+.ds-diff-line{display:grid;grid-template-columns:46px 46px 22px minmax(360px,1fr)}
+.ds-diff-line span{padding:0 7px}
+.ds-diff-num{color:var(--ds-ink-3);text-align:right;border-right:1px solid var(--ds-line);user-select:none}
+.ds-diff-mark{color:var(--ds-ink-3);text-align:center;user-select:none}
+.ds-diff-code{white-space:pre}
+.ds-diff-line.add{background:rgba(18,161,104,.1)}
+.ds-diff-line.add .ds-diff-mark,.ds-diff-line.add .ds-diff-code{color:var(--ds-ok)}
+.ds-diff-line.del{background:rgba(214,48,49,.09)}
+.ds-diff-line.del .ds-diff-mark,.ds-diff-line.del .ds-diff-code{color:var(--ds-danger)}
+.ds-diff-line.meta{color:var(--ds-ink-3);background:var(--ds-bg-2)}
+.ds-diff-empty{padding:14px;overflow:auto;border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);font-family:var(--ds-mono)}
+
 /* figure */
 .ds-figure{margin:0;display:grid;gap:9px}
 .ds-figure img{display:block;max-width:100%;height:auto;border:1px solid var(--ds-line);border-radius:12px}
@@ -440,13 +476,13 @@ tbody tr:hover td{color:var(--ds-ink)}
 @media print{
   :root{--ds-bg:#fff;--ds-bg-2:#fff;--ds-ink:#111;--ds-ink-2:#333;--ds-ink-3:#666;--ds-line:#ddd;--ds-line-2:#ccc}
   html{font-size:11pt}
-  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy{display:none!important}
+  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy,.ds-diff-files{display:none!important}
   .ds-layout{display:block}
   .ds-content{max-width:none}
   .ds-shell{width:100%}
   .ds-section[data-collapsed="1"] .ds-section-body{display:grid!important}
   .ds-ritem-wrap{grid-template-rows:1fr!important}
-  .ds-section,.ds-block,.ds-ritem,.ds-card,.ds-stat,.ds-chart,.ds-figure,table,pre{break-inside:avoid}
+  .ds-section,.ds-block,.ds-ritem,.ds-card,.ds-stat,.ds-chart,.ds-figure,.ds-patch,.ds-diff-file,.ds-hunk,table,pre{break-inside:avoid}
   .ds-reveal{opacity:1!important;transform:none!important}
   h1,h2,h3,h4{break-after:avoid}
   a{color:inherit;text-decoration:none}

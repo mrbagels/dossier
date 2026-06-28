@@ -282,6 +282,12 @@
           "$ref": "#/$defs/blocks/code"
         },
         {
+          "$ref": "#/$defs/blocks/patchSet"
+        },
+        {
+          "$ref": "#/$defs/blocks/diffView"
+        },
+        {
           "$ref": "#/$defs/blocks/tabs"
         },
         {
@@ -724,6 +730,140 @@
           },
           "code": {
             "type": "string"
+          }
+        }
+      },
+      "patchSet": {
+        "description": "Patch packet summary for implementation dossiers. Each patch can carry files, linked work items, verification, risk, and an optional unified diff.",
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "patches"
+        ],
+        "properties": {
+          "type": {
+            "const": "patch-set"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "patches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "title"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "operation": {
+                  "type": "string",
+                  "enum": [
+                    "add",
+                    "modify",
+                    "delete",
+                    "rename",
+                    "mixed"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "proposed",
+                    "accepted",
+                    "needs-revision",
+                    "applied",
+                    "skipped"
+                  ],
+                  "default": "proposed"
+                },
+                "risk": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ]
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "workItems": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Linked process-board item ids."
+                },
+                "verification": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "details": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "diff": {
+                  "type": "string",
+                  "description": "Optional unified diff for this patch."
+                }
+              }
+            }
+          }
+        }
+      },
+      "diffView": {
+        "description": "Static unified diff renderer with file summaries and hunk-level line styling.",
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "diff"
+        ],
+        "properties": {
+          "type": {
+            "const": "diff-view"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Fallback label when the diff has no file header."
+          },
+          "diff": {
+            "type": "string",
+            "description": "Unified diff text."
           }
         }
       },

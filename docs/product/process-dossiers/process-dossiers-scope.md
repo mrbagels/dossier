@@ -193,8 +193,8 @@ Commit boundaries should map to user-visible product increments and keep rollbac
 - **M0** (done), Product scope packet, OSS source posture, and implementation milestones.
 - **M1** (done), Schema and starter foundation: add process-oriented kinds, starters, validation coverage, README positioning, and MCP starter discovery.
 - **M2** (done), Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.
-- **M3** (planned), Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.
-- **M4** (planned), Embeddable editor: add CodeMirror-backed code-editor blocks in serve/live mode, static fallback in built artifacts, edited-text export, and validation.
+- **M3** (done), Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.
+- **M4** (in-progress), Embeddable editor: add CodeMirror-backed code-editor blocks in serve/live mode, static fallback in built artifacts, edited-text export, and validation.
 - **M5** (planned), Process MCP protocol: render, validate, read process verdicts, record run receipts, attach patchsets, and return closeout digest.
 - **M6** (planned), Live Studio: save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.
 - **M7** (planned), Integration-loop dossiers: producer/consumer packet templates, cycle control, closeout packets, and dogfood examples.
@@ -205,7 +205,7 @@ Commit boundaries should map to user-visible product increments and keep rollbac
 - [x] Commit M0 product scope packet. (@Codex)
 - [x] Commit M1 process kinds, starters, README and skill positioning. (@Codex)
 - [x] Commit M2 process-board render and verdict export loop. (@Codex)
-- [ ] Commit M3 diff-view and patch-set static rendering. (@Codex)
+- [x] Commit M3 diff-view and patch-set static rendering. (@Codex)
 - [ ] Commit M4 CodeMirror-backed live editor mode. (@Codex)
 
 

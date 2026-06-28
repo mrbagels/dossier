@@ -30,7 +30,7 @@
       "title": "One JSON file becomes this",
       "lede": "Everything below, navigation, search, theme, code, diagrams, charts, math, and an interactive review board, lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.",
       "pills": [
-        "26 block types",
+        "29 block types",
         "Self-contained",
         "Agent-readable",
         "Light + dark"
@@ -60,7 +60,7 @@
       "type": "stat-strip",
       "stats": [
         {
-          "value": "27",
+          "value": "29",
           "label": "Block types"
         },
         {
@@ -276,7 +276,7 @@
             },
             {
               "label": "Q3",
-              "value": 27
+              "value": 29
             },
             {
               "label": "Q4",
@@ -465,6 +465,37 @@
           }
         }
       ]
+    },
+    {
+      "type": "patch-set",
+      "title": "Patch set, proposed edits",
+      "summary": "Implementation dossiers can carry proposed patches grouped by intent, files, work items, risk, and verification.",
+      "patches": [
+        {
+          "id": "patch-process-aware-surface",
+          "title": "Patch process-aware surface",
+          "summary": "Move the artifact from a plan-only surface to a process-aware one.",
+          "operation": "modify",
+          "status": "proposed",
+          "risk": "low",
+          "files": [
+            "src/generate.mjs"
+          ],
+          "workItems": [
+            "extract-work-item"
+          ],
+          "verification": [
+            "npm test"
+          ],
+          "diff": "diff --git a/src/generate.mjs b/src/generate.mjs\n--- a/src/generate.mjs\n+++ b/src/generate.mjs\n@@ -1,2 +1,2 @@\n-// plan-only surface\n+// process-aware surface"
+        }
+      ]
+    },
+    {
+      "type": "diff-view",
+      "title": "Diff view, file-first review",
+      "summary": "A standalone unified diff renders with file summaries, hunks, additions, and deletions.",
+      "diff": "diff --git a/src/runtime/runtime.mjs b/src/runtime/runtime.mjs\n--- a/src/runtime/runtime.mjs\n+++ b/src/runtime/runtime.mjs\n@@ -1,3 +1,4 @@\n const state = loadState();\n+state.process = state.process || {};\n \n exportProcess(state);"
     },
     {
       "type": "glossary",

@@ -3,7 +3,7 @@
 // through a headless browser).
 
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, ImageRun } from "docx";
-import { chartSvg, enrich } from "./generate.mjs";
+import { chartSvg, enrich, parseUnifiedDiff } from "./generate.mjs";
 
 // Print the already-rendered, self-contained HTML to a PDF buffer via Playwright.
 export async function exportPdf(html, opts = {}) {
@@ -132,6 +132,30 @@ async function block(b, out, ctx) {
       String(b.code || "").split("\n").forEach((line) => out.push(new Paragraph({ children: [new TextRun({ text: line || " ", font: "Consolas", size: 18 })] })));
       out.push(new Paragraph({ text: "" }));
       break;
+    case "patch-set":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      if (b.summary) out.push(P(b.summary));
+      for (const p of b.patches || []) {
+        out.push(H(plain(p.title || p.id || "Patch"), HeadingLevel.HEADING_3));
+        if (p.summary) out.push(P(p.summary));
+        if (p.operation) out.push(P("Operation: " + plain(p.operation)));
+        if (p.status) out.push(P("Status: " + plain(p.status)));
+        if (p.risk) out.push(P("Risk: " + plain(p.risk)));
+        if (p.files && p.files.length) out.push(P("Files: " + p.files.map(plain).join(", ")));
+        if (p.workItems && p.workItems.length) out.push(P("Work items: " + p.workItems.map(plain).join(", ")));
+        if (p.verification && p.verification.length) out.push(P("Verification: " + p.verification.map(plain).join(", ")));
+        if (p.diff) String(p.diff).split("\n").forEach((line) => out.push(new Paragraph({ children: [new TextRun({ text: line || " ", font: "Consolas", size: 18 })] })));
+      }
+      break;
+    case "diff-view": {
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      if (b.summary) out.push(P(b.summary));
+      const files = parseUnifiedDiff(b.diff || "", b.filename || b.title || "diff");
+      if (files.length) out.push(P("Files: " + files.map((file) => (file.newPath || file.oldPath || "diff") + " (+" + file.additions + "/-" + file.deletions + ")").join(", ")));
+      String(b.diff || "").split("\n").forEach((line) => out.push(new Paragraph({ children: [new TextRun({ text: line || " ", font: "Consolas", size: 18 })] })));
+      out.push(new Paragraph({ text: "" }));
+      break;
+    }
     case "table":
       if (b.title) out.push(H(b.title, HeadingLevel.HEADING_3));
       addTable(out, b.columns, b.rows);
