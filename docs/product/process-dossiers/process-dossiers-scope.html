@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="dossier/1.0">
+<title>Process Dossiers Product Scope</title>
+<style>:root{}
+:root{
+  color-scheme:light dark;
+  --ds-bg:#fbfbfc; --ds-bg-2:#f5f4f8; --ds-bg-3:#edebf1;
+  --ds-line:#e8e6ee; --ds-line-2:#dcd9e4; --ds-line-strong:#c7c2d3;
+  --ds-ink:#1a1822; --ds-ink-2:#56525f; --ds-ink-3:#8b8698;
+  --ds-accent:#c81e4a; --ds-accent-2:#a8183d; --ds-accent-tint:rgba(200,30,74,.08);
+  --ds-ok:#0f7a52; --ds-warn:#9a5b00; --ds-danger:#c0263b;
+  --ds-ok-tint:rgba(15,122,82,.1); --ds-warn-tint:rgba(154,91,0,.12); --ds-danger-tint:rgba(192,38,59,.1);
+  --ds-frame:1180px; --ds-rail:212px;
+  --ds-font:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ds-serif:Charter,"Bitstream Charter","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --ds-mono:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;
+  --ds-ease:cubic-bezier(.2,0,0,1);
+}
+[data-theme="dark"]{
+  --ds-bg:#0e0d13; --ds-bg-2:#16141d; --ds-bg-3:#1e1b27;
+  --ds-line:#2c2937; --ds-line-2:#3b3749; --ds-line-strong:#524c63;
+  --ds-ink:#eceaf1; --ds-ink-2:#a8a3b6; --ds-ink-3:#7b7689;
+  --ds-accent:#ff6b88; --ds-accent-2:#ff8aa0; --ds-accent-tint:rgba(255,107,136,.12);
+  --ds-ok:#34d399; --ds-warn:#fbbf24; --ds-danger:#fb7185;
+  --ds-ok-tint:rgba(52,211,153,.12); --ds-warn-tint:rgba(251,191,36,.12); --ds-danger-tint:rgba(251,113,133,.12);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:66px}
+body{margin:0;background:var(--ds-bg);color:var(--ds-ink);font-family:var(--ds-font);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+::selection{background:var(--ds-accent-tint)}
+a{color:var(--ds-accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ds-accent);outline-offset:2px;border-radius:5px}
+h1,h2,h3,h4{font-weight:640;letter-spacing:-.014em;scroll-margin-top:66px}
+h1{font-size:30px;line-height:1.18;letter-spacing:-.02em}
+h2{font-size:22px;line-height:1.24;letter-spacing:-.015em;margin:0 0 5px}
+h3{font-size:17.5px;line-height:1.3;letter-spacing:-.006em;margin:0 0 4px}
+h4{font-size:15px;margin:0 0 3px}
+p{margin:0 0 13px}
+ul,ol{margin:0 0 13px;padding-left:21px}
+li{margin:5px 0}
+strong{font-weight:640}
+code{font-family:var(--ds-mono);font-size:.86em;background:var(--ds-bg-2);border:1px solid var(--ds-line);border-radius:5px;padding:.5px 5px;color:var(--ds-ink)}
+.ds-muted{color:var(--ds-ink-2)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+.ds-progress{position:fixed;inset:0 0 auto 0;height:2px;z-index:60}
+.ds-progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--ds-accent),var(--ds-accent-2))}
+
+.ds-shell{width:min(var(--ds-frame),calc(100% - 48px));margin:0 auto;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+
+/* top bar */
+.ds-topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:14px;height:54px;background:var(--ds-bg);border-bottom:1px solid var(--ds-line)}
+.ds-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.ds-mark{width:9px;height:9px;border-radius:50%;background:var(--ds-accent);box-shadow:0 0 0 4px var(--ds-accent-tint);flex:none}
+.ds-crumbs{color:var(--ds-ink);font-size:14.5px;font-weight:580;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-tools{display:flex;align-items:center;gap:8px;flex:none}
+.ds-btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 11px;border:0;background:transparent;color:var(--ds-ink-2);font-size:13px;font-weight:560;border-radius:9px;cursor:pointer;transition:background .12s var(--ds-ease),color .12s var(--ds-ease),border-color .12s var(--ds-ease),transform .1s var(--ds-ease)}
+.ds-btn:hover{background:var(--ds-bg-2);color:var(--ds-ink)}
+.ds-btn .ds-i{flex:none;display:flex}
+.ds-btn kbd{font-family:var(--ds-mono);font-size:11px;color:var(--ds-ink-3);border:1px solid var(--ds-line-2);border-radius:5px;padding:1px 5px}
+.ds-search-btn{border:1px solid var(--ds-line-2);background:var(--ds-bg-2);min-width:172px;justify-content:flex-start;color:var(--ds-ink-3)}
+.ds-search-btn .ds-search-label{margin-right:auto}
+.ds-search-btn:hover{border-color:var(--ds-line-strong);background:var(--ds-bg-2);color:var(--ds-ink-2)}
+.ds-btn[data-theme-toggle]{width:40px;height:40px;padding:0;justify-content:center;font-size:20px;line-height:1;color:var(--ds-ink-2)}
+.ds-btn[data-theme-toggle]:hover{background:transparent;color:var(--ds-accent)}
+.ds-menu{position:relative}
+.ds-menu>summary{list-style:none;display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border:1px solid var(--ds-line-2);background:var(--ds-bg-2);color:var(--ds-ink);font-size:13px;font-weight:580;border-radius:9px;cursor:pointer}
+.ds-menu>summary::-webkit-details-marker{display:none}
+.ds-menu>summary::after{content:"▾";font-size:11px;color:var(--ds-ink-3)}
+.ds-menu>summary:hover{border-color:var(--ds-line-strong);background:var(--ds-bg-3)}
+.ds-menu-list{position:absolute;right:0;top:42px;min-width:206px;display:grid;padding:6px;background:var(--ds-bg);border:1px solid var(--ds-line-2);border-radius:12px;box-shadow:0 14px 38px rgba(20,16,40,.14);z-index:50}
+.ds-menu-list button{justify-content:flex-start;width:100%;height:36px;padding:0 11px;color:var(--ds-ink);font-weight:520}
+
+.ds-lifecycle{display:inline-flex;align-items:center;gap:9px;margin:22px 0 0;padding:6px 13px;background:var(--ds-bg-2);border:1px solid var(--ds-line);border-radius:999px;color:var(--ds-ink-2);font-size:12.5px}
+.ds-lifecycle b{display:inline-flex;align-items:center;gap:7px;color:var(--ds-ink);font-weight:600;text-transform:capitalize}
+.ds-lifecycle b::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ds-warn);box-shadow:0 0 0 3px var(--ds-warn-tint)}
+.ds-lifecycle.stage-durable b::before{background:var(--ds-ok);box-shadow:0 0 0 3px var(--ds-ok-tint)}
+.ds-lifecycle.stage-review b::before{background:var(--ds-accent);box-shadow:0 0 0 3px var(--ds-accent-tint)}
+
+/* layout */
+.ds-layout{display:grid;grid-template-columns:minmax(0,1fr) var(--ds-rail);gap:56px;padding:10px 0 96px;align-items:start}
+.ds-layout.no-toc{grid-template-columns:1fr}
+.ds-content{min-width:0;grid-column:1;counter-reset:sec}
+.ds-toc{grid-column:2;position:sticky;top:74px;display:grid;gap:0;font-size:12.5px;align-self:start}
+.ds-toc .ds-search{margin:0 0 14px}
+.ds-toc .ds-search input{width:100%;height:34px;border:1px solid var(--ds-line-2);border-radius:9px;background:var(--ds-bg-2);padding:0 11px;font-size:13px;outline:0}
+.ds-toc .ds-search input:focus{border-color:var(--ds-line-strong);background:var(--ds-bg)}
+.ds-toc-head{color:var(--ds-ink-3);font-size:11px;font-weight:680;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px}
+.ds-toc-link{display:block;padding:4px 0 4px 14px;color:var(--ds-ink-3);border-left:1.5px solid var(--ds-line);font-weight:520;transition:color .12s var(--ds-ease),border-color .12s var(--ds-ease)}
+.ds-toc-link.lvl-2{padding-left:25px}
+.ds-toc-link:hover{color:var(--ds-ink)}
+.ds-toc-link.active{color:var(--ds-accent);border-left-color:var(--ds-accent)}
+
+.ds-block{position:relative}
+.ds-content>.ds-block+.ds-block{margin-top:34px}
+.ds-content>.ds-block+.ds-section{margin-top:50px}
+.ds-content>.ds-section{counter-increment:sec}
+.ds-copy{position:absolute;top:8px;right:8px;z-index:2;display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;opacity:0;border:1px solid var(--ds-line);border-radius:8px;background:var(--ds-bg);color:var(--ds-ink-3);cursor:pointer;box-shadow:0 1px 2px rgba(20,16,40,.04);transition:opacity .12s var(--ds-ease),color .12s,background .12s,border-color .12s}
+.ds-block:hover>.ds-copy{opacity:1}
+.ds-copy:hover{color:var(--ds-ink);background:var(--ds-bg-2);border-color:var(--ds-line-strong)}
+.ds-copy svg{display:block}
+.ds-block[data-block="code"]>.ds-copy,.ds-block[data-block="diagram"]>.ds-copy{display:none}
+
+/* in-place edit mode */
+html.ds-editing .ds-btn[data-edit-toggle]{background:var(--ds-accent-tint);color:var(--ds-accent)}
+.ds-editing [data-edit]{outline:1px dashed var(--ds-line-strong);outline-offset:3px;border-radius:4px;cursor:text}
+.ds-editing [data-edit]:hover{outline-color:var(--ds-accent)}
+.ds-editing [data-edit]:focus{outline:2px solid var(--ds-accent);outline-offset:3px}
+
+/* theme studio */
+.ds-swatch{width:34px;padding:0;justify-content:center}
+.ds-swatch span{width:14px;height:14px;border-radius:50%;background:var(--ds-accent);box-shadow:0 0 0 1px var(--ds-line-2)}
+.ds-studio{position:fixed;right:18px;top:62px;z-index:70;width:238px;background:var(--ds-bg);border:1px solid var(--ds-line-2);border-radius:14px;box-shadow:0 18px 44px rgba(20,16,40,.18);padding:14px;display:grid;gap:12px}
+.ds-studio[hidden]{display:none}
+.ds-studio-head{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.ds-studio-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:560;color:var(--ds-ink-2)}
+.ds-studio-row input[type=color]{width:46px;height:28px;border:1px solid var(--ds-line-2);border-radius:7px;background:none;cursor:pointer;padding:2px}
+.ds-studio-presets{display:flex;flex-wrap:wrap;gap:8px}
+.ds-studio-sw{width:26px;height:26px;border-radius:50%;border:1px solid var(--ds-line-2);cursor:pointer;padding:0;transition:transform .1s var(--ds-ease)}
+.ds-studio-sw:hover{transform:scale(1.1)}
+.ds-studio-actions{display:grid;gap:7px}
+.ds-studio-actions .ds-btn-line{justify-content:center}
+mark{background:var(--ds-accent-tint);color:inherit;border-radius:3px;padding:0 2px}
+
+/* hero, no background wash */
+.ds-hero{padding:34px 0 4px}
+.ds-eyebrow{display:inline-flex;align-items:center;margin:0 0 15px;padding:5px 12px;background:var(--ds-accent-tint);color:var(--ds-accent);font-size:12px;font-weight:600;letter-spacing:.02em;border-radius:999px}
+.ds-hero h1{font-family:var(--ds-serif);font-weight:400;font-size:clamp(30px,4.2vw,44px);line-height:1.08;letter-spacing:-.022em;margin:0;max-width:20ch}
+.ds-lede{max-width:62ch;margin:18px 0 0;color:var(--ds-ink-2);font-size:18px;line-height:1.5}
+.ds-pillrow{display:flex;flex-wrap:wrap;gap:0;margin-top:20px;color:var(--ds-ink-3);font-size:12.5px;font-weight:520}
+.ds-pill{position:relative;padding:0 14px}
+.ds-pill:first-child{padding-left:0}
+.ds-pill+.ds-pill::before{content:"";position:absolute;left:0;top:50%;width:3px;height:3px;border-radius:50%;background:var(--ds-line-strong);transform:translateY(-50%)}
+.ds-meta{display:flex;flex-wrap:wrap;gap:30px;margin-top:24px;padding-top:20px;border-top:1px solid var(--ds-line)}
+.ds-meta-item{display:grid;gap:3px}
+.ds-meta-item .ds-label{color:var(--ds-ink-3);font-size:11px;font-weight:680;letter-spacing:.06em;text-transform:uppercase}
+.ds-meta-item .ds-val{color:var(--ds-ink);font-size:14.5px;font-weight:560}
+
+/* section */
+.ds-section{padding-top:32px;border-top:1px solid var(--ds-line-2)}
+.ds-section.unframed{border-top:0;padding-top:0}
+.ds-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.ds-section-titles{flex:1;min-width:0}
+.ds-content>.ds-section .ds-section-titles h2::before{content:"§ " counter(sec,decimal-leading-zero);display:flex;align-items:center;width:fit-content;background:var(--ds-accent-tint);color:var(--ds-accent);font-family:var(--ds-mono);font-size:11.5px;font-weight:600;letter-spacing:.07em;padding:4px 10px;border-radius:999px;margin-bottom:12px}
+.ds-section-titles .ds-muted{margin:7px 0 0;font-size:15px}
+.ds-toggle{flex:none;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--ds-ink-3);width:28px;height:28px;border-radius:8px;cursor:pointer;transition:background .12s,color .12s}
+.ds-toggle:hover{background:var(--ds-bg-2);color:var(--ds-ink)}
+.ds-toggle svg{transition:transform .2s var(--ds-ease)}
+.ds-section[data-collapsed="1"] .ds-toggle svg{transform:rotate(-90deg)}
+.ds-section-body{display:grid;gap:18px}
+.ds-section[data-collapsed="1"] .ds-section-body{display:none}
+
+.ds-twocol{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+
+/* outlined cards (equal-size) */
+.ds-cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.ds-card{padding:17px 19px;border:1px solid var(--ds-line-2);border-radius:13px;background:var(--ds-bg);transition:border-color .14s var(--ds-ease),transform .14s var(--ds-ease)}
+.ds-card h3{font-size:15.5px;margin:0 0 7px}
+.ds-card p{margin:0;color:var(--ds-ink-2);font-size:14.5px}
+
+.ds-statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.ds-stat{padding:16px 18px;border:1px solid var(--ds-line-2);border-radius:13px;background:var(--ds-bg)}
+.ds-stat strong{display:block;font-size:30px;font-weight:600;letter-spacing:-.022em;line-height:1;font-variant-numeric:tabular-nums}
+.ds-stat span{display:block;margin-top:8px;color:var(--ds-ink-2);font-size:13px}
+
+/* flow */
+.ds-flow{display:grid;counter-reset:flow}
+.ds-flowstep{display:grid;grid-template-columns:32px 1fr;gap:18px;padding:15px 0;border-top:1px solid var(--ds-line);align-items:start}
+.ds-flowstep:first-child{border-top:0}
+.ds-flowstep::before{counter-increment:flow;content:counter(flow,decimal-leading-zero);font-family:var(--ds-mono);font-size:12.5px;color:var(--ds-accent);padding-top:3px}
+.ds-flowstep-body strong{display:block;margin-bottom:3px;font-size:15.5px}
+.ds-flowstep-body span{color:var(--ds-ink-2);font-size:15px}
+
+/* timeline */
+.ds-timeline{display:grid}
+.ds-phase{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:15px 0;border-top:1px solid var(--ds-line)}
+.ds-phase:first-child{border-top:0}
+.ds-phase-id{display:flex;flex-direction:column;gap:7px;color:var(--ds-ink);font-weight:600;font-size:14.5px;align-items:flex-start}
+.ds-date{color:var(--ds-ink-3);font-size:12px;font-weight:500}
+.ds-phase>div:last-child{color:var(--ds-ink-2)}
+
+/* tables (scrollable on small screens) */
+.ds-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:0}
+th,td{text-align:left;padding:10px 16px 10px 0;border-bottom:1px solid var(--ds-line);vertical-align:top}
+th{color:var(--ds-ink-3);font-size:11px;font-weight:680;letter-spacing:.05em;text-transform:uppercase;border-bottom-color:var(--ds-line-2);white-space:nowrap}
+td{color:var(--ds-ink-2)}
+td strong{color:var(--ds-ink)}
+tr.ds-rec td{color:var(--ds-ink)}
+
+/* chips */
+.ds-status,.ds-lvl,.ds-akind,.ds-astatus,.ds-badge{display:inline-block;font-size:11px;font-weight:620;letter-spacing:.02em}
+.ds-status{padding:2px 9px;border-radius:999px;background:var(--ds-bg-3);color:var(--ds-ink-2);text-transform:capitalize}
+.s-done,.s-shipped{color:var(--ds-ok);background:var(--ds-ok-tint)} .s-in-progress,.s-doing{color:var(--ds-accent);background:var(--ds-accent-tint)} .s-blocked{color:var(--ds-danger);background:var(--ds-danger-tint)}
+.ds-lvl{text-transform:capitalize}
+.ds-lvl.l-high{color:var(--ds-danger)} .ds-lvl.l-medium{color:var(--ds-warn)} .ds-lvl.l-low{color:var(--ds-ok)}
+
+/* callout */
+.ds-callout{border-left:2px solid var(--ds-line-strong);padding:2px 0 2px 18px;color:var(--ds-ink-2)}
+.ds-callout strong{color:var(--ds-ink)}
+.ds-callout.tone-tip{border-left-color:var(--ds-accent)}
+.ds-callout.tone-ok{border-left-color:var(--ds-ok)}
+.ds-callout.tone-warn{border-left-color:var(--ds-warn)}
+.ds-callout.tone-danger{border-left-color:var(--ds-danger)}
+
+/* code */
+.ds-code,.ds-diagram{border:1px solid var(--ds-line);border-radius:11px;overflow:hidden;background:var(--ds-bg-2)}
+.ds-code-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-family:var(--ds-mono);font-size:12px;color:var(--ds-ink-3);border-bottom:1px solid var(--ds-line)}
+.ds-code-bar .ds-lang{color:var(--ds-accent);letter-spacing:.02em}
+.ds-code-copy{border:1px solid var(--ds-line-2);background:var(--ds-bg);color:var(--ds-ink-3);font-family:var(--ds-font);font-size:11.5px;font-weight:560;border-radius:7px;padding:3px 10px;cursor:pointer;transition:color .12s,border-color .12s,transform .1s}
+.ds-code-copy:hover{color:var(--ds-ink);border-color:var(--ds-line-strong)}
+pre{margin:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:15px;font-family:var(--ds-mono);font-size:13px;line-height:1.6;color:var(--ds-ink)}
+pre code{background:transparent;border:0;padding:0;font-size:inherit}
+/* Shiki dual-theme highlighting (build-time, no client JS) */
+.ds-code .shiki{background:transparent!important;margin:0}
+.ds-code .shiki,.ds-code .shiki span{color:var(--shiki-light)}
+[data-theme="dark"] .ds-code .shiki,[data-theme="dark"] .ds-code .shiki span{color:var(--shiki-dark)}
+/* Graphviz diagram, baked to inline SVG */
+.ds-diagram-svg{display:flex;justify-content:center;padding:18px;background:#fff;border:0}
+.ds-diagram-svg svg{max-width:100%;height:auto}
+
+/* figure */
+.ds-figure{margin:0;display:grid;gap:9px}
+.ds-figure img{display:block;max-width:100%;height:auto;border:1px solid var(--ds-line);border-radius:12px}
+.ds-figure figcaption{color:var(--ds-ink-3);font-size:13px;text-align:center}
+
+/* math (KaTeX MathML, native render) */
+.ds-math{overflow-x:auto;text-align:center;font-size:1.05em}
+.ds-math.inline{display:inline-block;text-align:left}
+.ds-math math{font-size:1.15em}
+
+/* footnotes */
+.ds-fnref{font-size:.72em;line-height:0}
+.ds-fnref a{padding:0 1px}
+.ds-footnotes{margin:0;padding-left:22px;color:var(--ds-ink-2);font-size:14.5px}
+.ds-footnotes li{margin:6px 0}
+.ds-footnotes li:target{background:var(--ds-accent-tint);border-radius:6px}
+.ds-fnback{margin-left:4px;text-decoration:none}
+
+/* charts (inline SVG) */
+.ds-chart{border:1px solid var(--ds-line);border-radius:12px;background:var(--ds-bg);padding:14px 12px}
+.ds-chart-svg{display:block;width:100%;height:auto}
+.ds-chart-label,.ds-chart-tick{fill:var(--ds-ink-3);font-family:var(--ds-font);font-size:11px}
+
+/* provenance receipt */
+.ds-receipt{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg-2);padding:16px 18px;font-size:14px}
+.ds-receipt-head{font-weight:680;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ds-ink-3);margin-bottom:12px}
+.ds-receipt .ds-detail{grid-template-columns:120px 1fr}
+.ds-receipt-sources{margin-top:12px;padding-top:12px;border-top:1px solid var(--ds-line)}
+.ds-receipt-sources ul{margin:6px 0 0;padding-left:20px;color:var(--ds-ink-2)}
+
+/* plugin block fallback (Node string renderer injected into the React port) */
+.ds-content>.ds-pluginblock{margin-top:34px}
+.ds-content>.ds-pluginblock:first-child{margin-top:0}
+
+/* tabs */
+.ds-tabbar{display:flex;gap:22px;border-bottom:1px solid var(--ds-line);margin-bottom:20px;overflow-x:auto}
+.ds-tab{border:0;background:transparent;padding:0 0 11px;color:var(--ds-ink-3);font-size:14px;font-weight:560;border-bottom:1.5px solid transparent;margin-bottom:-1px;cursor:pointer;white-space:nowrap}
+.ds-tab.active{color:var(--ds-ink);border-bottom-color:var(--ds-accent)}
+.ds-pane{display:none}
+.ds-pane.active{display:grid;gap:20px}
+
+/* faq */
+details.ds-faq{border-bottom:1px solid var(--ds-line);padding:14px 0}
+details.ds-faq summary{cursor:pointer;font-weight:560;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px}
+details.ds-faq summary::-webkit-details-marker{display:none}
+details.ds-faq summary::after{content:"+";color:var(--ds-ink-3);font-size:18px;flex:none}
+details.ds-faq[open] summary::after{content:"–"}
+details.ds-faq p{margin:12px 0 2px;color:var(--ds-ink-2)}
+
+/* action items */
+.ds-actions{list-style:none;padding:0;margin:0;display:grid}
+.ds-action{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-top:1px solid var(--ds-line)}
+.ds-action:first-child{border-top:0}
+.ds-action label{display:flex;align-items:center;gap:12px;cursor:pointer;flex:1;min-width:0}
+.ds-action input{width:17px;height:17px;accent-color:var(--ds-accent);flex:none}
+.ds-action.done .ds-action-title{text-decoration:line-through;color:var(--ds-ink-3)}
+.ds-action-meta{display:flex;gap:12px;align-items:center;flex:none}
+.ds-owner{font-size:12.5px;color:var(--ds-ink-3)}
+
+/* assumptions */
+.ds-assumptions{list-style:none;padding:0;margin:0;display:grid}
+.ds-assumption{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;padding:12px 0;border-top:1px solid var(--ds-line)}
+.ds-assumption:first-child{border-top:0}
+.ds-akind{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ds-ink-3)}
+.ds-astatus{color:var(--ds-ink-3)}
+.ds-assumption.a-verified .ds-astatus{color:var(--ds-ok)}
+.ds-assumption.a-rejected .ds-astatus{color:var(--ds-danger)}
+
+/* glossary */
+.ds-glossary{display:grid;margin:0}
+.ds-gterm{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:13px 0;border-top:1px solid var(--ds-line)}
+.ds-gterm:first-child{border-top:0}
+.ds-gterm dt{font-weight:560}
+.ds-gterm dd{margin:0;color:var(--ds-ink-2)}
+.ds-term{border-bottom:1px dotted var(--ds-ink-3);cursor:help}
+.ds-xlink{color:var(--ds-accent)}
+
+/* review / triage list */
+.ds-reviewboard .ds-review-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0 13px}
+.ds-review-search{flex:1 1 170px;height:36px;border:1px solid var(--ds-line-2);border-radius:9px;background:var(--ds-bg-2);padding:0 12px;font-size:13.5px;outline:0}
+.ds-review-search:focus{border-color:var(--ds-line-strong);background:var(--ds-bg)}
+.ds-review-only{display:inline-flex;align-items:center;gap:8px;color:var(--ds-ink-2);font-size:13.5px;font-weight:520;cursor:pointer}
+.ds-review-only input{width:16px;height:16px;accent-color:var(--ds-accent)}
+.ds-review-count{color:var(--ds-ink-2);font-size:13.5px;font-weight:560;font-variant-numeric:tabular-nums}
+.ds-btn-line{border:1px solid var(--ds-line-2);background:var(--ds-bg);color:var(--ds-ink-2);height:36px}
+.ds-btn-line:hover{border-color:var(--ds-line-strong);background:var(--ds-bg-2);color:var(--ds-ink)}
+.ds-rlist{display:grid;gap:9px}
+.ds-ritem{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);overflow:hidden;transition:border-color .14s var(--ds-ease)}
+.ds-ritem:hover{border-color:var(--ds-line-strong)}
+.ds-ritem.selected{border-color:var(--ds-accent)}
+.ds-ritem.selected .ds-ritem-head{background:var(--ds-accent-tint)}
+.ds-ritem-head{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start;padding:15px 17px;cursor:pointer}
+.ds-ritem-check{display:flex;align-items:center;padding-top:1px}
+.ds-ritem-check input{width:18px;height:18px;accent-color:var(--ds-accent);cursor:pointer}
+.ds-ritem-titles{min-width:0}
+.ds-ritem-titles h4{font-size:15.5px;margin:0 0 3px}
+.ds-ritem-titles .ds-muted{margin:0;font-size:14px}
+.ds-ritem-aside{display:flex;align-items:center;gap:11px;white-space:nowrap}
+.ds-chev{color:var(--ds-ink-3);font-size:12px;transition:transform .22s var(--ds-ease)}
+.ds-ritem.open .ds-chev{transform:rotate(180deg)}
+.ds-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.ds-chip{padding:3px 10px;border:1px solid var(--ds-line-2);border-radius:999px;color:var(--ds-ink-2);font-size:11px;font-weight:560}
+.ds-ritem-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .26s var(--ds-ease)}
+.ds-ritem.open .ds-ritem-wrap{grid-template-rows:1fr}
+.ds-ritem-body{overflow:hidden;min-height:0;padding:0 17px}
+.ds-ref{padding-top:6px;border-top:1px solid var(--ds-line)}
+.ds-ref>*{margin-top:15px}
+.ds-notes{display:grid;gap:7px;padding:15px 0 17px}
+.ds-notes span{color:var(--ds-ink-3);font-size:11.5px;font-weight:680;letter-spacing:.05em;text-transform:uppercase}
+.ds-detailgrid{display:grid;margin:0}
+.ds-detail{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:8px 0;border-top:1px solid var(--ds-line)}
+.ds-detail dt{color:var(--ds-ink-3);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.ds-detail dd{margin:0;color:var(--ds-ink-2)}
+textarea{width:100%;min-height:80px;resize:vertical;border:1px solid var(--ds-line-2);border-radius:9px;background:var(--ds-bg);padding:10px 11px;font-size:14px;line-height:1.5;outline:0}
+textarea:focus{border-color:var(--ds-line-strong)}
+
+.ds-footer{padding:24px 0 calc(24px + env(safe-area-inset-bottom));border-top:1px solid var(--ds-line);color:var(--ds-ink-3);font-size:12.5px}
+
+/* palette + modals */
+.ds-palette{position:fixed;inset:0;z-index:70;background:rgba(14,11,22,.42);display:flex;align-items:flex-start;justify-content:center;padding:13vh 16px 16px}
+.ds-palette[hidden]{display:none}
+.ds-palette-box{width:min(620px,100%);background:var(--ds-bg);border:1px solid var(--ds-line-2);border-radius:16px;box-shadow:0 30px 70px rgba(14,11,22,.3);overflow:hidden}
+.ds-palette-input{width:100%;border:0;border-bottom:1px solid var(--ds-line);padding:18px 20px;font-size:16px;background:transparent;outline:0}
+.ds-palette-list{max-height:52vh;overflow:auto;-webkit-overflow-scrolling:touch;padding:8px}
+.ds-palette-item{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;font-weight:520;font-size:14.5px}
+.ds-palette-item.active{background:var(--ds-bg-2)}
+.ds-palette-item small{color:var(--ds-ink-3)}
+.ds-modal{position:fixed;inset:0;z-index:70;background:rgba(14,11,22,.42);display:flex;align-items:center;justify-content:center;padding:18px}
+.ds-modal[hidden]{display:none}
+.ds-modal-box{width:min(820px,100%);max-height:84vh;display:flex;flex-direction:column;background:var(--ds-bg);border:1px solid var(--ds-line-2);border-radius:16px;overflow:hidden;box-shadow:0 30px 70px rgba(14,11,22,.3)}
+.ds-modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--ds-line)}
+.ds-modal-box textarea{flex:1;min-height:54vh;border:0;border-radius:0;font-family:var(--ds-mono);font-size:13px}
+.ds-toast{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:80;background:var(--ds-ink);color:var(--ds-bg);border-radius:11px;padding:11px 16px;font-size:13.5px;font-weight:560;box-shadow:0 16px 38px rgba(14,11,22,.32);opacity:0;transform:translateY(8px);transition:.18s var(--ds-ease);pointer-events:none}
+.ds-toast.show{opacity:1;transform:none}
+
+/* back to top */
+.ds-totop{position:fixed;left:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:50;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--ds-line-2);background:var(--ds-bg);color:var(--ds-ink-2);font-size:17px;cursor:pointer;box-shadow:0 10px 28px rgba(20,16,40,.14);opacity:0;transform:translateY(10px) scale(.92);transition:.2s var(--ds-ease);pointer-events:none}
+.ds-totop.show{opacity:1;transform:none;pointer-events:auto}
+.ds-totop:hover{color:var(--ds-accent);border-color:var(--ds-line-strong)}
+
+/* entrance reveal, JS-added, so no-JS markup stays visible */
+.ds-reveal{opacity:0;transform:translateY(12px);transition:opacity .55s var(--ds-ease),transform .55s var(--ds-ease)}
+.ds-reveal.in{opacity:1;transform:none}
+
+/* hover lift + link underline + press feedback (pointer devices) */
+@media (hover:hover){
+  .ds-card,.ds-stat{transition:border-color .14s var(--ds-ease),transform .14s var(--ds-ease)}
+  .ds-card:hover,.ds-stat:hover{transform:translateY(-2px);border-color:var(--ds-line-strong)}
+  .ds-content a:not(.ds-anchor){background:linear-gradient(currentColor 0 0) 0 100% / 0 1.5px no-repeat;transition:background-size .18s var(--ds-ease)}
+  .ds-content a:not(.ds-anchor):hover{background-size:100% 1.5px;text-decoration:none}
+}
+.ds-btn:active,.ds-menu>summary:active,.ds-toggle:active,.ds-totop:active,.ds-code-copy:active{transform:scale(.96)}
+
+/* heading anchors */
+.ds-content h2,.ds-content h3{position:relative}
+.ds-anchor{margin-left:9px;color:var(--ds-ink-3);font-weight:400;opacity:0;text-decoration:none;transition:opacity .12s var(--ds-ease),color .12s var(--ds-ease)}
+.ds-content h2:hover .ds-anchor,.ds-content h3:hover .ds-anchor,.ds-anchor:focus-visible{opacity:1}
+.ds-anchor:hover{color:var(--ds-accent)}
+tbody tr{transition:color .12s var(--ds-ease)}
+tbody tr:hover td{color:var(--ds-ink)}
+.ds-action:hover .ds-action-title{color:var(--ds-ink)}
+
+/* ============ responsive ============ */
+@media (max-width:1040px){
+  .ds-shell{width:calc(100% - 40px)}
+  .ds-layout{grid-template-columns:1fr;gap:0;padding-bottom:80px}
+  .ds-toc{display:none}
+}
+@media (max-width:720px){
+  .ds-shell{width:calc(100% - 32px)}
+  .ds-topbar{height:52px;gap:10px}
+  .ds-tools{gap:6px}
+  .ds-search-btn{min-width:0;width:40px;padding:0;justify-content:center}
+  .ds-search-btn .ds-search-label,.ds-search-btn kbd{display:none}
+  .ds-btn[data-theme-toggle]{width:38px;height:38px}
+  .ds-hero{padding:24px 0 2px}
+  .ds-lede{font-size:16.5px;margin-top:15px}
+  .ds-meta{gap:20px}
+  .ds-content>.ds-block+.ds-block{margin-top:28px}
+  .ds-content>.ds-block+.ds-section{margin-top:40px}
+  .ds-section{padding-top:26px}
+  .ds-section-body{gap:16px}
+  h2{font-size:20px}
+  .ds-twocol{grid-template-columns:1fr;gap:18px}
+  .ds-phase,.ds-gterm,.ds-detail{grid-template-columns:1fr;gap:5px}
+  .ds-review-search{flex-basis:100%}
+  .ds-tablewrap table{min-width:520px}
+  .ds-copy{display:none}
+}
+@media (max-width:480px){
+  .ds-shell{width:calc(100% - 24px)}
+  .ds-crumbs{font-size:13.5px}
+  .ds-hero h1{font-size:27px}
+  .ds-lede{font-size:16px}
+  .ds-statgrid{grid-template-columns:1fr 1fr}
+  .ds-stat strong{font-size:26px}
+  .ds-ritem-head{padding:13px 14px;gap:11px}
+  .ds-ritem-body{padding:0 14px}
+  .ds-palette{padding-top:9vh}
+  .ds-flowstep{grid-template-columns:26px 1fr;gap:13px}
+}
+
+/* print / PDF */
+@media print{
+  :root{--ds-bg:#fff;--ds-bg-2:#fff;--ds-ink:#111;--ds-ink-2:#333;--ds-ink-3:#666;--ds-line:#ddd;--ds-line-2:#ccc}
+  html{font-size:11pt}
+  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy{display:none!important}
+  .ds-layout{display:block}
+  .ds-content{max-width:none}
+  .ds-shell{width:100%}
+  .ds-section[data-collapsed="1"] .ds-section-body{display:grid!important}
+  .ds-ritem-wrap{grid-template-rows:1fr!important}
+  .ds-section,.ds-block,.ds-ritem,.ds-card,.ds-stat,.ds-chart,.ds-figure,table,pre{break-inside:avoid}
+  .ds-reveal{opacity:1!important;transform:none!important}
+  h1,h2,h3,h4{break-after:avoid}
+  a{color:inherit;text-decoration:none}
+  .ds-reveal{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+<div class="ds-progress"><div class="ds-progress-bar"></div></div>
+<div class="ds-shell">
+<header class="ds-topbar">
+<div class="ds-brand"><span class="ds-mark"></span><span class="ds-crumbs">Process Dossiers Product Scope</span></div>
+<div class="ds-tools">
+<button class="ds-btn ds-search-btn" type="button" data-palette-open><span class="ds-i"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.4-3.4"></path></svg></span><span class="ds-search-label">Search</span><kbd>⌘K</kbd></button>
+<button class="ds-btn" type="button" data-edit-toggle title="Edit text in place">Edit</button>
+<button class="ds-btn ds-swatch" type="button" data-studio-open title="Theme studio"><span></span></button>
+<button class="ds-btn" type="button" data-theme-toggle aria-label="Toggle theme">◐</button>
+<details class="ds-menu"><summary>Export</summary><div class="ds-menu-list">
+<button class="ds-btn" type="button" data-action="copy-md">Copy Markdown</button>
+<button class="ds-btn" type="button" data-action="copy-digest">Copy for AI (digest)</button>
+<button class="ds-btn" type="button" data-action="download-md">Download Markdown</button>
+<button class="ds-btn" type="button" data-action="download-json">Download JSON</button>
+<button class="ds-btn" type="button" data-action="view-source">View source</button>
+</div></details>
+</div>
+</header>
+
+<div class="ds-layout">
+<main class="ds-content">
+<section class="ds-hero ds-block" data-block="hero" data-id="process-dossiers-structured-human-agent-workflows-for-real-work-0"><p class="ds-eyebrow">Product direction</p><h1 id="process-dossiers-structured-human-agent-workflows-for-real-work-0" data-edit="process-dossiers-structured-human-agent-workflows-for-real-work-0:title">Process Dossiers: structured human-agent workflows for real work</h1><p class="ds-lede" data-edit="process-dossiers-structured-human-agent-workflows-for-real-work-0:lede">Dossier should evolve from an artifact for planning and review into a general process workbench: a self-contained, agent-readable control surface for implementation, code review, verification, integration loops, releases, incidents, and any other structured AI-assisted process.</p><div class="ds-pillrow"><span class="ds-pill">All in</span><span class="ds-pill">Agent-readable</span><span class="ds-pill">Human-gated</span><span class="ds-pill">Diff-aware</span><span class="ds-pill">Embeddable editor</span></div></section>
+<section class="ds-block" data-block="summary-cards" data-id="summary-cards-1"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div class="ds-cardgrid"><article class="ds-card tone-highlight"><h3>Thesis</h3><p>The durable unit is not a plan. It is a <strong>process packet</strong>: goal, context, work items, edits, evidence, decisions, receipts, and handoff in one round-trippable model.</p></article><article class="ds-card "><h3>Product</h3><p>A Dossier can become a review board, implementation console, patch review surface, verification runbook, incident room, release board, or cross-project integration loop without losing the single-file artifact promise.</p></article><article class="ds-card "><h3>Execution boundary</h3><p>The artifact does not need to become an IDE or agent runtime. It coordinates humans and agents, records structured state, and hands precise packets to tools that do the actual filesystem, Git, execution, or external-service work.</p></article></div></section>
+<section class="ds-block" data-block="flow" data-id="generalized-dossier-loop-2"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="generalized-dossier-loop-2">Generalized dossier loop</h3><div class="ds-flow"><div class="ds-flowstep"><div class="ds-flowstep-body"><strong>Author</strong><span>An agent emits a structured process model with context, proposed work, risks, and evidence requirements.</span></div></div><div class="ds-flowstep"><div class="ds-flowstep-body"><strong>Inspect</strong><span>The human reads, searches, expands, edits, compares, and annotates the process surface.</span></div></div><div class="ds-flowstep"><div class="ds-flowstep-body"><strong>Decide</strong><span>The human applies verdicts: approve, revise, skip, defer, split, retry, or request evidence.</span></div></div><div class="ds-flowstep"><div class="ds-flowstep-body"><strong>Execute</strong><span>An agent or host tool reads the exported packet and performs bounded work against the real system.</span></div></div><div class="ds-flowstep"><div class="ds-flowstep-body"><strong>Verify</strong><span>Tests, diffs, commands, logs, screenshots, and receipts flow back into the model.</span></div></div><div class="ds-flowstep"><div class="ds-flowstep-body"><strong>Handoff</strong><span>The artifact becomes the durable record and the next agent-readable input.</span></div></div></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="why-this-is-bigger-than-planning-3"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="why-this-is-bigger-than-planning-3" data-edit="why-this-is-bigger-than-planning-3:title">Why This Is Bigger Than Planning</h2><p class="ds-muted" data-edit="why-this-is-bigger-than-planning-3:subtitle">The current product already contains the primitives, but the vocabulary is too narrow.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="prose" data-id="prose-4"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div data-edit="prose-4:markdown"><p>Today Dossier is excellent at producing structured planning and decision artifacts. The existing <code>review-board</code> proves the deeper idea: a dossier can be a human-agent protocol, not just a document. The next step is to name that protocol and add blocks for work execution.</p><p>The important reframing is: <strong>planning is one process kind</strong>. Implementation, review, debugging, dependency dogfooding, release prep, incident response, research synthesis, and operations changes are also process kinds. They need the same pattern: structured context, human markup, machine-readable decisions, executable follow-up, and durable receipts.</p></div></section><section class="ds-block" data-block="table" data-id="current-capability-versus-target-capability-5"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="current-capability-versus-target-capability-5">Current capability versus target capability</h3><div class="ds-tablewrap"><table><thead><tr><th>Current Dossier surface</th><th>What it proves</th><th>Process Dossier expansion</th></tr></thead><tbody><tr><td><code>review-board</code></td><td>Humans can select and annotate agent-proposed candidates.</td><td><code>process-board</code> with per-item verdicts, dependencies, evidence, risks, and execution state.</td></tr><tr><td><code>action-items</code></td><td>Checklist state can persist and export.</td><td><code>work-items</code> with owners, branch/worktree refs, verification, and handoff status.</td></tr><tr><td><code>code</code></td><td>Code can be highlighted in static artifacts.</td><td><code>code-editor</code> and <code>diff-view</code> blocks for reviewing and editing snippets or proposed patches.</td></tr><tr><td><code>receipt</code></td><td>Provenance can be represented in the artifact.</td><td><code>run-receipt</code>, <code>verification-receipt</code>, and <code>decision-receipt</code> packets.</td></tr><tr><td>MCP <code>read_decisions</code></td><td>Agents can consume human decisions without scraping.</td><td>MCP <code>read_process</code>, <code>read_verdicts</code>, <code>record_run</code>, and <code>record_patchset</code> tools.</td></tr></tbody></table></div></section></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="lumen-inspiration-to-lift-6"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="lumen-inspiration-to-lift-6" data-edit="lumen-inspiration-to-lift-6:title">Lumen Inspiration To Lift</h2><p class="ds-muted" data-edit="lumen-inspiration-to-lift-6:subtitle">Lumen already documents the broader agent-work vocabulary Dossier needs.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="table" data-id="reusable-product-primitives-7"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="reusable-product-primitives-7">Reusable product primitives</h3><div class="ds-tablewrap"><table><thead><tr><th>Lumen concept</th><th>Dossier adaptation</th><th>Why it matters</th></tr></thead><tbody><tr><td>Decision Layer, approvals, receipts</td><td>Every process dossier can export and import versioned verdict and receipt packets.</td><td>Human control becomes explicit and replayable.</td></tr><tr><td>Execution envelopes</td><td>Dossier records execution intent and evidence, while host tools run commands in bounded environments.</td><td>The artifact stays portable while execution stays safe.</td></tr><tr><td>Agent Work run packets</td><td>A process dossier is the portable packet format for run objective, constraints, budget, state, evidence, and closeout.</td><td>Agents can resume or hand off work without transcript archaeology.</td></tr><tr><td>Git/Forge Workspace Engine</td><td>Implementation dossiers model lanes, branches, patchsets, PRs, checks, review comments, and CI repairs.</td><td>Code editing becomes a first-class process, not an afterthought.</td></tr><tr><td>Dependency Dogfood Pair Sessions</td><td>Dossier can represent producer/consumer integration cycles as bounded packet exchange.</td><td>Reusable dependencies get real adoption feedback loops.</td></tr><tr><td>API Studio concept</td><td>Dossier can embed executable request specs and response diffs as process evidence.</td><td>Implementation and verification can include API calls, not only files.</td></tr><tr><td>CodeMirror and existing diff rendering in Lumen</td><td>Use CodeMirror for embeddable editor blocks and a diff parser/renderer for static patch review.</td><td>The interaction model aligns with tools Kyle already uses.</td></tr><tr><td>OSS intake packets</td><td>Each external project gets source posture, license posture, consumption mode, and milestone placement.</td><td>We can farm OSS aggressively without losing provenance.</td></tr></tbody></table></div></section><section class="ds-block" data-block="callout" data-id="product-boundary-8"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div class="ds-callout tone-tip"><strong data-edit="product-boundary-8:title">Product boundary.</strong> <span data-edit="product-boundary-8:body">Dossier should not duplicate Lumen's runtime. Lumen can execute, coordinate live sessions, and manage approvals. Dossier should define portable workflow artifacts that Lumen, CLI tools, MCP servers, and standalone HTML can all understand.</span></div></section></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="final-product-shape-9"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="final-product-shape-9" data-edit="final-product-shape-9:title">Final Product Shape</h2><p class="ds-muted" data-edit="final-product-shape-9:subtitle">The all-in scope is a process artifact system with static, editable, and host-integrated modes.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="summary-cards" data-id="summary-cards-a"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div class="ds-cardgrid"><article class="ds-card "><h3>Static Artifact</h3><p>A self-contained HTML file with source model, readable process state, diff rendering, readonly code views, decisions export, receipts export, and agent digest.</p></article><article class="ds-card "><h3>Editable Artifact</h3><p>The same file can enter edit mode for text, verdicts, notes, process item status, lightweight code snippets, and theme/model exports.</p></article><article class="ds-card "><h3>Live Studio</h3><p>A hosted or local <code>dossier serve</code> mode adds richer CodeMirror editing, save-back to disk, patch import/export, live validation, and host tool hooks.</p></article><article class="ds-card "><h3>MCP Protocol</h3><p>Agents can render, validate, read verdict packets, record run evidence, attach patchsets, and generate closeout packets without scraping HTML.</p></article></div></section><section class="ds-block" data-block="table" data-id="process-kinds-b"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="process-kinds-b">Process kinds</h3><div class="ds-tablewrap"><table><thead><tr><th>Kind</th><th>Purpose</th><th>Core blocks</th></tr></thead><tbody><tr><td><code>plan</code></td><td>Strategy, option selection, feature planning.</td><td><code>review-board</code>, <code>decision-matrix</code>, <code>assumptions</code>, <code>action-items</code></td></tr><tr><td><code>implementation</code></td><td>Actual code edit loop.</td><td><code>context-map</code>, <code>process-board</code>, <code>patch-set</code>, <code>diff-view</code>, <code>verification-run</code>, <code>receipt</code></td></tr><tr><td><code>review</code></td><td>Code review, design review, security review.</td><td><code>review-board</code>, <code>finding-list</code>, <code>diff-view</code>, <code>comment-thread</code>, <code>verdict-gate</code></td></tr><tr><td><code>debug</code></td><td>Bug reproduction, hypotheses, traces, fixes.</td><td><code>evidence-log</code>, <code>hypothesis-board</code>, <code>patch-set</code>, <code>verification-run</code></td></tr><tr><td><code>integration-loop</code></td><td>Producer/consumer dependency dogfooding.</td><td><code>cycle-board</code>, <code>integration-report</code>, <code>upstream-response</code>, <code>closeout</code></td></tr><tr><td><code>release</code></td><td>Release prep, checks, approvals, changelog.</td><td><code>release-checklist</code>, <code>risk-register</code>, <code>verification-run</code>, <code>receipt</code></td></tr><tr><td><code>incident</code></td><td>Timeline, impact, mitigation, follow-ups.</td><td><code>timeline</code>, <code>evidence-log</code>, <code>decision-log</code>, <code>action-items</code></td></tr></tbody></table></div></section></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="new-block-families-c"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="new-block-families-c" data-edit="new-block-families-c:title">New Block Families</h2><p class="ds-muted" data-edit="new-block-families-c:subtitle">These are the product primitives to add beyond the current planning catalog.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="table" data-id="table-d"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div class="ds-tablewrap"><table><thead><tr><th>Block</th><th>What it renders</th><th>Exported state</th></tr></thead><tbody><tr><td><code>process-board</code></td><td>Expandable work items with status, owner, lane, dependencies, risks, evidence links, and human verdict controls.</td><td>Verdicts, notes, priority, assigned agent, blocked reason, selected verification.</td></tr><tr><td><code>patch-set</code></td><td>Patch summary grouped by file, operation, risk, and relation to work items.</td><td>Patch ids, target files, apply strategy, accepted/skipped/revise state.</td></tr><tr><td><code>diff-view</code></td><td>Unified diff with file tree, hunks, additions/deletions, copy, collapse, and comments.</td><td>Per-file and per-hunk verdicts, comments, requested changes.</td></tr><tr><td><code>code-editor</code></td><td>Embeddable CodeMirror editor for snippets, config, prompts, JSON, markdown, and small patches.</td><td>Edited text, language, dirty state, optional target path.</td></tr><tr><td><code>verification-run</code></td><td>Commands, expected results, actual results, logs, artifacts, and rerun guidance.</td><td>Pass/fail/blocked state, command receipt refs, selected rerun requests.</td></tr><tr><td><code>evidence-log</code></td><td>Append-only observations: screenshots, logs, links, command outputs, API responses, source refs.</td><td>Evidence ids, trust level, source, created time, linked work items.</td></tr><tr><td><code>verdict-gate</code></td><td>A focused approval surface for apply/revise/skip/defer/split/retry decisions.</td><td>Structured verdict packet for agents and MCP tools.</td></tr><tr><td><code>process-receipt</code></td><td>Closeout/provenance summary covering model, tools, commands, files, tests, risks, and failures.</td><td>Receipt packet plus digest text.</td></tr></tbody></table></div></section><section class="ds-block" data-block="code" data-id="code-e"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div class="ds-code"><div class="ds-code-bar"><span class="ds-lang">illustrative-process-packet.json</span><button class="ds-code-copy" type="button" data-code-copy>Copy</button></div><pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e" tabindex="0"><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "schema"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"dossier.process/v1"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "slug"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"auth-session-refactor"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "processKind"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"implementation"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "workItems"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "extract-token-store"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "status"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"ready-for-review"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "verdict"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"apply"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "targetFiles"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"src/auth/session.ts"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "patchIds"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"patch-token-store"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "verification"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"npm test -- auth"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "notes"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Keep the public session API stable."</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "patchSets"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "patch-token-store"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "format"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"unified-diff"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "risk"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"medium"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "summary"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Extract token persistence behind a narrow helper."</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "receipts"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "verify-auth-tests"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "kind"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"verification-run"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "status"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"passed"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">      "command"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"npm test -- auth"</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre></div></section></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="open-source-farm-f"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="open-source-farm-f" data-edit="open-source-farm-f:title">Open Source Farm</h2><p class="ds-muted" data-edit="open-source-farm-f:subtitle">Aggressive reuse is encouraged, with provenance and license-aware consumption modes.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="table" data-id="editor-diff-and-workflow-source-posture-g"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="editor-diff-and-workflow-source-posture-g">Editor, diff, and workflow source posture</h3><div class="ds-tablewrap"><table><thead><tr><th>Source</th><th>Role</th><th>License posture</th><th>Consumption mode</th></tr></thead><tbody><tr><td>CodeMirror 6</td><td>Embeddable editor, small language packages, merge/diff editing surface.</td><td>MIT, good fit.</td><td>Primary editor for static/live Dossier blocks. Bundle only when a model uses editor blocks.</td></tr><tr><td>Monaco Editor</td><td>Full IDE-grade editor and diff editor.</td><td>MIT, but large.</td><td>Optional live Studio mode, not default self-contained artifact runtime.</td></tr><tr><td>Shiki</td><td>Build-time syntax highlighting already used by Dossier.</td><td>MIT, already aligned.</td><td>Keep for static code/diff highlighting and no-client-JS output.</td></tr><tr><td>Diff2Html / react-diff-view / gitdiff-parser</td><td>Unified diff parse/render references.</td><td>Permissive options exist; verify before vendoring.</td><td>Prefer a tiny local parser first, then adopt a library if hunk/comment complexity grows.</td></tr><tr><td>@pierre/diffs</td><td>Lumen already uses this for diff rendering.</td><td>Use Lumen as local reference; verify package license before copying.</td><td>Strong inspiration if the package API and license are suitable for Dossier.</td></tr><tr><td>GitButler</td><td>Virtual branches, lanes, commit timeline, conflict-first UX.</td><td>Private-use source posture in Lumen; public Dossier needs license review.</td><td>Mine product vocabulary and UX patterns first, not code.</td></tr><tr><td>Hoppscotch</td><td>API Studio pattern and packet discipline.</td><td>MIT.</td><td>Use as an example for headless model plus native UI separation.</td></tr><tr><td>opengist</td><td>Git-backed, revisioned snippets.</td><td>AGPL-3.0.</td><td>Pattern only or sidecar. Do not copy source into public Dossier.</td></tr><tr><td>Continue, Aider, OpenHands</td><td>Agent coding workflow references.</td><td>Mixed licenses, verify per component.</td><td>Farm workflow patterns: patch loops, context packets, approval gates, and transcript-to-artifact conversion.</td></tr></tbody></table></div></section><section class="ds-block" data-block="references" data-id="source-references-to-verify-before-vendoring-h"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="source-references-to-verify-before-vendoring-h">Source references to verify before vendoring</h3><div class="ds-tablewrap"><table><thead><tr><th>Source</th><th>Signal</th><th>Use</th></tr></thead><tbody><tr><td><a href="https://codemirror.net/">CodeMirror</a></td><td>Modular editor foundation.</td><td>Primary embeddable editor candidate.</td></tr><tr><td><a href="https://github.com/codemirror/merge">CodeMirror merge package</a></td><td>Merge and diff-oriented package.</td><td>Candidate for diff/edit blocks.</td></tr><tr><td><a href="https://microsoft.github.io/monaco-editor/">Monaco Editor</a></td><td>IDE-grade web editor.</td><td>Optional live Studio editor.</td></tr><tr><td><a href="https://shiki.style/">Shiki</a></td><td>Build-time highlighting.</td><td>Keep static artifact path lightweight.</td></tr><tr><td><a href="https://github.com/gitbutlerapp/gitbutler">GitButler</a></td><td>Virtual lanes and Git workflow UX.</td><td>Product inspiration for implementation dossiers.</td></tr><tr><td><a href="https://github.com/hoppscotch/hoppscotch">Hoppscotch</a></td><td>Headless model plus native surface strategy in Lumen docs.</td><td>Pattern for Dossier live surfaces.</td></tr><tr><td><a href="https://github.com/All-Hands-AI/OpenHands">OpenHands</a></td><td>Open-source software development agents.</td><td>Workflow and process inspiration.</td></tr><tr><td><a href="https://github.com/Aider-AI/aider">Aider</a></td><td>Patch-oriented AI coding loop.</td><td>Patch packet and edit loop inspiration.</td></tr><tr><td><a href="https://github.com/continuedev/continue">Continue</a></td><td>Open-source AI code assistant.</td><td>Context and IDE-agent interaction inspiration.</td></tr></tbody></table></div></section></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="milestone-commit-plan-i"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="milestone-commit-plan-i" data-edit="milestone-commit-plan-i:title">Milestone Commit Plan</h2><p class="ds-muted" data-edit="milestone-commit-plan-i:subtitle">Commit boundaries should map to user-visible product increments and keep rollback simple.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="timeline" data-id="milestones-j"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="milestones-j">Milestones</h3><div class="ds-timeline"><div class="ds-phase"><div class="ds-phase-id">M0<span class="ds-status s-in-progress">in-progress</span></div><div>Product scope packet, OSS source posture, and implementation milestones.</div></div><div class="ds-phase"><div class="ds-phase-id">M1<span class="ds-status s-planned">planned</span></div><div>Schema and starter foundation: add process-oriented kinds, starters, validation coverage, block cheatsheet entries, README positioning, and MCP starter discovery.</div></div><div class="ds-phase"><div class="ds-phase-id">M2<span class="ds-status s-planned">planned</span></div><div>Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.</div></div><div class="ds-phase"><div class="ds-phase-id">M3<span class="ds-status s-planned">planned</span></div><div>Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.</div></div><div class="ds-phase"><div class="ds-phase-id">M4<span class="ds-status s-planned">planned</span></div><div>Embeddable editor: add CodeMirror-backed code-editor blocks in serve/live mode, static fallback in built artifacts, edited-text export, and validation.</div></div><div class="ds-phase"><div class="ds-phase-id">M5<span class="ds-status s-planned">planned</span></div><div>Process MCP protocol: render, validate, read process verdicts, record run receipts, attach patchsets, and return closeout digest.</div></div><div class="ds-phase"><div class="ds-phase-id">M6<span class="ds-status s-planned">planned</span></div><div>Live Studio: save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.</div></div><div class="ds-phase"><div class="ds-phase-id">M7<span class="ds-status s-planned">planned</span></div><div>Integration-loop dossiers: producer/consumer packet templates, cycle control, closeout packets, and dogfood examples.</div></div><div class="ds-phase"><div class="ds-phase-id">M8<span class="ds-status s-planned">planned</span></div><div>Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, and release readiness.</div></div></div></section><section class="ds-block" data-block="action-items" data-id="immediate-next-commits-k"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="immediate-next-commits-k">Immediate next commits</h3><ul class="ds-actions"><li class="ds-action" data-action="immediate-next-commits-k:0"><label><input type="checkbox" data-action-check ><span class="ds-action-title">Commit M0 product scope packet.</span></label><span class="ds-action-meta"><span class="ds-owner">Codex</span><span class="ds-status s-doing">doing</span></span></li><li class="ds-action" data-action="immediate-next-commits-k:1"><label><input type="checkbox" data-action-check ><span class="ds-action-title">Commit M1 process kinds, starters, README and skill positioning.</span></label><span class="ds-action-meta"><span class="ds-owner">Codex</span><span class="ds-status s-todo">todo</span></span></li><li class="ds-action" data-action="immediate-next-commits-k:2"><label><input type="checkbox" data-action-check ><span class="ds-action-title">Commit M2 process-board render and verdict export loop.</span></label><span class="ds-action-meta"><span class="ds-owner">Codex</span><span class="ds-status s-todo">todo</span></span></li><li class="ds-action" data-action="immediate-next-commits-k:3"><label><input type="checkbox" data-action-check ><span class="ds-action-title">Commit M3 diff-view and patch-set static rendering.</span></label><span class="ds-action-meta"><span class="ds-owner">Codex</span><span class="ds-status s-todo">todo</span></span></li><li class="ds-action" data-action="immediate-next-commits-k:4"><label><input type="checkbox" data-action-check ><span class="ds-action-title">Commit M4 CodeMirror-backed live editor mode.</span></label><span class="ds-action-meta"><span class="ds-owner">Codex</span><span class="ds-status s-todo">todo</span></span></li></ul></section></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="data-model-direction-l"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="data-model-direction-l" data-edit="data-model-direction-l:title">Data Model Direction</h2><p class="ds-muted" data-edit="data-model-direction-l:subtitle">Keep the existing document model, but add process contracts that can round-trip independently.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="table" data-id="table-m"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div class="ds-tablewrap"><table><thead><tr><th>Contract</th><th>Purpose</th><th>Notes</th></tr></thead><tbody><tr><td><code>ProcessStatePacket</code></td><td>All local human state that should leave the artifact.</td><td>Superset of today's decisions map. Version it separately from the document schema.</td></tr><tr><td><code>WorkItem</code></td><td>Atomic unit of process work.</td><td>Has id, title, goal, status, owner, dependencies, files, risks, evidence, and verdict.</td></tr><tr><td><code>PatchSet</code></td><td>One proposed or applied edit set.</td><td>Can store inline unified diff, file summaries, external artifact refs, or both.</td></tr><tr><td><code>VerificationRun</code></td><td>Commands and evidence.</td><td>Expected versus actual result, logs, artifacts, pass/fail/blocked, rerun request.</td></tr><tr><td><code>Verdict</code></td><td>Human decision over item, file, hunk, patch, or run.</td><td>Values: approve, revise, skip, defer, split, retry, block.</td></tr><tr><td><code>Receipt</code></td><td>Durable trace of generated, applied, verified, or rejected work.</td><td>Keep provenance even when output is later copied into another tool.</td></tr><tr><td><code>SourceRef</code></td><td>Pointer to files, docs, repos, issues, PRs, command outputs, browser captures, or source material.</td><td>This is how Dossier avoids bloating packets while preserving evidence links.</td></tr></tbody></table></div></section><section class="ds-block" data-block="callout" data-id="versioning-rule-n"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><div class="ds-callout tone-warn"><strong data-edit="versioning-rule-n:title">Versioning rule.</strong> <span data-edit="versioning-rule-n:body">Do not overload the existing <code>decisions</code> packet indefinitely. Add a versioned <code>dossier.process/v1</code> packet so agents can distinguish planning selections from implementation verdicts, patch review, verification evidence, and closeout state.</span></div></section></div></section>
+<section class="ds-section ds-block" data-block="section" data-id="product-guardrails-o"><div class="ds-section-head"><div class="ds-section-titles"><h2 id="product-guardrails-o" data-edit="product-guardrails-o:title">Product Guardrails</h2><p class="ds-muted" data-edit="product-guardrails-o:subtitle">Going all in still needs crisp boundaries.</p></div><button class="ds-toggle" type="button" data-toggle aria-label="Toggle section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button></div><div class="ds-section-body"><section class="ds-block" data-block="risk-register" data-id="risks-p"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="risks-p">Risks</h3><div class="ds-tablewrap"><table><thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead><tbody><tr><td>Static artifact bloat from bundling a full editor into every output.</td><td><span class="ds-lvl l-medium">medium</span></td><td><span class="ds-lvl l-high">high</span></td><td>Gate editor runtime by block usage and prefer CodeMirror over Monaco for artifact mode.</td></tr><tr><td>Dossier accidentally becomes a half-built IDE.</td><td><span class="ds-lvl l-medium">medium</span></td><td><span class="ds-lvl l-high">high</span></td><td>Keep execution, filesystem writes, Git operations, and sandboxing in host tools. Dossier coordinates and records.</td></tr><tr><td>Process state grows incompatible with current decisions export.</td><td><span class="ds-lvl l-high">high</span></td><td><span class="ds-lvl l-medium">medium</span></td><td>Introduce a versioned process packet and keep decision export as a compatibility layer.</td></tr><tr><td>OSS license leakage from farming AGPL/GPL projects.</td><td><span class="ds-lvl l-medium">medium</span></td><td><span class="ds-lvl l-high">high</span></td><td>Record license posture per source. Copy permissive code only; use AGPL/GPL as pattern or sidecar only unless deliberately accepted.</td></tr><tr><td>Too many block types before one loop is excellent.</td><td><span class="ds-lvl l-medium">medium</span></td><td><span class="ds-lvl l-medium">medium</span></td><td>Build implementation dossier first end to end, then generalize to integration loops and release/incident kinds.</td></tr></tbody></table></div></section><section class="ds-block" data-block="assumptions" data-id="open-decisions-q"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="open-decisions-q">Open decisions</h3><ul class="ds-assumptions"><li class="ds-assumption a-unverified"><span class="ds-akind">assumption</span><span>Use CodeMirror as the default embeddable editor for Dossier artifact/live mode.</span><span class="ds-astatus">unverified</span></li><li class="ds-assumption a-unverified"><span class="ds-akind">assumption</span><span>Use Monaco only for a future hosted Studio or Lumen integration where bundle size and worker setup are acceptable.</span><span class="ds-astatus">unverified</span></li><li class="ds-assumption a-unverified"><span class="ds-akind">assumption</span><span>A tiny first-party unified diff renderer may be enough for M3, with a library adopted only if inline comments and complex hunk mapping require it.</span><span class="ds-astatus">unverified</span></li><li class="ds-assumption a-verified"><span class="ds-akind">assumption</span><span>Dossier should remain useful without Lumen, but become more powerful when Lumen or another host consumes the same MCP/process contracts.</span><span class="ds-astatus">verified</span></li></ul></section></div></section>
+<section class="ds-block" data-block="receipt" data-id="planning-receipt-r"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><aside class="ds-receipt"><div class="ds-receipt-head">Planning receipt</div><dl class="ds-detailgrid"><div class="ds-detail"><dt>Generated by</dt><dd>Codex</dd></div><div class="ds-detail"><dt>Date</dt><dd>2026-06-28</dd></div><div class="ds-detail"><dt>Confidence</dt><dd>medium</dd></div><div class="ds-detail"><dt>Tools</dt><dd>repo inspection, Lumen docs review, Context7 attempted, web source verification queued</dd></div></dl><div class="ds-receipt-sources"><span class="ds-label">Sources</span><ul><li><a href="../../README.md">Dossier README</a></li><li><a href="../../schema/dossier.schema.json">Dossier schema</a></li><li><a href="../../../../lumen/docs/llm/START_HERE.md">Lumen docs entrypoint</a></li><li><a href="../../../../lumen/docs/architecture/oss-inspiration-integration-brainstorm.md">Lumen OSS brainstorm</a></li><li><a href="../../../../lumen/docs/project/lumen-cockpit-implementation/git-forge-workspace-engine/README.md">Lumen Git/Forge Workspace Engine</a></li><li><a href="../../../../lumen/docs/project/lumen-cockpit-implementation/api-studio/README.md">Lumen API Studio</a></li><li><a href="../../../../lumen/docs/project/lumen-cockpit-implementation/dependency-dogfood-pair-sessions.md">Lumen Dependency Dogfood Pair Sessions</a></li></ul></div><p class="ds-muted">Context7 was unavailable due quota, so package-specific implementation details must be verified from official docs before vendoring or dependency changes.</p></aside></section>
+</main>
+<aside class="ds-toc"><div class="ds-search"><input type="search" placeholder="Search…" data-search></div><div class="ds-toc-head">On this page</div><a class="ds-toc-link lvl-1" href="#process-dossiers-structured-human-agent-workflows-for-real-work-0" data-toc="process-dossiers-structured-human-agent-workflows-for-real-work-0">Process Dossiers: structured human-agent workflows for real work</a><a class="ds-toc-link lvl-2" href="#why-this-is-bigger-than-planning-3" data-toc="why-this-is-bigger-than-planning-3">Why This Is Bigger Than Planning</a><a class="ds-toc-link lvl-2" href="#lumen-inspiration-to-lift-6" data-toc="lumen-inspiration-to-lift-6">Lumen Inspiration To Lift</a><a class="ds-toc-link lvl-2" href="#final-product-shape-9" data-toc="final-product-shape-9">Final Product Shape</a><a class="ds-toc-link lvl-2" href="#new-block-families-c" data-toc="new-block-families-c">New Block Families</a><a class="ds-toc-link lvl-2" href="#open-source-farm-f" data-toc="open-source-farm-f">Open Source Farm</a><a class="ds-toc-link lvl-2" href="#milestone-commit-plan-i" data-toc="milestone-commit-plan-i">Milestone Commit Plan</a><a class="ds-toc-link lvl-2" href="#data-model-direction-l" data-toc="data-model-direction-l">Data Model Direction</a><a class="ds-toc-link lvl-2" href="#product-guardrails-o" data-toc="product-guardrails-o">Product Guardrails</a></aside>
+</div>
+<footer class="ds-footer">11 min read · 2,502 words · Generated with Dossier · 2026-06-28</footer>
+</div>
+<button class="ds-totop" type="button" data-totop aria-label="Back to top">↑</button>
+
+<div class="ds-palette" data-palette hidden><div class="ds-palette-box"><input type="text" placeholder="Jump to or run an action…" data-palette-input><div class="ds-palette-list" data-palette-list></div></div></div>
+<div class="ds-modal" data-source-modal hidden><div class="ds-modal-box"><div class="ds-modal-head"><strong>Markdown source</strong><button class="ds-btn" type="button" data-source-close>Close</button></div><textarea readonly data-source-text></textarea></div></div>
+<div class="ds-toast" data-toast></div>
+<div class="ds-studio" data-studio hidden>
+<div class="ds-studio-head"><strong>Theme studio</strong><button class="ds-btn" type="button" data-studio-close>Close</button></div>
+<label class="ds-studio-row">Accent <input type="color" data-studio-accent></label>
+<div class="ds-studio-presets"><button class="ds-studio-sw" type="button" data-studio-preset="berry" title="berry" style="background:#c81e4a"></button><button class="ds-studio-sw" type="button" data-studio-preset="slate" title="slate" style="background:#4f5b6b"></button><button class="ds-studio-sw" type="button" data-studio-preset="forest" title="forest" style="background:#2f7d55"></button><button class="ds-studio-sw" type="button" data-studio-preset="ocean" title="ocean" style="background:#1f7a98"></button><button class="ds-studio-sw" type="button" data-studio-preset="midnight" title="midnight" style="background:#5b6ef5"></button><button class="ds-studio-sw" type="button" data-studio-preset="amber" title="amber" style="background:#c2790c"></button><button class="ds-studio-sw" type="button" data-studio-preset="plum" title="plum" style="background:#8a3ffc"></button></div>
+<div class="ds-studio-actions"><button class="ds-btn ds-btn-line" type="button" data-studio-copy>Copy theme JSON</button><button class="ds-btn ds-btn-line" type="button" data-studio-reset>Reset</button></div>
+</div>
+<script type="application/json" id="ds-themes">{"default":{},"berry":{"accent":"#c81e4a","accent-2":"#a8183d","accent-tint":"rgba(200,30,74,.08)"},"slate":{"accent":"#4f5b6b","accent-2":"#3a4452","accent-tint":"rgba(79,91,107,.1)"},"forest":{"accent":"#2f7d55","accent-2":"#246342","accent-tint":"rgba(47,125,85,.1)"},"ocean":{"accent":"#1f7a98","accent-2":"#185f76","accent-tint":"rgba(31,122,152,.1)"},"midnight":{"accent":"#5b6ef5","accent-2":"#4654d4","accent-tint":"rgba(91,110,245,.12)"},"amber":{"accent":"#c2790c","accent-2":"#a06409","accent-tint":"rgba(194,121,12,.12)"},"plum":{"accent":"#8a3ffc","accent-2":"#722fd1","accent-tint":"rgba(138,63,252,.1)"}}</script>
+
+<script type="application/json" id="dossier-model">{"$schema":"https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json","dossierVersion":"1.0","kind":"dossier","meta":{"title":"Process Dossiers Product Scope","slug":"process-dossiers-scope","eyebrow":"Product direction","status":"draft","owner":"Kyle + Codex","updated":"2026-06-28","tags":["process-dossiers","agent-workflows","implementation","editor","diff"]},"blocks":[{"type":"hero","eyebrow":"Product direction","title":"Process Dossiers: structured human-agent workflows for real work","lede":"Dossier should evolve from an artifact for planning and review into a general process workbench: a self-contained, agent-readable control surface for implementation, code review, verification, integration loops, releases, incidents, and any other structured AI-assisted process.","pills":["All in","Agent-readable","Human-gated","Diff-aware","Embeddable editor"],"id":"process-dossiers-structured-human-agent-workflows-for-real-work-0"},{"type":"summary-cards","cards":[{"title":"Thesis","body":"The durable unit is not a plan. It is a **process packet**: goal, context, work items, edits, evidence, decisions, receipts, and handoff in one round-trippable model.","tone":"highlight"},{"title":"Product","body":"A Dossier can become a review board, implementation console, patch review surface, verification runbook, incident room, release board, or cross-project integration loop without losing the single-file artifact promise."},{"title":"Execution boundary","body":"The artifact does not need to become an IDE or agent runtime. It coordinates humans and agents, records structured state, and hands precise packets to tools that do the actual filesystem, Git, execution, or external-service work."}],"id":"summary-cards-1"},{"type":"flow","title":"Generalized dossier loop","steps":[{"title":"Author","body":"An agent emits a structured process model with context, proposed work, risks, and evidence requirements."},{"title":"Inspect","body":"The human reads, searches, expands, edits, compares, and annotates the process surface."},{"title":"Decide","body":"The human applies verdicts: approve, revise, skip, defer, split, retry, or request evidence."},{"title":"Execute","body":"An agent or host tool reads the exported packet and performs bounded work against the real system."},{"title":"Verify","body":"Tests, diffs, commands, logs, screenshots, and receipts flow back into the model."},{"title":"Handoff","body":"The artifact becomes the durable record and the next agent-readable input."}],"id":"generalized-dossier-loop-2"},{"type":"section","title":"Why This Is Bigger Than Planning","subtitle":"The current product already contains the primitives, but the vocabulary is too narrow.","blocks":[{"type":"prose","markdown":"Today Dossier is excellent at producing structured planning and decision artifacts. The existing `review-board` proves the deeper idea: a dossier can be a human-agent protocol, not just a document. The next step is to name that protocol and add blocks for work execution.\n\nThe important reframing is: **planning is one process kind**. Implementation, review, debugging, dependency dogfooding, release prep, incident response, research synthesis, and operations changes are also process kinds. They need the same pattern: structured context, human markup, machine-readable decisions, executable follow-up, and durable receipts.","id":"prose-4"},{"type":"table","title":"Current capability versus target capability","columns":["Current Dossier surface","What it proves","Process Dossier expansion"],"rows":[["`review-board`","Humans can select and annotate agent-proposed candidates.","`process-board` with per-item verdicts, dependencies, evidence, risks, and execution state."],["`action-items`","Checklist state can persist and export.","`work-items` with owners, branch/worktree refs, verification, and handoff status."],["`code`","Code can be highlighted in static artifacts.","`code-editor` and `diff-view` blocks for reviewing and editing snippets or proposed patches."],["`receipt`","Provenance can be represented in the artifact.","`run-receipt`, `verification-receipt`, and `decision-receipt` packets."],["MCP `read_decisions`","Agents can consume human decisions without scraping.","MCP `read_process`, `read_verdicts`, `record_run`, and `record_patchset` tools."]],"id":"current-capability-versus-target-capability-5"}],"id":"why-this-is-bigger-than-planning-3"},{"type":"section","title":"Lumen Inspiration To Lift","subtitle":"Lumen already documents the broader agent-work vocabulary Dossier needs.","blocks":[{"type":"table","title":"Reusable product primitives","columns":["Lumen concept","Dossier adaptation","Why it matters"],"rows":[["Decision Layer, approvals, receipts","Every process dossier can export and import versioned verdict and receipt packets.","Human control becomes explicit and replayable."],["Execution envelopes","Dossier records execution intent and evidence, while host tools run commands in bounded environments.","The artifact stays portable while execution stays safe."],["Agent Work run packets","A process dossier is the portable packet format for run objective, constraints, budget, state, evidence, and closeout.","Agents can resume or hand off work without transcript archaeology."],["Git/Forge Workspace Engine","Implementation dossiers model lanes, branches, patchsets, PRs, checks, review comments, and CI repairs.","Code editing becomes a first-class process, not an afterthought."],["Dependency Dogfood Pair Sessions","Dossier can represent producer/consumer integration cycles as bounded packet exchange.","Reusable dependencies get real adoption feedback loops."],["API Studio concept","Dossier can embed executable request specs and response diffs as process evidence.","Implementation and verification can include API calls, not only files."],["CodeMirror and existing diff rendering in Lumen","Use CodeMirror for embeddable editor blocks and a diff parser/renderer for static patch review.","The interaction model aligns with tools Kyle already uses."],["OSS intake packets","Each external project gets source posture, license posture, consumption mode, and milestone placement.","We can farm OSS aggressively without losing provenance."]],"id":"reusable-product-primitives-7"},{"type":"callout","tone":"tip","title":"Product boundary.","body":"Dossier should not duplicate Lumen's runtime. Lumen can execute, coordinate live sessions, and manage approvals. Dossier should define portable workflow artifacts that Lumen, CLI tools, MCP servers, and standalone HTML can all understand.","id":"product-boundary-8"}],"id":"lumen-inspiration-to-lift-6"},{"type":"section","title":"Final Product Shape","subtitle":"The all-in scope is a process artifact system with static, editable, and host-integrated modes.","blocks":[{"type":"summary-cards","cards":[{"title":"Static Artifact","body":"A self-contained HTML file with source model, readable process state, diff rendering, readonly code views, decisions export, receipts export, and agent digest."},{"title":"Editable Artifact","body":"The same file can enter edit mode for text, verdicts, notes, process item status, lightweight code snippets, and theme/model exports."},{"title":"Live Studio","body":"A hosted or local `dossier serve` mode adds richer CodeMirror editing, save-back to disk, patch import/export, live validation, and host tool hooks."},{"title":"MCP Protocol","body":"Agents can render, validate, read verdict packets, record run evidence, attach patchsets, and generate closeout packets without scraping HTML."}],"id":"summary-cards-a"},{"type":"table","title":"Process kinds","columns":["Kind","Purpose","Core blocks"],"rows":[["`plan`","Strategy, option selection, feature planning.","`review-board`, `decision-matrix`, `assumptions`, `action-items`"],["`implementation`","Actual code edit loop.","`context-map`, `process-board`, `patch-set`, `diff-view`, `verification-run`, `receipt`"],["`review`","Code review, design review, security review.","`review-board`, `finding-list`, `diff-view`, `comment-thread`, `verdict-gate`"],["`debug`","Bug reproduction, hypotheses, traces, fixes.","`evidence-log`, `hypothesis-board`, `patch-set`, `verification-run`"],["`integration-loop`","Producer/consumer dependency dogfooding.","`cycle-board`, `integration-report`, `upstream-response`, `closeout`"],["`release`","Release prep, checks, approvals, changelog.","`release-checklist`, `risk-register`, `verification-run`, `receipt`"],["`incident`","Timeline, impact, mitigation, follow-ups.","`timeline`, `evidence-log`, `decision-log`, `action-items`"]],"id":"process-kinds-b"}],"id":"final-product-shape-9"},{"type":"section","title":"New Block Families","subtitle":"These are the product primitives to add beyond the current planning catalog.","blocks":[{"type":"table","columns":["Block","What it renders","Exported state"],"rows":[["`process-board`","Expandable work items with status, owner, lane, dependencies, risks, evidence links, and human verdict controls.","Verdicts, notes, priority, assigned agent, blocked reason, selected verification."],["`patch-set`","Patch summary grouped by file, operation, risk, and relation to work items.","Patch ids, target files, apply strategy, accepted/skipped/revise state."],["`diff-view`","Unified diff with file tree, hunks, additions/deletions, copy, collapse, and comments.","Per-file and per-hunk verdicts, comments, requested changes."],["`code-editor`","Embeddable CodeMirror editor for snippets, config, prompts, JSON, markdown, and small patches.","Edited text, language, dirty state, optional target path."],["`verification-run`","Commands, expected results, actual results, logs, artifacts, and rerun guidance.","Pass/fail/blocked state, command receipt refs, selected rerun requests."],["`evidence-log`","Append-only observations: screenshots, logs, links, command outputs, API responses, source refs.","Evidence ids, trust level, source, created time, linked work items."],["`verdict-gate`","A focused approval surface for apply/revise/skip/defer/split/retry decisions.","Structured verdict packet for agents and MCP tools."],["`process-receipt`","Closeout/provenance summary covering model, tools, commands, files, tests, risks, and failures.","Receipt packet plus digest text."]],"id":"table-d"},{"type":"code","lang":"json","filename":"illustrative-process-packet.json","code":"{\n  \"schema\": \"dossier.process/v1\",\n  \"slug\": \"auth-session-refactor\",\n  \"processKind\": \"implementation\",\n  \"workItems\": {\n    \"extract-token-store\": {\n      \"status\": \"ready-for-review\",\n      \"verdict\": \"apply\",\n      \"targetFiles\": [\"src/auth/session.ts\"],\n      \"patchIds\": [\"patch-token-store\"],\n      \"verification\": [\"npm test -- auth\"],\n      \"notes\": \"Keep the public session API stable.\"\n    }\n  },\n  \"patchSets\": {\n    \"patch-token-store\": {\n      \"format\": \"unified-diff\",\n      \"risk\": \"medium\",\n      \"summary\": \"Extract token persistence behind a narrow helper.\"\n    }\n  },\n  \"receipts\": {\n    \"verify-auth-tests\": {\n      \"kind\": \"verification-run\",\n      \"status\": \"passed\",\n      \"command\": \"npm test -- auth\"\n    }\n  }\n}","id":"code-e"}],"id":"new-block-families-c"},{"type":"section","title":"Open Source Farm","subtitle":"Aggressive reuse is encouraged, with provenance and license-aware consumption modes.","blocks":[{"type":"table","title":"Editor, diff, and workflow source posture","columns":["Source","Role","License posture","Consumption mode"],"rows":[["CodeMirror 6","Embeddable editor, small language packages, merge/diff editing surface.","MIT, good fit.","Primary editor for static/live Dossier blocks. Bundle only when a model uses editor blocks."],["Monaco Editor","Full IDE-grade editor and diff editor.","MIT, but large.","Optional live Studio mode, not default self-contained artifact runtime."],["Shiki","Build-time syntax highlighting already used by Dossier.","MIT, already aligned.","Keep for static code/diff highlighting and no-client-JS output."],["Diff2Html / react-diff-view / gitdiff-parser","Unified diff parse/render references.","Permissive options exist; verify before vendoring.","Prefer a tiny local parser first, then adopt a library if hunk/comment complexity grows."],["@pierre/diffs","Lumen already uses this for diff rendering.","Use Lumen as local reference; verify package license before copying.","Strong inspiration if the package API and license are suitable for Dossier."],["GitButler","Virtual branches, lanes, commit timeline, conflict-first UX.","Private-use source posture in Lumen; public Dossier needs license review.","Mine product vocabulary and UX patterns first, not code."],["Hoppscotch","API Studio pattern and packet discipline.","MIT.","Use as an example for headless model plus native UI separation."],["opengist","Git-backed, revisioned snippets.","AGPL-3.0.","Pattern only or sidecar. Do not copy source into public Dossier."],["Continue, Aider, OpenHands","Agent coding workflow references.","Mixed licenses, verify per component.","Farm workflow patterns: patch loops, context packets, approval gates, and transcript-to-artifact conversion."]],"id":"editor-diff-and-workflow-source-posture-g"},{"type":"references","title":"Source references to verify before vendoring","items":[{"label":"CodeMirror","url":"https://codemirror.net/","signal":"Modular editor foundation.","use":"Primary embeddable editor candidate."},{"label":"CodeMirror merge package","url":"https://github.com/codemirror/merge","signal":"Merge and diff-oriented package.","use":"Candidate for diff/edit blocks."},{"label":"Monaco Editor","url":"https://microsoft.github.io/monaco-editor/","signal":"IDE-grade web editor.","use":"Optional live Studio editor."},{"label":"Shiki","url":"https://shiki.style/","signal":"Build-time highlighting.","use":"Keep static artifact path lightweight."},{"label":"GitButler","url":"https://github.com/gitbutlerapp/gitbutler","signal":"Virtual lanes and Git workflow UX.","use":"Product inspiration for implementation dossiers."},{"label":"Hoppscotch","url":"https://github.com/hoppscotch/hoppscotch","signal":"Headless model plus native surface strategy in Lumen docs.","use":"Pattern for Dossier live surfaces."},{"label":"OpenHands","url":"https://github.com/All-Hands-AI/OpenHands","signal":"Open-source software development agents.","use":"Workflow and process inspiration."},{"label":"Aider","url":"https://github.com/Aider-AI/aider","signal":"Patch-oriented AI coding loop.","use":"Patch packet and edit loop inspiration."},{"label":"Continue","url":"https://github.com/continuedev/continue","signal":"Open-source AI code assistant.","use":"Context and IDE-agent interaction inspiration."}],"id":"source-references-to-verify-before-vendoring-h"}],"id":"open-source-farm-f"},{"type":"section","title":"Milestone Commit Plan","subtitle":"Commit boundaries should map to user-visible product increments and keep rollback simple.","blocks":[{"type":"timeline","title":"Milestones","phases":[{"label":"M0","body":"Product scope packet, OSS source posture, and implementation milestones.","status":"in-progress"},{"label":"M1","body":"Schema and starter foundation: add process-oriented kinds, starters, validation coverage, block cheatsheet entries, README positioning, and MCP starter discovery.","status":"planned"},{"label":"M2","body":"Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.","status":"planned"},{"label":"M3","body":"Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.","status":"planned"},{"label":"M4","body":"Embeddable editor: add CodeMirror-backed code-editor blocks in serve/live mode, static fallback in built artifacts, edited-text export, and validation.","status":"planned"},{"label":"M5","body":"Process MCP protocol: render, validate, read process verdicts, record run receipts, attach patchsets, and return closeout digest.","status":"planned"},{"label":"M6","body":"Live Studio: save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.","status":"planned"},{"label":"M7","body":"Integration-loop dossiers: producer/consumer packet templates, cycle control, closeout packets, and dogfood examples.","status":"planned"},{"label":"M8","body":"Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, and release readiness.","status":"planned"}],"id":"milestones-j"},{"type":"action-items","title":"Immediate next commits","items":[{"title":"Commit M0 product scope packet.","owner":"Codex","status":"doing"},{"title":"Commit M1 process kinds, starters, README and skill positioning.","owner":"Codex","status":"todo"},{"title":"Commit M2 process-board render and verdict export loop.","owner":"Codex","status":"todo"},{"title":"Commit M3 diff-view and patch-set static rendering.","owner":"Codex","status":"todo"},{"title":"Commit M4 CodeMirror-backed live editor mode.","owner":"Codex","status":"todo"}],"id":"immediate-next-commits-k"}],"id":"milestone-commit-plan-i"},{"type":"section","title":"Data Model Direction","subtitle":"Keep the existing document model, but add process contracts that can round-trip independently.","blocks":[{"type":"table","columns":["Contract","Purpose","Notes"],"rows":[["`ProcessStatePacket`","All local human state that should leave the artifact.","Superset of today's decisions map. Version it separately from the document schema."],["`WorkItem`","Atomic unit of process work.","Has id, title, goal, status, owner, dependencies, files, risks, evidence, and verdict."],["`PatchSet`","One proposed or applied edit set.","Can store inline unified diff, file summaries, external artifact refs, or both."],["`VerificationRun`","Commands and evidence.","Expected versus actual result, logs, artifacts, pass/fail/blocked, rerun request."],["`Verdict`","Human decision over item, file, hunk, patch, or run.","Values: approve, revise, skip, defer, split, retry, block."],["`Receipt`","Durable trace of generated, applied, verified, or rejected work.","Keep provenance even when output is later copied into another tool."],["`SourceRef`","Pointer to files, docs, repos, issues, PRs, command outputs, browser captures, or source material.","This is how Dossier avoids bloating packets while preserving evidence links."]],"id":"table-m"},{"type":"callout","tone":"warn","title":"Versioning rule.","body":"Do not overload the existing `decisions` packet indefinitely. Add a versioned `dossier.process/v1` packet so agents can distinguish planning selections from implementation verdicts, patch review, verification evidence, and closeout state.","id":"versioning-rule-n"}],"id":"data-model-direction-l"},{"type":"section","title":"Product Guardrails","subtitle":"Going all in still needs crisp boundaries.","blocks":[{"type":"risk-register","title":"Risks","risks":[{"risk":"Static artifact bloat from bundling a full editor into every output.","likelihood":"medium","impact":"high","mitigation":"Gate editor runtime by block usage and prefer CodeMirror over Monaco for artifact mode."},{"risk":"Dossier accidentally becomes a half-built IDE.","likelihood":"medium","impact":"high","mitigation":"Keep execution, filesystem writes, Git operations, and sandboxing in host tools. Dossier coordinates and records."},{"risk":"Process state grows incompatible with current decisions export.","likelihood":"high","impact":"medium","mitigation":"Introduce a versioned process packet and keep decision export as a compatibility layer."},{"risk":"OSS license leakage from farming AGPL/GPL projects.","likelihood":"medium","impact":"high","mitigation":"Record license posture per source. Copy permissive code only; use AGPL/GPL as pattern or sidecar only unless deliberately accepted."},{"risk":"Too many block types before one loop is excellent.","likelihood":"medium","impact":"medium","mitigation":"Build implementation dossier first end to end, then generalize to integration loops and release/incident kinds."}],"id":"risks-p"},{"type":"assumptions","title":"Open decisions","items":[{"statement":"Use CodeMirror as the default embeddable editor for Dossier artifact/live mode.","kind":"assumption","status":"unverified"},{"statement":"Use Monaco only for a future hosted Studio or Lumen integration where bundle size and worker setup are acceptable.","kind":"assumption","status":"unverified"},{"statement":"A tiny first-party unified diff renderer may be enough for M3, with a library adopted only if inline comments and complex hunk mapping require it.","kind":"assumption","status":"unverified"},{"statement":"Dossier should remain useful without Lumen, but become more powerful when Lumen or another host consumes the same MCP/process contracts.","kind":"assumption","status":"verified"}],"id":"open-decisions-q"}],"id":"product-guardrails-o"},{"type":"receipt","title":"Planning receipt","generatedBy":"Codex","date":"2026-06-28","confidence":"medium","tools":["repo inspection","Lumen docs review","Context7 attempted","web source verification queued"],"sources":[{"label":"Dossier README","url":"../../README.md"},{"label":"Dossier schema","url":"../../schema/dossier.schema.json"},{"label":"Lumen docs entrypoint","url":"../../../../lumen/docs/llm/START_HERE.md"},{"label":"Lumen OSS brainstorm","url":"../../../../lumen/docs/architecture/oss-inspiration-integration-brainstorm.md"},{"label":"Lumen Git/Forge Workspace Engine","url":"../../../../lumen/docs/project/lumen-cockpit-implementation/git-forge-workspace-engine/README.md"},{"label":"Lumen API Studio","url":"../../../../lumen/docs/project/lumen-cockpit-implementation/api-studio/README.md"},{"label":"Lumen Dependency Dogfood Pair Sessions","url":"../../../../lumen/docs/project/lumen-cockpit-implementation/dependency-dogfood-pair-sessions.md"}],"notes":"Context7 was unavailable due quota, so package-specific implementation details must be verified from official docs before vendoring or dependency changes.","id":"planning-receipt-r"}]}</script>
+<script type="text/markdown" id="dossier-markdown">---
+title: &quot;Process Dossiers Product Scope&quot;
+slug: &quot;process-dossiers-scope&quot;
+status: &quot;draft&quot;
+updated: &quot;2026-06-28&quot;
+---
+# Process Dossiers: structured human-agent workflows for real work
+
+Dossier should evolve from an artifact for planning and review into a general process workbench: a self-contained, agent-readable control surface for implementation, code review, verification, integration loops, releases, incidents, and any other structured AI-assisted process.
+
+### Thesis
+
+The durable unit is not a plan. It is a **process packet**: goal, context, work items, edits, evidence, decisions, receipts, and handoff in one round-trippable model.
+
+### Product
+
+A Dossier can become a review board, implementation console, patch review surface, verification runbook, incident room, release board, or cross-project integration loop without losing the single-file artifact promise.
+
+### Execution boundary
+
+The artifact does not need to become an IDE or agent runtime. It coordinates humans and agents, records structured state, and hands precise packets to tools that do the actual filesystem, Git, execution, or external-service work.
+
+
+### Generalized dossier loop
+
+1. **Author**, An agent emits a structured process model with context, proposed work, risks, and evidence requirements.
+2. **Inspect**, The human reads, searches, expands, edits, compares, and annotates the process surface.
+3. **Decide**, The human applies verdicts: approve, revise, skip, defer, split, retry, or request evidence.
+4. **Execute**, An agent or host tool reads the exported packet and performs bounded work against the real system.
+5. **Verify**, Tests, diffs, commands, logs, screenshots, and receipts flow back into the model.
+6. **Handoff**, The artifact becomes the durable record and the next agent-readable input.
+
+## Why This Is Bigger Than Planning
+
+The current product already contains the primitives, but the vocabulary is too narrow.
+
+Today Dossier is excellent at producing structured planning and decision artifacts. The existing `review-board` proves the deeper idea: a dossier can be a human-agent protocol, not just a document. The next step is to name that protocol and add blocks for work execution.
+
+The important reframing is: **planning is one process kind**. Implementation, review, debugging, dependency dogfooding, release prep, incident response, research synthesis, and operations changes are also process kinds. They need the same pattern: structured context, human markup, machine-readable decisions, executable follow-up, and durable receipts.
+
+### Current capability versus target capability
+
+| Current Dossier surface | What it proves | Process Dossier expansion |
+| --- | --- | --- |
+| `review-board` | Humans can select and annotate agent-proposed candidates. | `process-board` with per-item verdicts, dependencies, evidence, risks, and execution state. |
+| `action-items` | Checklist state can persist and export. | `work-items` with owners, branch/worktree refs, verification, and handoff status. |
+| `code` | Code can be highlighted in static artifacts. | `code-editor` and `diff-view` blocks for reviewing and editing snippets or proposed patches. |
+| `receipt` | Provenance can be represented in the artifact. | `run-receipt`, `verification-receipt`, and `decision-receipt` packets. |
+| MCP `read_decisions` | Agents can consume human decisions without scraping. | MCP `read_process`, `read_verdicts`, `record_run`, and `record_patchset` tools. |
+
+
+## Lumen Inspiration To Lift
+
+Lumen already documents the broader agent-work vocabulary Dossier needs.
+
+### Reusable product primitives
+
+| Lumen concept | Dossier adaptation | Why it matters |
+| --- | --- | --- |
+| Decision Layer, approvals, receipts | Every process dossier can export and import versioned verdict and receipt packets. | Human control becomes explicit and replayable. |
+| Execution envelopes | Dossier records execution intent and evidence, while host tools run commands in bounded environments. | The artifact stays portable while execution stays safe. |
+| Agent Work run packets | A process dossier is the portable packet format for run objective, constraints, budget, state, evidence, and closeout. | Agents can resume or hand off work without transcript archaeology. |
+| Git/Forge Workspace Engine | Implementation dossiers model lanes, branches, patchsets, PRs, checks, review comments, and CI repairs. | Code editing becomes a first-class process, not an afterthought. |
+| Dependency Dogfood Pair Sessions | Dossier can represent producer/consumer integration cycles as bounded packet exchange. | Reusable dependencies get real adoption feedback loops. |
+| API Studio concept | Dossier can embed executable request specs and response diffs as process evidence. | Implementation and verification can include API calls, not only files. |
+| CodeMirror and existing diff rendering in Lumen | Use CodeMirror for embeddable editor blocks and a diff parser/renderer for static patch review. | The interaction model aligns with tools Kyle already uses. |
+| OSS intake packets | Each external project gets source posture, license posture, consumption mode, and milestone placement. | We can farm OSS aggressively without losing provenance. |
+
+&gt; **Product boundary.** Dossier should not duplicate Lumen's runtime. Lumen can execute, coordinate live sessions, and manage approvals. Dossier should define portable workflow artifacts that Lumen, CLI tools, MCP servers, and standalone HTML can all understand.
+
+
+## Final Product Shape
+
+The all-in scope is a process artifact system with static, editable, and host-integrated modes.
+
+### Static Artifact
+
+A self-contained HTML file with source model, readable process state, diff rendering, readonly code views, decisions export, receipts export, and agent digest.
+
+### Editable Artifact
+
+The same file can enter edit mode for text, verdicts, notes, process item status, lightweight code snippets, and theme/model exports.
+
+### Live Studio
+
+A hosted or local `dossier serve` mode adds richer CodeMirror editing, save-back to disk, patch import/export, live validation, and host tool hooks.
+
+### MCP Protocol
+
+Agents can render, validate, read verdict packets, record run evidence, attach patchsets, and generate closeout packets without scraping HTML.
+
+
+### Process kinds
+
+| Kind | Purpose | Core blocks |
+| --- | --- | --- |
+| `plan` | Strategy, option selection, feature planning. | `review-board`, `decision-matrix`, `assumptions`, `action-items` |
+| `implementation` | Actual code edit loop. | `context-map`, `process-board`, `patch-set`, `diff-view`, `verification-run`, `receipt` |
+| `review` | Code review, design review, security review. | `review-board`, `finding-list`, `diff-view`, `comment-thread`, `verdict-gate` |
+| `debug` | Bug reproduction, hypotheses, traces, fixes. | `evidence-log`, `hypothesis-board`, `patch-set`, `verification-run` |
+| `integration-loop` | Producer/consumer dependency dogfooding. | `cycle-board`, `integration-report`, `upstream-response`, `closeout` |
+| `release` | Release prep, checks, approvals, changelog. | `release-checklist`, `risk-register`, `verification-run`, `receipt` |
+| `incident` | Timeline, impact, mitigation, follow-ups. | `timeline`, `evidence-log`, `decision-log`, `action-items` |
+
+
+## New Block Families
+
+These are the product primitives to add beyond the current planning catalog.
+
+| Block | What it renders | Exported state |
+| --- | --- | --- |
+| `process-board` | Expandable work items with status, owner, lane, dependencies, risks, evidence links, and human verdict controls. | Verdicts, notes, priority, assigned agent, blocked reason, selected verification. |
+| `patch-set` | Patch summary grouped by file, operation, risk, and relation to work items. | Patch ids, target files, apply strategy, accepted/skipped/revise state. |
+| `diff-view` | Unified diff with file tree, hunks, additions/deletions, copy, collapse, and comments. | Per-file and per-hunk verdicts, comments, requested changes. |
+| `code-editor` | Embeddable CodeMirror editor for snippets, config, prompts, JSON, markdown, and small patches. | Edited text, language, dirty state, optional target path. |
+| `verification-run` | Commands, expected results, actual results, logs, artifacts, and rerun guidance. | Pass/fail/blocked state, command receipt refs, selected rerun requests. |
+| `evidence-log` | Append-only observations: screenshots, logs, links, command outputs, API responses, source refs. | Evidence ids, trust level, source, created time, linked work items. |
+| `verdict-gate` | A focused approval surface for apply/revise/skip/defer/split/retry decisions. | Structured verdict packet for agents and MCP tools. |
+| `process-receipt` | Closeout/provenance summary covering model, tools, commands, files, tests, risks, and failures. | Receipt packet plus digest text. |
+
+```json
+{
+  &quot;schema&quot;: &quot;dossier.process/v1&quot;,
+  &quot;slug&quot;: &quot;auth-session-refactor&quot;,
+  &quot;processKind&quot;: &quot;implementation&quot;,
+  &quot;workItems&quot;: {
+    &quot;extract-token-store&quot;: {
+      &quot;status&quot;: &quot;ready-for-review&quot;,
+      &quot;verdict&quot;: &quot;apply&quot;,
+      &quot;targetFiles&quot;: [&quot;src/auth/session.ts&quot;],
+      &quot;patchIds&quot;: [&quot;patch-token-store&quot;],
+      &quot;verification&quot;: [&quot;npm test -- auth&quot;],
+      &quot;notes&quot;: &quot;Keep the public session API stable.&quot;
+    }
+  },
+  &quot;patchSets&quot;: {
+    &quot;patch-token-store&quot;: {
+      &quot;format&quot;: &quot;unified-diff&quot;,
+      &quot;risk&quot;: &quot;medium&quot;,
+      &quot;summary&quot;: &quot;Extract token persistence behind a narrow helper.&quot;
+    }
+  },
+  &quot;receipts&quot;: {
+    &quot;verify-auth-tests&quot;: {
+      &quot;kind&quot;: &quot;verification-run&quot;,
+      &quot;status&quot;: &quot;passed&quot;,
+      &quot;command&quot;: &quot;npm test -- auth&quot;
+    }
+  }
+}
+```
+
+
+## Open Source Farm
+
+Aggressive reuse is encouraged, with provenance and license-aware consumption modes.
+
+### Editor, diff, and workflow source posture
+
+| Source | Role | License posture | Consumption mode |
+| --- | --- | --- | --- |
+| CodeMirror 6 | Embeddable editor, small language packages, merge/diff editing surface. | MIT, good fit. | Primary editor for static/live Dossier blocks. Bundle only when a model uses editor blocks. |
+| Monaco Editor | Full IDE-grade editor and diff editor. | MIT, but large. | Optional live Studio mode, not default self-contained artifact runtime. |
+| Shiki | Build-time syntax highlighting already used by Dossier. | MIT, already aligned. | Keep for static code/diff highlighting and no-client-JS output. |
+| Diff2Html / react-diff-view / gitdiff-parser | Unified diff parse/render references. | Permissive options exist; verify before vendoring. | Prefer a tiny local parser first, then adopt a library if hunk/comment complexity grows. |
+| @pierre/diffs | Lumen already uses this for diff rendering. | Use Lumen as local reference; verify package license before copying. | Strong inspiration if the package API and license are suitable for Dossier. |
+| GitButler | Virtual branches, lanes, commit timeline, conflict-first UX. | Private-use source posture in Lumen; public Dossier needs license review. | Mine product vocabulary and UX patterns first, not code. |
+| Hoppscotch | API Studio pattern and packet discipline. | MIT. | Use as an example for headless model plus native UI separation. |
+| opengist | Git-backed, revisioned snippets. | AGPL-3.0. | Pattern only or sidecar. Do not copy source into public Dossier. |
+| Continue, Aider, OpenHands | Agent coding workflow references. | Mixed licenses, verify per component. | Farm workflow patterns: patch loops, context packets, approval gates, and transcript-to-artifact conversion. |
+
+### Source references to verify before vendoring
+
+| Source | Signal | Use |
+| --- | --- | --- |
+| CodeMirror | Modular editor foundation. | Primary embeddable editor candidate. |
+| CodeMirror merge package | Merge and diff-oriented package. | Candidate for diff/edit blocks. |
+| Monaco Editor | IDE-grade web editor. | Optional live Studio editor. |
+| Shiki | Build-time highlighting. | Keep static artifact path lightweight. |
+| GitButler | Virtual lanes and Git workflow UX. | Product inspiration for implementation dossiers. |
+| Hoppscotch | Headless model plus native surface strategy in Lumen docs. | Pattern for Dossier live surfaces. |
+| OpenHands | Open-source software development agents. | Workflow and process inspiration. |
+| Aider | Patch-oriented AI coding loop. | Patch packet and edit loop inspiration. |
+| Continue | Open-source AI code assistant. | Context and IDE-agent interaction inspiration. |
+
+
+## Milestone Commit Plan
+
+Commit boundaries should map to user-visible product increments and keep rollback simple.
+
+### Milestones
+
+- **M0** (in-progress), Product scope packet, OSS source posture, and implementation milestones.
+- **M1** (planned), Schema and starter foundation: add process-oriented kinds, starters, validation coverage, block cheatsheet entries, README positioning, and MCP starter discovery.
+- **M2** (planned), Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.
+- **M3** (planned), Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.
+- **M4** (planned), Embeddable editor: add CodeMirror-backed code-editor blocks in serve/live mode, static fallback in built artifacts, edited-text export, and validation.
+- **M5** (planned), Process MCP protocol: render, validate, read process verdicts, record run receipts, attach patchsets, and return closeout digest.
+- **M6** (planned), Live Studio: save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.
+- **M7** (planned), Integration-loop dossiers: producer/consumer packet templates, cycle control, closeout packets, and dogfood examples.
+- **M8** (planned), Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, and release readiness.
+
+### Immediate next commits
+
+- [ ] Commit M0 product scope packet. (@Codex)
+- [ ] Commit M1 process kinds, starters, README and skill positioning. (@Codex)
+- [ ] Commit M2 process-board render and verdict export loop. (@Codex)
+- [ ] Commit M3 diff-view and patch-set static rendering. (@Codex)
+- [ ] Commit M4 CodeMirror-backed live editor mode. (@Codex)
+
+
+## Data Model Direction
+
+Keep the existing document model, but add process contracts that can round-trip independently.
+
+| Contract | Purpose | Notes |
+| --- | --- | --- |
+| `ProcessStatePacket` | All local human state that should leave the artifact. | Superset of today's decisions map. Version it separately from the document schema. |
+| `WorkItem` | Atomic unit of process work. | Has id, title, goal, status, owner, dependencies, files, risks, evidence, and verdict. |
+| `PatchSet` | One proposed or applied edit set. | Can store inline unified diff, file summaries, external artifact refs, or both. |
+| `VerificationRun` | Commands and evidence. | Expected versus actual result, logs, artifacts, pass/fail/blocked, rerun request. |
+| `Verdict` | Human decision over item, file, hunk, patch, or run. | Values: approve, revise, skip, defer, split, retry, block. |
+| `Receipt` | Durable trace of generated, applied, verified, or rejected work. | Keep provenance even when output is later copied into another tool. |
+| `SourceRef` | Pointer to files, docs, repos, issues, PRs, command outputs, browser captures, or source material. | This is how Dossier avoids bloating packets while preserving evidence links. |
+
+&gt; **Versioning rule.** Do not overload the existing `decisions` packet indefinitely. Add a versioned `dossier.process/v1` packet so agents can distinguish planning selections from implementation verdicts, patch review, verification evidence, and closeout state.
+
+
+## Product Guardrails
+
+Going all in still needs crisp boundaries.
+
+### Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+| --- | --- | --- | --- |
+| Static artifact bloat from bundling a full editor into every output. | medium | high | Gate editor runtime by block usage and prefer CodeMirror over Monaco for artifact mode. |
+| Dossier accidentally becomes a half-built IDE. | medium | high | Keep execution, filesystem writes, Git operations, and sandboxing in host tools. Dossier coordinates and records. |
+| Process state grows incompatible with current decisions export. | high | medium | Introduce a versioned process packet and keep decision export as a compatibility layer. |
+| OSS license leakage from farming AGPL/GPL projects. | medium | high | Record license posture per source. Copy permissive code only; use AGPL/GPL as pattern or sidecar only unless deliberately accepted. |
+| Too many block types before one loop is excellent. | medium | medium | Build implementation dossier first end to end, then generalize to integration loops and release/incident kinds. |
+
+### Open decisions
+
+- (assumption/unverified) Use CodeMirror as the default embeddable editor for Dossier artifact/live mode.
+- (assumption/unverified) Use Monaco only for a future hosted Studio or Lumen integration where bundle size and worker setup are acceptable.
+- (assumption/unverified) A tiny first-party unified diff renderer may be enough for M3, with a library adopted only if inline comments and complex hunk mapping require it.
+- (assumption/verified) Dossier should remain useful without Lumen, but become more powerful when Lumen or another host consumes the same MCP/process contracts.
+
+
+</script>
+<script type="text/plain" id="dossier-digest"># Process Dossiers Product Scope [draft]
+SUMMARY: Dossier should evolve from an artifact for planning and review into a general process workbench: a self-contained, agent-readable control surface for implementation, code review, verification, integration loops, releases, incidents, and any other structured AI-assisted process.
+- summary-cards
+- flow: Generalized dossier loop
+## Why This Is Bigger Than Planning
+- prose
+- table: Current capability versus target capability
+## Lumen Inspiration To Lift
+- table: Reusable product primitives
+- callout: Product boundary.
+## Final Product Shape
+- summary-cards
+- table: Process kinds
+## New Block Families
+- table
+- code
+## Open Source Farm
+- table: Editor, diff, and workflow source posture
+- references: Source references to verify before vendoring
+## Milestone Commit Plan
+- timeline: Milestones
+- action-items: Immediate next commits
+## Data Model Direction
+- table
+- callout: Versioning rule.
+## Product Guardrails
+- risk-register: Risks
+- assumptions: Open decisions
+- receipt: Planning receipt</script>
+<script>
+(function(){
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var model={},mdSrc="",digestSrc="",slug="dossier";
+  try{model=JSON.parse($("#dossier-model").textContent);}catch(e){}
+  mdSrc=(($("#dossier-markdown")||{}).textContent||"");
+  digestSrc=(($("#dossier-digest")||{}).textContent||"");
+  slug=(model.meta&&model.meta.slug)||"dossier";
+  var store="ds:"+slug;
+
+  function toast(msg){var t=$("[data-toast]");if(!t)return;t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},1600);}
+  function copy(text,msg){if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){toast(msg||"Copied")});}else{var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(e){}ta.remove();toast(msg||"Copied");}}
+  function download(name,text,type){var b=new Blob([text],{type:type||"text/plain"});var u=URL.createObjectURL(b);var a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+
+  var savedTheme=localStorage.getItem("ds:theme");
+  if(savedTheme)document.documentElement.setAttribute("data-theme",savedTheme);
+  var tt=$("[data-theme-toggle]");
+  function themeGlyph(){return document.documentElement.getAttribute("data-theme")==="dark"?"☀":"☾";}
+  function toggleTheme(){var cur=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",cur);localStorage.setItem("ds:theme",cur);if(tt)tt.textContent=themeGlyph();}
+  if(tt){tt.textContent=themeGlyph();tt.addEventListener("click",toggleTheme);}
+
+  var bar=$(".ds-progress-bar");
+  function prog(){if(!bar)return;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(window.scrollY/h*100):0)+"%";}
+  window.addEventListener("scroll",prog,{passive:true});prog();
+
+  var links={};$$(".ds-toc-link").forEach(function(l){links[l.getAttribute("data-toc")]=l;});
+  if(window.IntersectionObserver){
+    var io=new IntersectionObserver(function(ents){ents.forEach(function(en){if(en.isIntersecting){var id=en.target.id;if(links[id]){Object.keys(links).forEach(function(k){links[k].classList.toggle("active",k===id);});}}});},{rootMargin:"-8% 0px -82% 0px"});
+    Object.keys(links).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el);});
+  }
+
+  $$("[data-copy]").forEach(function(btn){btn.addEventListener("click",function(e){e.stopPropagation();var blk=btn.closest(".ds-block");var txt=blk?blk.innerText.replace(/^Copy\s*/,""):"";copy(txt,"Block copied");});});
+
+  $$("[data-toggle]").forEach(function(btn){btn.addEventListener("click",function(){var sec=btn.closest(".ds-section");var c=sec.getAttribute("data-collapsed")==="1";sec.setAttribute("data-collapsed",c?"0":"1");});});
+
+  $$(".ds-tabs").forEach(function(w){var tabs=$$(".ds-tab",w),panes=$$(".ds-pane",w);tabs.forEach(function(tb){tb.addEventListener("click",function(){var i=tb.getAttribute("data-tab");tabs.forEach(function(x){x.classList.toggle("active",x===tb)});panes.forEach(function(p){p.classList.toggle("active",p.getAttribute("data-pane")===i)});});});});
+
+  var search=$("[data-search]");
+  if(search){search.addEventListener("input",function(){var q=search.value.trim().toLowerCase();$$(".ds-content > .ds-block").forEach(function(blk){var hit=!q||blk.innerText.toLowerCase().indexOf(q)>=0;blk.style.display=hit?"":"none";});});}
+
+  function viewSource(){var m=$("[data-source-modal]");if(!m)return;$("[data-source-text]").value=mdSrc;m.hidden=false;}
+  $$("[data-action]").forEach(function(b){b.addEventListener("click",function(){var a=b.getAttribute("data-action");if(a==="copy-md")copy(mdSrc,"Markdown copied");else if(a==="copy-digest")copy(digestSrc,"Agent digest copied");else if(a==="download-md")download(slug+".md",mdSrc,"text/markdown");else if(a==="download-json")download(slug+".json",JSON.stringify(model,null,2),"application/json");else if(a==="view-source")viewSource();});});
+  var sc=$("[data-source-close]");if(sc)sc.addEventListener("click",function(){$("[data-source-modal]").hidden=true;});
+
+  var pal=$("[data-palette]"),palIn=$("[data-palette-input]"),palList=$("[data-palette-list]");
+  var cmds=[];
+  $$(".ds-toc-link").forEach(function(l){cmds.push({label:l.textContent,hint:"Section",act:function(){location.hash="#"+l.getAttribute("data-toc");}});});
+  cmds.push({label:"Toggle theme",hint:"Action",act:toggleTheme});
+  cmds.push({label:"Copy Markdown",hint:"Action",act:function(){copy(mdSrc,"Markdown copied");}});
+  cmds.push({label:"Download JSON",hint:"Action",act:function(){download(slug+".json",JSON.stringify(model,null,2),"application/json");}});
+  cmds.push({label:"View Markdown source",hint:"Action",act:viewSource});
+  var palIdx=0,palFiltered=cmds;
+  function renderPal(){if(!palList)return;palList.innerHTML="";palFiltered.forEach(function(c,i){var d=document.createElement("div");d.className="ds-palette-item"+(i===palIdx?" active":"");var s1=document.createElement("span");s1.textContent=c.label;var s2=document.createElement("small");s2.textContent=c.hint;d.appendChild(s1);d.appendChild(s2);d.addEventListener("click",function(){c.act();closePal();});palList.appendChild(d);});}
+  function openPal(){if(!pal)return;pal.hidden=false;palIn.value="";palFiltered=cmds;palIdx=0;renderPal();palIn.focus();}
+  function closePal(){if(pal)pal.hidden=true;}
+  function filterPal(){var q=palIn.value.toLowerCase();palFiltered=cmds.filter(function(c){return c.label.toLowerCase().indexOf(q)>=0;});palIdx=0;renderPal();}
+  var po=$("[data-palette-open]");if(po)po.addEventListener("click",openPal);
+  if(palIn){palIn.addEventListener("input",filterPal);palIn.addEventListener("keydown",function(e){if(e.key==="ArrowDown"){palIdx=Math.min(palIdx+1,palFiltered.length-1);renderPal();e.preventDefault();}else if(e.key==="ArrowUp"){palIdx=Math.max(palIdx-1,0);renderPal();e.preventDefault();}else if(e.key==="Enter"){if(palFiltered[palIdx]){palFiltered[palIdx].act();closePal();}}else if(e.key==="Escape"){closePal();}});}
+  document.addEventListener("keydown",function(e){if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openPal();}});
+  if(pal)pal.addEventListener("click",function(e){if(e.target===pal)closePal();});
+
+  var state={};try{state=JSON.parse(localStorage.getItem(store)||"{}");}catch(e){}
+  function save(){localStorage.setItem(store,JSON.stringify(state));}
+
+  state.actions=state.actions||{};
+  $$(".ds-action").forEach(function(li){var key=li.getAttribute("data-action");var cb=$("[data-action-check]",li);if(!cb)return;if(state.actions[key])cb.checked=true;function sync(){li.classList.toggle("done",cb.checked);state.actions[key]=cb.checked;save();}cb.addEventListener("change",sync);li.classList.toggle("done",cb.checked);});
+
+  function reviewCount(){var n=$$("[data-select]:checked").length;var c=$("[data-review-count]");if(c)c.textContent=n+" selected";}
+  state.decisions=state.decisions||{};
+  $$("[data-select]").forEach(function(cb){var id=cb.getAttribute("data-select");if(state.decisions[id]&&state.decisions[id].selected){cb.checked=true;cb.closest(".ds-ritem").classList.add("selected");}cb.addEventListener("change",function(){cb.closest(".ds-ritem").classList.toggle("selected",cb.checked);state.decisions[id]=state.decisions[id]||{};state.decisions[id].selected=cb.checked;save();reviewCount();});});
+  $$("[data-notes]").forEach(function(ta){var id=ta.getAttribute("data-notes");if(state.decisions[id]&&state.decisions[id].notes)ta.value=state.decisions[id].notes;ta.addEventListener("input",function(){state.decisions[id]=state.decisions[id]||{};state.decisions[id].notes=ta.value;save();});});
+  reviewCount();
+  var ed=$("[data-export-decisions]");if(ed)ed.addEventListener("click",function(){download(slug+".decisions.json",JSON.stringify({slug:slug,decisions:state.decisions},null,2),"application/json");});
+  var im=$("[data-import-decisions]");if(im)im.addEventListener("click",function(){var inp=document.createElement("input");inp.type="file";inp.accept="application/json";inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);var dec=d.decisions||d;Object.keys(dec).forEach(function(id){state.decisions[id]=dec[id];var cb=$("[data-select='"+id+"']");if(cb){cb.checked=!!dec[id].selected;cb.closest(".ds-ritem").classList.toggle("selected",cb.checked);}var ta=$("[data-notes='"+id+"']");if(ta&&dec[id].notes!=null)ta.value=dec[id].notes;});save();reviewCount();toast("Imported decisions");}catch(e){toast("Import failed");}};r.readAsText(f);};inp.click();});
+
+  // expandable triage rows: header toggles open, checkbox does not
+  $$(".ds-ritem").forEach(function(item){var head=item.querySelector("[data-rtoggle]");if(head)head.addEventListener("click",function(e){if(e.target.closest("[data-stop]"))return;item.classList.toggle("open");});var stop=item.querySelector("[data-stop]");if(stop)stop.addEventListener("click",function(e){e.stopPropagation();});});
+  var rsearch=$("[data-review-search]"),ronly=$("[data-review-only]"),rexpand=$("[data-review-expand]");
+  function reviewFilter(){var q=((rsearch&&rsearch.value)||"").trim().toLowerCase();var only=ronly&&ronly.checked;$$(".ds-ritem").forEach(function(i){var txt=i.getAttribute("data-text")||"";var cb=i.querySelector("[data-select]");var sel=cb&&cb.checked;i.style.display=((!q||txt.indexOf(q)>=0)&&(!only||sel))?"":"none";});}
+  if(rsearch)rsearch.addEventListener("input",reviewFilter);
+  if(ronly)ronly.addEventListener("change",reviewFilter);
+  if(rexpand)rexpand.addEventListener("click",function(){var items=$$(".ds-ritem");var anyClosed=items.some(function(i){return !i.classList.contains("open");});items.forEach(function(i){i.classList.toggle("open",anyClosed);});rexpand.textContent=anyClosed?"Collapse all":"Expand all";});
+  $$("[data-select]").forEach(function(cb){cb.addEventListener("change",reviewFilter);});
+
+  // close the export menu after an action or an outside click
+  $$(".ds-menu-list button").forEach(function(b){b.addEventListener("click",function(){var m=b.closest(".ds-menu");if(m)m.removeAttribute("open");});});
+  document.addEventListener("click",function(e){var om=$(".ds-menu[open]");if(om&&!om.contains(e.target))om.removeAttribute("open");});
+
+  // count-up on stats when they scroll into view
+  function animateCount(el){var raw=el.textContent.trim();var m=raw.match(/^(\d[\d,]*)(.*)$/);if(!m)return;var target=parseInt(m[1].replace(/,/g,""),10);var suffix=m[2]||"";if(!isFinite(target)||target>1000000)return;if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;var dur=900,start=null;function step(ts){if(!start)start=ts;var p=Math.min((ts-start)/dur,1);var e=1-Math.pow(1-p,3);el.textContent=Math.round(e*target).toLocaleString()+suffix;if(p<1)requestAnimationFrame(step);else el.textContent=target.toLocaleString()+suffix;}requestAnimationFrame(step);}
+  if(window.IntersectionObserver){var so=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){animateCount(en.target);so.unobserve(en.target);}});},{threshold:.6});$$(".ds-stat strong").forEach(function(s){so.observe(s);});}
+
+  // heading anchors: hover reveals a # that copies a deep link
+  $$(".ds-content h2[id], .ds-content h3[id]").forEach(function(h){var a=document.createElement("a");a.className="ds-anchor";a.href="#"+h.id;a.textContent="#";a.setAttribute("aria-label","Copy link to section");a.addEventListener("click",function(e){e.preventDefault();location.hash=h.id;copy(location.href.split("#")[0]+"#"+h.id,"Link copied");});h.appendChild(a);});
+
+  // code copy
+  $$("[data-code-copy]").forEach(function(btn){btn.addEventListener("click",function(e){e.stopPropagation();var box=btn.closest(".ds-code,.ds-diagram");var pre=box&&box.querySelector("pre");copy(pre?pre.innerText:"","Code copied");});});
+
+  // back to top
+  var totop=$("[data-totop]");
+  if(totop){totop.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});window.addEventListener("scroll",function(){totop.classList.toggle("show",window.scrollY>640);},{passive:true});}
+
+  // entrance reveal for below-the-fold blocks (added by JS, so no-JS stays visible; skips on-screen blocks to avoid flash)
+  if(window.IntersectionObserver){var ro=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");ro.unobserve(en.target);}});},{rootMargin:"0px 0px -6% 0px"});$$(".ds-content>.ds-block").forEach(function(b){if(b.getBoundingClientRect().top<window.innerHeight*0.92)return;b.classList.add("ds-reveal");ro.observe(b);});}
+
+  // shortcuts: "/" focuses search, "t" toggles theme, Esc closes modal
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){var m=$("[data-source-modal]");if(m)m.hidden=true;}var tag=((e.target&&e.target.tagName)||"").toLowerCase();if(tag==="input"||tag==="textarea"||(e.target&&e.target.isContentEditable)||e.metaKey||e.ctrlKey||e.altKey)return;if(e.key==="/"){e.preventDefault();var s=$("[data-search]");if(s)s.focus();else openPal();}else if(e.key==="t"){toggleTheme();}});
+
+  // in-place text editing: toggle edit mode, sync edits into the model (Export -> Download JSON to save)
+  var __editing=false,__hinted=false;
+  function __findBlock(blocks,id){if(!blocks)return null;for(var i=0;i<blocks.length;i++){var b=blocks[i],r;if(b&&b.id===id)return b;if(b){if((r=__findBlock(b.blocks,id)))return r;if((r=__findBlock(b.left,id)))return r;if((r=__findBlock(b.right,id)))return r;if(b.tabs){for(var j=0;j<b.tabs.length;j++){if((r=__findBlock(b.tabs[j].blocks,id)))return r;}}if(b.candidates){for(var k=0;k<b.candidates.length;k++){if((r=__findBlock(b.candidates[k].blocks,id)))return r;}}}}return null;}
+  var __editBtn=$("[data-edit-toggle]"),__editFields=$$("[data-edit]");
+  if(__editBtn&&__editFields.length){
+    __editFields.forEach(function(el){el.addEventListener("input",function(){if(!__editing)return;var p=el.getAttribute("data-edit"),i=p.indexOf(":"),b=__findBlock(model.blocks,p.slice(0,i));if(b)b[p.slice(i+1)]=el.innerText.trim();});});
+    __editBtn.addEventListener("click",function(){__editing=!__editing;document.documentElement.classList.toggle("ds-editing",__editing);__editFields.forEach(function(el){el.contentEditable=__editing?"true":"false";});__editBtn.textContent=__editing?"Done":"Edit";if(__editing&&!__hinted){__hinted=true;toast("Edit text in place, then Export \u25b8 Download JSON to save");}});
+  }
+
+  // theme studio: live token tweaks (applied as inline CSS vars) + brand-pack presets + copy
+  var __studio=$("[data-studio]"),__studioBtn=$("[data-studio-open]");
+  if(__studio&&__studioBtn){
+    var __themes={};try{__themes=JSON.parse(($("#ds-themes")||{}).textContent||"{}");}catch(e){}
+    var __ov={},__accIn=$("[data-studio-accent]");
+    function __h2(c){c=String(c||"").replace("#","");if(!/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c))return [0,0,0];if(c.length===3)c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
+    function __darken(hex,amt){return "#"+__h2(hex).map(function(v){return ("0"+Math.max(0,Math.round(v*(1-amt))).toString(16)).slice(-2);}).join("");}
+    function __rgba(hex,a){var r=__h2(hex);return "rgba("+r[0]+","+r[1]+","+r[2]+","+a+")";}
+    function __set(name,val){document.documentElement.style.setProperty("--ds-"+name,val);__ov[name]=val;}
+    function __setAccent(hex){__set("accent",hex);__set("accent-2",__darken(hex,0.16));__set("accent-tint",__rgba(hex,0.1));if(__accIn)__accIn.value=hex;}
+    if(__accIn){__accIn.addEventListener("input",function(){__setAccent(__accIn.value);});var cur=getComputedStyle(document.documentElement).getPropertyValue("--ds-accent").trim();if(/^#/.test(cur))__accIn.value=cur;}
+    $$("[data-studio-preset]").forEach(function(b){b.addEventListener("click",function(){var t=__themes[b.getAttribute("data-studio-preset")]||{};Object.keys(t).forEach(function(k){__set(k,t[k]);});if(t.accent&&__accIn)__accIn.value=t.accent;});});
+    var __c=$("[data-studio-copy]");if(__c)__c.addEventListener("click",function(){copy(JSON.stringify(__ov,null,2),"Theme JSON copied, paste into meta.theme");});
+    var __r=$("[data-studio-reset]");if(__r)__r.addEventListener("click",function(){Object.keys(__ov).forEach(function(k){document.documentElement.style.removeProperty("--ds-"+k);});__ov={};});
+    __studioBtn.addEventListener("click",function(){__studio.hidden=!__studio.hidden;});
+    var __sc=$("[data-studio-close]");if(__sc)__sc.addEventListener("click",function(){__studio.hidden=true;});
+  }
+})();
+</script>
+</body>
+</html>
