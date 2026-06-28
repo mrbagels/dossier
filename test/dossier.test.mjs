@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { generate, validateModel } from "../src/index.mjs";
@@ -8,10 +8,21 @@ import { diffModels } from "../src/diff.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const examplesDir = join(root, "examples");
+const startersDir = join(root, "src", "starters");
 const sample = JSON.parse(readFileSync(join(examplesDir, "sample.dossier.json"), "utf8"));
 
 test("the sample validates", () => {
   assert.equal(validateModel(sample).ok, true);
+});
+
+test("all starters validate", () => {
+  const files = readdirSync(startersDir).filter((file) => file.endsWith(".dossier.json"));
+  assert.ok(files.length >= 1, "starters exist");
+  for (const file of files) {
+    const model = JSON.parse(readFileSync(join(startersDir, file), "utf8"));
+    const result = validateModel(model);
+    assert.deepEqual(result.errors, [], file);
+  }
 });
 
 test("validation catches unknown types and missing fields", () => {

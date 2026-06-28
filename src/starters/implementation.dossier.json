@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "dossierVersion": "1.0",
+  "kind": "implementation",
+  "meta": {
+    "title": "Implementation: Replace with the change",
+    "slug": "replace-with-slug",
+    "eyebrow": "Implementation dossier",
+    "status": "review",
+    "updated": "2026-06-28",
+    "tags": ["implementation", "process"],
+    "lifecycle": { "stage": "review", "note": "Approve work items, constraints, and verification before applying edits.", "promoteTo": "durable" }
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "eyebrow": "Implementation dossier",
+      "title": "Replace with the code change",
+      "lede": "A structured control surface for actual code editing: context, work items, proposed edits, verification, risks, and handoff."
+    },
+    {
+      "type": "summary-cards",
+      "cards": [
+        { "title": "Goal", "body": "State the user-visible outcome and the code boundary.", "tone": "highlight" },
+        { "title": "Constraints", "body": "List compatibility, API, design, migration, dependency, or safety constraints." },
+        { "title": "Verification", "body": "List the narrowest meaningful commands and smoke checks." }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Context map",
+      "blocks": [
+        { "type": "table", "columns": ["Area", "Files or references", "Why it matters"], "rows": [
+          ["Primary surface", "`replace/with/file.ts`", "Main behavior to change."],
+          ["Tests", "`replace/with/file.test.ts`", "Narrow verification target."],
+          ["Docs", "`README.md`", "User-facing behavior or setup notes."]
+        ] },
+        { "type": "assumptions", "items": [
+          { "statement": "Replace with a risk or assumption the agent must preserve.", "kind": "assumption", "status": "unverified" }
+        ] }
+      ]
+    },
+    {
+      "type": "review-board",
+      "title": "Work items",
+      "candidates": [
+        {
+          "id": "work-item-one",
+          "title": "Work item one",
+          "summary": "Atomic edit or behavior change.",
+          "category": "Code",
+          "status": "proposed",
+          "impact": "Medium",
+          "effort": "Small",
+          "body": "Describe the edit, target files, expected patch shape, risks, and verification command.",
+          "details": {
+            "Target files": "`replace/with/file.ts`",
+            "Verification": "`npm test -- replace`",
+            "Verdict": "approve | revise | skip | defer"
+          }
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "lang": "diff",
+      "filename": "patch-preview.diff",
+      "code": "diff --git a/replace/with/file.ts b/replace/with/file.ts\n--- a/replace/with/file.ts\n+++ b/replace/with/file.ts\n@@ -1,3 +1,3 @@\n-// old behavior\n+// proposed behavior"
+    },
+    {
+      "type": "action-items",
+      "title": "Verification checklist",
+      "items": [
+        { "title": "Run the narrow unit or typecheck command.", "owner": "agent", "status": "todo" },
+        { "title": "Record changed files and residual risk.", "owner": "agent", "status": "todo" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "dossierVersion": "1.0",
+  "kind": "release",
+  "meta": {
+    "title": "Release: Replace with the version",
+    "slug": "replace-with-slug",
+    "eyebrow": "Release dossier",
+    "status": "review",
+    "updated": "2026-06-28",
+    "tags": ["release", "process"],
+    "lifecycle": { "stage": "review", "note": "Confirm readiness, risks, rollback, and approvals.", "promoteTo": "durable" }
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "eyebrow": "Release dossier",
+      "title": "Replace with the release version or train",
+      "lede": "A release readiness surface covering scope, checks, risks, approvals, rollback, and closeout."
+    },
+    {
+      "type": "action-items",
+      "title": "Release checklist",
+      "items": [
+        { "title": "Confirm version, branch, and changelog.", "owner": "agent", "status": "todo" },
+        { "title": "Run required tests, typecheck, build, or smoke checks.", "owner": "agent", "status": "todo" },
+        { "title": "Confirm rollback or recovery path.", "owner": "agent", "status": "todo" },
+        { "title": "Record approvals and publish result.", "owner": "agent", "status": "todo" }
+      ]
+    },
+    {
+      "type": "risk-register",
+      "title": "Release risks",
+      "risks": [
+        { "risk": "Regression in the primary workflow.", "likelihood": "medium", "impact": "high", "mitigation": "Run focused smoke checks and keep rollback ready." }
+      ]
+    },
+    {
+      "type": "receipt",
+      "generatedBy": "release agent",
+      "date": "2026-06-28",
+      "confidence": "medium",
+      "tools": ["tests", "build", "manual smoke"],
+      "notes": "Replace with final release evidence and unresolved risks."
+    }
+  ]
+}

@@ -11,7 +11,20 @@ import { generate, validateModel } from "../src/index.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = dirname(here);
-const STARTERS = ["dossier", "adr", "runbook", "postmortem", "review-board"];
+const STARTERS = [
+  "dossier",
+  "plan",
+  "implementation",
+  "review",
+  "debug",
+  "integration-loop",
+  "release",
+  "incident",
+  "adr",
+  "runbook",
+  "postmortem",
+  "review-board",
+];
 
 const TOOLS = [
   {

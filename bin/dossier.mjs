@@ -28,7 +28,20 @@ for (let i = 0; i < rest.length; i++) {
   } else args.push(a);
 }
 
-const STARTERS = ["dossier", "adr", "runbook", "postmortem", "review-board"];
+const STARTERS = [
+  "dossier",
+  "plan",
+  "implementation",
+  "review",
+  "debug",
+  "integration-loop",
+  "release",
+  "incident",
+  "adr",
+  "runbook",
+  "postmortem",
+  "review-board",
+];
 
 const USAGE = [
   "Dossier, self-contained, agent-readable HTML documents from one JSON file.",

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "dossierVersion": "1.0",
+  "kind": "incident",
+  "meta": {
+    "title": "Incident: Replace with the incident",
+    "slug": "replace-with-slug",
+    "eyebrow": "Incident dossier",
+    "status": "review",
+    "updated": "2026-06-28",
+    "tags": ["incident", "process"],
+    "lifecycle": { "stage": "review", "note": "Capture timeline, decisions, mitigation, and follow-ups.", "promoteTo": "durable" }
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "eyebrow": "Incident dossier",
+      "title": "Replace with the incident",
+      "lede": "A structured incident room for impact, timeline, decisions, evidence, mitigation, and follow-up work.",
+      "sideCards": [
+        { "label": "Severity", "value": "SEV-?" },
+        { "label": "Started", "value": "?" },
+        { "label": "Status", "value": "active" }
+      ]
+    },
+    {
+      "type": "timeline",
+      "title": "Timeline",
+      "phases": [
+        { "label": "Detected", "body": "How the incident was detected.", "status": "done" },
+        { "label": "Triaged", "body": "Initial scope and suspected cause.", "status": "in-progress" },
+        { "label": "Mitigated", "body": "What reduces or removes customer impact.", "status": "planned" },
+        { "label": "Resolved", "body": "What closes the incident.", "status": "planned" }
+      ]
+    },
+    {
+      "type": "review-board",
+      "title": "Decisions",
+      "candidates": [
+        {
+          "id": "mitigation-one",
+          "title": "Mitigation option one",
+          "summary": "Immediate action to reduce impact.",
+          "category": "Mitigation",
+          "status": "candidate",
+          "impact": "High",
+          "effort": "Small",
+          "body": "Describe the mitigation, risk, owner, and verification."
+        }
+      ]
+    },
+    {
+      "type": "action-items",
+      "title": "Follow-ups",
+      "items": [
+        { "title": "Replace with corrective action.", "owner": "agent", "status": "todo" }
+      ]
+    }
+  ]
+}

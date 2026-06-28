@@ -30,12 +30,19 @@
       "type": "string",
       "enum": [
         "reader",
+        "plan",
         "review-board",
         "dossier",
         "adr",
         "runbook",
         "research",
-        "comparison"
+        "comparison",
+        "implementation",
+        "review",
+        "debug",
+        "integration-loop",
+        "release",
+        "incident"
       ],
       "default": "dossier"
     },

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "dossierVersion": "1.0",
+  "kind": "debug",
+  "meta": {
+    "title": "Debug: Replace with the bug",
+    "slug": "replace-with-slug",
+    "eyebrow": "Debug dossier",
+    "status": "review",
+    "updated": "2026-06-28",
+    "tags": ["debug", "process"]
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "eyebrow": "Debug dossier",
+      "title": "Replace with the bug",
+      "lede": "A structured bug investigation surface for symptoms, reproduction, hypotheses, evidence, proposed fixes, and verification."
+    },
+    {
+      "type": "section",
+      "title": "Reproduction",
+      "blocks": [
+        { "type": "flow", "steps": [
+          { "title": "Setup", "body": "Environment, branch, data, account, or fixture." },
+          { "title": "Trigger", "body": "Exact user action, command, request, or event." },
+          { "title": "Observe", "body": "Expected versus actual behavior." }
+        ] },
+        { "type": "code", "lang": "bash", "filename": "repro-command", "code": "replace-with-command-that-reproduces-the-bug" }
+      ]
+    },
+    {
+      "type": "assumptions",
+      "title": "Hypotheses",
+      "items": [
+        { "statement": "Replace with the leading hypothesis.", "kind": "assumption", "status": "unverified" },
+        { "statement": "Replace with the question that would disprove it.", "kind": "open-question", "status": "unverified" }
+      ]
+    },
+    {
+      "type": "review-board",
+      "title": "Fix candidates",
+      "candidates": [
+        {
+          "id": "fix-one",
+          "title": "Fix candidate one",
+          "summary": "Narrow proposed repair.",
+          "category": "Fix",
+          "status": "candidate",
+          "impact": "Medium",
+          "effort": "Small",
+          "body": "Describe the code change, why it addresses the hypothesis, and how to verify it.",
+          "details": { "Verification": "`npm test -- replace`" }
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 # Dossier
 
-### Stop asking your AI for a Markdown file. Have it build you a Dossier: a self-contained, interactive HTML document for planning, documenting, and deciding *with* AI.
+### Stop asking your AI for a Markdown file. Have it build you a Dossier: a self-contained, interactive HTML document for planning, documenting, deciding, and doing *with* AI.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
@@ -17,19 +17,20 @@
 
 </div>
 
-When you ask an AI to "write up a plan" or "lay out the options," it dumps a wall of
-Markdown. Dossier replaces that. Your agent builds you **one self-contained, interactive
-HTML page** you can navigate, search, mark up, and hand back to the AI to act on.
+When you ask an AI to "write up a plan," "lay out the options," or "run this
+implementation through a real review loop," it usually dumps a wall of Markdown. Dossier
+replaces that. Your agent builds you **one self-contained, interactive HTML page** you can
+navigate, search, mark up, and hand back to the AI to act on.
 
 ```
   "write me a markdown file"   →   a flat .md you skim once and lose
   "make me a dossier"          →   one interactive .html: navigable, markable, agent-readable
 ```
 
-Built for the back and forth that real planning needs:
+Built for the back and forth that real AI-assisted work needs:
 
-- **Your agent writes it.** Plans, specs, research, and options, as a structured document
-  instead of a text dump. You hand-write nothing.
+- **Your agent writes it.** Plans, specs, research, implementation packets, reviews, and
+  options, as a structured document instead of a text dump. You hand-write nothing.
 - **You work in it.** Navigate, search, expand the details that matter, tick the options you
   want, leave notes, and edit text in place.
 - **You hand it back.** Export your decisions as JSON and the agent implements them. The
@@ -50,6 +51,7 @@ ln -s "$(pwd)/dossier/skill" ~/.claude/skills/dossier  # if cloned; see "Use it 
 Then ask your assistant:
 
 > *"Make me a dossier planning the Q3 migration."*
+> *"Make me an implementation dossier for this refactor."*
 > *"Turn these five options into a review board I can triage."*
 
 It writes a `*.dossier.json`, runs `dossier build`, and you get `my-doc.html` (+ `.md`).
@@ -70,7 +72,8 @@ open my-doc.html                   # Linux: xdg-open, Windows: start
 
 [How it works](#how-it-works) · [From an agent](#use-it-from-an-agent) ·
 [Authoring](#authoring) · [Block types](#block-types) · [Review / triage](#review--triage) ·
-[React](#react) · [Plugins & CLI](#plugins--cli) · [Embedding](#embedding) · [Development](#development)
+[Process dossiers](#process-dossiers) · [React](#react) · [Plugins & CLI](#plugins--cli) ·
+[Embedding](#embedding) · [Development](#development)
 
 ---
 
@@ -106,8 +109,8 @@ or agent digest. All inlined, all offline, responsive to mobile.
 ## Use it from an agent
 
 Dossier ships a [Claude Code](https://claude.com/claude-code) skill in [`skill/`](skill/), so
-an agent reaches for it whenever you ask for a plan, write-up, report, or options to decide
-on. Link it into your skills directory:
+an agent reaches for it whenever you ask for a plan, implementation packet, review,
+write-up, report, or options to decide on. Link it into your skills directory:
 
 ```bash
 ln -s "$(pwd)/skill" ~/.claude/skills/dossier
@@ -148,7 +151,9 @@ You normally let the agent write this, but the model is small. A dossier is
 }
 ```
 
-- **`kind`**: `reader | review-board | dossier | adr | runbook | research | comparison`. Selects defaults.
+- **`kind`**: `reader | plan | review-board | dossier | adr | runbook | research |
+  comparison | implementation | review | debug | integration-loop | release | incident`.
+  Selects defaults and starter shape.
 - **`meta`**: `title` (required), `slug`, `eyebrow`, `lede`, `crumbs`, `status`, `owner`,
   `updated`, `version`, `tags`, `baseUrl` (for hosted cross-links), `theme` (token overrides),
   `lifecycle`, `changelog`.
@@ -181,6 +186,26 @@ markdown and/or nested `blocks`) plus a notes field.
 You filter, search, tick what to do, and write notes, then export a decisions JSON (re-import
 to resume). The agent reads the reference plus your decisions and implements them. The human
 to agent loop, in one file.
+
+## Process dossiers
+
+Planning is one process. Dossier now also scaffolds process-oriented starters for the actual
+work loop:
+
+| Starter | Use it for |
+|---|---|
+| `plan` | Strategy, options, tradeoffs, and selected direction. |
+| `implementation` | Code-editing context, work items, patch preview, verification, and handoff. |
+| `review` | Findings, severity, evidence, accepted fixes, and follow-up work. |
+| `debug` | Reproduction, hypotheses, fix candidates, and verification. |
+| `integration-loop` | Producer/consumer dependency dogfooding and packet exchange. |
+| `release` | Release readiness, checks, risks, approvals, and closeout. |
+| `incident` | Timeline, mitigation decisions, evidence, and follow-ups. |
+
+They use the existing block catalog today, especially `review-board`, `action-items`,
+`risk-register`, `code`, `timeline`, and `receipt`. Dedicated process blocks for work items,
+patchsets, diffs, embedded editors, verification runs, and process receipts are tracked in
+[`docs/product/process-dossiers/process-dossiers-scope.md`](docs/product/process-dossiers/process-dossiers-scope.md).
 
 ## React
 
@@ -226,7 +251,7 @@ The full CLI:
 
 | Command | What it does |
 |---|---|
-| `dossier init [name] --kind <kind>` | scaffold from a starter (`dossier`, `adr`, `runbook`, `postmortem`, `review-board`) |
+| `dossier init [name] --kind <kind>` | scaffold from a starter (`dossier`, `plan`, `implementation`, `review`, `debug`, `integration-loop`, `release`, `incident`, `adr`, `runbook`, `postmortem`, `review-board`) |
 | `dossier build <file> [--watch] [--plugin a,b]` | validate and render to `<slug>.html` (+ `.md`) |
 | `dossier serve <file> [--open] [--port]` | build and live-reload dev server |
 | `dossier validate <file>` | check a model without rendering |

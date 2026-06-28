@@ -216,8 +216,8 @@
           "type": "timeline",
           "title": "Milestones",
           "phases": [
-            { "label": "M0", "body": "Product scope packet, OSS source posture, and implementation milestones.", "status": "in-progress" },
-            { "label": "M1", "body": "Schema and starter foundation: add process-oriented kinds, starters, validation coverage, block cheatsheet entries, README positioning, and MCP starter discovery.", "status": "planned" },
+            { "label": "M0", "body": "Product scope packet, OSS source posture, and implementation milestones.", "status": "done" },
+            { "label": "M1", "body": "Schema and starter foundation: add process-oriented kinds, starters, validation coverage, README positioning, and MCP starter discovery.", "status": "done" },
             { "label": "M2", "body": "Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.", "status": "planned" },
             { "label": "M3", "body": "Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.", "status": "planned" },
             { "label": "M4", "body": "Embeddable editor: add CodeMirror-backed code-editor blocks in serve/live mode, static fallback in built artifacts, edited-text export, and validation.", "status": "planned" },
@@ -231,9 +231,9 @@
           "type": "action-items",
           "title": "Immediate next commits",
           "items": [
-            { "title": "Commit M0 product scope packet.", "owner": "Codex", "status": "doing" },
-            { "title": "Commit M1 process kinds, starters, README and skill positioning.", "owner": "Codex", "status": "todo" },
-            { "title": "Commit M2 process-board render and verdict export loop.", "owner": "Codex", "status": "todo" },
+            { "title": "Commit M0 product scope packet.", "owner": "Codex", "status": "done" },
+            { "title": "Commit M1 process kinds, starters, README and skill positioning.", "owner": "Codex", "status": "done" },
+            { "title": "Commit M2 process-board render and verdict export loop.", "owner": "Codex", "status": "doing" },
             { "title": "Commit M3 diff-view and patch-set static rendering.", "owner": "Codex", "status": "todo" },
             { "title": "Commit M4 CodeMirror-backed live editor mode.", "owner": "Codex", "status": "todo" }
           ]

@@ -1,6 +1,6 @@
 ---
 name: dossier
-description: Generate a polished, self-contained, agent-readable HTML dossier (plus Markdown) from structured content, research reports, plans, specs, architecture/decision (ADR) docs, runbooks, postmortems, or an interactive review/triage surface for deciding which items to implement. Use when the user wants a doc, plan, report, brief, spec, or review as a shareable artifact, or wants a structured decision surface they can mark up and hand back to an agent.
+description: Generate a polished, self-contained, agent-readable HTML dossier (plus Markdown) from structured content, research reports, plans, specs, implementation packets, reviews, debugging notes, integration loops, architecture/decision (ADR) docs, runbooks, releases, incidents, postmortems, or an interactive review/triage surface. Use when the user wants a doc, plan, report, brief, spec, implementation workflow, code review, process packet, or structured decision surface they can mark up and hand back to an agent.
 metadata:
   short-description: Render JSON document models into self-contained, agent-readable HTML dossiers
 ---
@@ -19,12 +19,15 @@ This skill bundles a block cheatsheet (`references/blocks.md`) and a starter tem
 
 ## When to use this
 
-- A research report, plan, spec, brief, architecture doc, ADR, runbook, or postmortem
+- A research report, plan, spec, brief, architecture doc, ADR, runbook, release, incident,
+  implementation dossier, debug packet, review packet, integration loop, or postmortem
   that should be a clean, shareable, durable artifact (not just chat text).
 - An **interactive review/triage surface**: a list of candidate items (features, ideas,
   risks), each with deep reference detail, that a human selects + annotates and exports
   back as JSON for an agent to implement. Use the `review-board` block for this.
-- Any time the user says "make a doc/plan/report/brief/review/page for this."
+- A structured **process surface** for actual work: code edits, debugging, review findings,
+  release readiness, incident response, or producer/consumer dependency dogfooding.
+- Any time the user says "make a doc/plan/report/brief/review/page/dossier for this."
 
 Prefer this over dumping long Markdown when the content benefits from structure,
 navigation, or a decision loop.
@@ -56,8 +59,8 @@ HTML stays in sync with the JSON (round-trip).
 
 Other commands: `dossier validate <file>` (check without rendering), `dossier serve <file>
 --open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
-`dossier init <name> --kind adr|runbook|postmortem|review-board`, and `--plugin <file>` to
-add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
+`dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
+and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
 render/validate/read-decisions as MCP tools. Block types beyond the basics, `figure`,
 `math`, `chart`, `footnotes` (with inline `[^id]`), and `receipt` (provenance), are in
 `references/blocks.md`.
@@ -82,7 +85,8 @@ Top-level shape:
 }
 ```
 
-- **`kind`**: `reader | review-board | dossier | adr | runbook | research | comparison`.
+- **`kind`**: `reader | plan | review-board | dossier | adr | runbook | research |
+  comparison | implementation | review | debug | integration-loop | release | incident`.
 - **`meta`**: `title` (required), `slug`, `eyebrow`, `lede`, `crumbs[]`, `status`,
   `owner`, `updated`, `version`, `tags[]`, `baseUrl` (for hosted cross-links),
   `theme` (per-project token overrides), `lifecycle` (banner), `changelog`.
@@ -103,6 +107,20 @@ select checkbox), expanding to its full reference (`body` markdown and/or nested
 filters/searches, ticks decisions, writes notes, and **exports a decisions JSON** (and
 can re-import). Pair the rich reference in the model with the exported decisions to
 implement. See `references/blocks.md` → `review-board`.
+
+## Process dossier starters
+
+Use process starters when the user wants to steer the actual work, not only read a plan:
+
+- `implementation`: code-editing context, work items, patch preview, verification, and handoff.
+- `review`: findings, evidence, severity, accepted fixes, and follow-up work.
+- `debug`: reproduction, hypotheses, fix candidates, and verification.
+- `integration-loop`: producer/consumer dependency dogfood cycle packets.
+- `release`: release readiness, checks, risks, approvals, and closeout.
+- `incident`: timeline, mitigation decisions, evidence, and follow-ups.
+
+These starters use today's blocks (`review-board`, `action-items`, `risk-register`,
+`code`, `timeline`, `receipt`) while dedicated process blocks are developed.
 
 ## What the reader gets (built in)
 

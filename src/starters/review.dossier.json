@@ -1,0 +1,57 @@
+{
+  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "dossierVersion": "1.0",
+  "kind": "review",
+  "meta": {
+    "title": "Review: Replace with the subject",
+    "slug": "replace-with-slug",
+    "eyebrow": "Review dossier",
+    "status": "review",
+    "updated": "2026-06-28",
+    "tags": ["review", "process"],
+    "lifecycle": { "stage": "review", "note": "Triage findings and export the accepted fix list.", "promoteTo": "durable" }
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "eyebrow": "Review dossier",
+      "title": "Replace with the review subject",
+      "lede": "A structured review surface for findings, evidence, severity, decisions, and follow-up fixes."
+    },
+    {
+      "type": "review-board",
+      "title": "Findings",
+      "candidates": [
+        {
+          "id": "finding-one",
+          "title": "Finding one",
+          "summary": "Concise finding summary.",
+          "category": "Correctness",
+          "status": "open",
+          "impact": "High",
+          "effort": "Small",
+          "body": "Explain the issue, evidence, affected files, reproduction, and suggested fix. Include exact file references in the details.",
+          "details": {
+            "Severity": "P1",
+            "Evidence": "`path/to/file.ts:42`",
+            "Fix direction": "Replace with a concrete repair."
+          }
+        }
+      ]
+    },
+    {
+      "type": "risk-register",
+      "title": "Review risks",
+      "risks": [
+        { "risk": "False positive or incomplete evidence.", "likelihood": "medium", "impact": "medium", "mitigation": "Require a reproduction, source reference, or test before accepting." }
+      ]
+    },
+    {
+      "type": "action-items",
+      "title": "Accepted fixes",
+      "items": [
+        { "title": "Implement accepted findings.", "owner": "agent", "status": "todo" }
+      ]
+    }
+  ]
+}
