@@ -27,6 +27,7 @@ const REQUIRED = {
   glossary: ["terms"],
   diagram: ["spec"],
   "review-board": ["candidates"],
+  "process-board": ["items"],
   figure: ["src"],
   math: ["tex"],
   footnotes: ["items"],
@@ -69,6 +70,8 @@ function walk(blocks, path, errors, known, seen) {
     if (Array.isArray(b.tabs)) b.tabs.forEach((t, j) => t && t.blocks && walk(t.blocks, `${p}.tabs[${j}].blocks`, errors, known, seen));
     if (Array.isArray(b.candidates))
       b.candidates.forEach((c, j) => c && c.blocks && walk(c.blocks, `${p}.candidates[${j}].blocks`, errors, known, seen));
+    if (Array.isArray(b.items))
+      b.items.forEach((it, j) => it && it.blocks && walk(it.blocks, `${p}.items[${j}].blocks`, errors, known, seen));
   });
 }
 

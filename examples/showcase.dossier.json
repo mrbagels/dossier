@@ -60,7 +60,7 @@
       "type": "stat-strip",
       "stats": [
         {
-          "value": "26",
+          "value": "27",
           "label": "Block types"
         },
         {
@@ -425,6 +425,44 @@
           "impact": "High",
           "effort": "-",
           "body": "The whole design is a small token system; one accent, near-monochrome neutrals."
+        }
+      ]
+    },
+    {
+      "type": "process-board",
+      "title": "Process board, implementation loop",
+      "items": [
+        {
+          "id": "extract-work-item",
+          "title": "Extract a work item",
+          "summary": "Use verdicts and notes to steer actual implementation work.",
+          "category": "Implementation",
+          "status": "proposed",
+          "owner": "agent",
+          "priority": "P1",
+          "impact": "Medium",
+          "effort": "Small",
+          "verdict": "undecided",
+          "files": [
+            "src/generate.mjs",
+            "src/runtime/runtime.mjs"
+          ],
+          "verification": [
+            "npm test"
+          ],
+          "body": "Pick a verdict, leave notes, then export process JSON. An agent reads that packet with `dossier_read_process` and acts on the accepted work.",
+          "blocks": [
+            {
+              "type": "code",
+              "lang": "diff",
+              "filename": "preview.diff",
+              "code": "diff --git a/src/generate.mjs b/src/generate.mjs\n@@ -1 +1 @@\n-// plan-only surface\n+// process-aware surface"
+            }
+          ],
+          "details": {
+            "Packet": "`dossier.process/v1`",
+            "Verdicts": "approve, revise, skip, defer, split, retry, block"
+          }
         }
       ]
     },

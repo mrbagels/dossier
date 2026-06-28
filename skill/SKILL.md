@@ -61,7 +61,7 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 --open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
 `dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
 and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
-render/validate/read-decisions as MCP tools. Block types beyond the basics, `figure`,
+render/validate/read-decisions/read-process as MCP tools. Block types beyond the basics, `figure`,
 `math`, `chart`, `footnotes` (with inline `[^id]`), and `receipt` (provenance), are in
 `references/blocks.md`.
 
@@ -91,7 +91,7 @@ Top-level shape:
   `owner`, `updated`, `version`, `tags[]`, `baseUrl` (for hosted cross-links),
   `theme` (per-project token overrides), `lifecycle` (banner), `changelog`.
 - **`blocks[]`**: ordered. `section`, `two-col`, and `tabs` nest other blocks. Lead with
-  a `hero`. See `references/blocks.md` for all 21 types.
+  a `hero`. See `references/blocks.md` for all 27 types.
 - **Inline markdown** in text fields: `**bold**`, `` `code` ``, `[label](url)`,
   `[[other-slug]]` (cross-artifact link), `[[Term]]` (glossary tooltip).
 - **Code**: `{ "type": "code", "lang": "ts", "code": "..." }`, highlighted at build
@@ -119,8 +119,9 @@ Use process starters when the user wants to steer the actual work, not only read
 - `release`: release readiness, checks, risks, approvals, and closeout.
 - `incident`: timeline, mitigation decisions, evidence, and follow-ups.
 
-These starters use today's blocks (`review-board`, `action-items`, `risk-register`,
-`code`, `timeline`, `receipt`) while dedicated process blocks are developed.
+These starters use today's blocks plus `process-board` for work items, verdicts, notes,
+process JSON export/import, and MCP readback while deeper patch/diff/editor blocks are
+developed.
 
 ## What the reader gets (built in)
 

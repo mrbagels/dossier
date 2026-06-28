@@ -338,6 +338,18 @@ details.ds-faq p{margin:12px 0 2px;color:var(--ds-ink-2)}
 textarea{width:100%;min-height:80px;resize:vertical;border:1px solid var(--ds-line-2);border-radius:9px;background:var(--ds-bg);padding:10px 11px;font-size:14px;line-height:1.5;outline:0}
 textarea:focus{border-color:var(--ds-line-strong)}
 
+/* process boards */
+.ds-pitem .ds-ritem-head{grid-template-columns:1fr auto}
+.ds-pitem.verdict-approve{border-color:var(--ds-ok)}
+.ds-pitem.verdict-approve .ds-ritem-head{background:rgba(18,161,104,.08)}
+.ds-pitem.verdict-block{border-color:var(--ds-danger)}
+.ds-pitem.verdict-block .ds-ritem-head{background:rgba(214,48,49,.08)}
+.ds-pitem.verdict-revise,.ds-pitem.verdict-retry{border-color:var(--ds-warn)}
+.ds-pitem.verdict-revise .ds-ritem-head,.ds-pitem.verdict-retry .ds-ritem-head{background:rgba(245,158,11,.09)}
+.ds-process-verdict-wrap{display:flex;align-items:center;gap:7px;color:var(--ds-ink-3);font-size:11px;font-weight:680;letter-spacing:.04em;text-transform:uppercase;cursor:default}
+.ds-process-verdict{height:32px;border:1px solid var(--ds-line-2);border-radius:8px;background:var(--ds-bg);color:var(--ds-ink);font:inherit;font-size:12px;font-weight:620;letter-spacing:0;text-transform:none;padding:0 26px 0 9px;cursor:pointer}
+.ds-process-verdict:focus{outline:2px solid var(--ds-accent-tint);border-color:var(--ds-line-strong)}
+
 .ds-footer{padding:24px 0 calc(24px + env(safe-area-inset-bottom));border-top:1px solid var(--ds-line);color:var(--ds-ink-3);font-size:12.5px}
 
 /* palette + modals */

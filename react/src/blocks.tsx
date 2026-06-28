@@ -7,7 +7,7 @@ const componentRegistry = new Map<string, React.FC<{ b: any }>>();
 export function registerComponent(type: string, Component: React.FC<{ b: any }>) {
   componentRegistry.set(type, Component);
 }
-import type { Block as B, ReviewCandidate } from "./types.js";
+import type { Block as B, ProcessItem as ProcessItemModel, ReviewCandidate } from "./types.js";
 
 // Render context (glossary + baseUrl) for inline-markdown resolution. Set once per render.
 let CTX: any = { glossary: new Map<string, string>(), baseUrl: "" };
@@ -16,6 +16,7 @@ export function setCtx(ctx: any) {
 }
 const md = (t?: string) => ({ __html: inlineMd(t ?? "", CTX) });
 const raw = (h?: string) => ({ __html: h ?? "" });
+const PROCESS_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "split", "retry", "block"];
 
 const CopyIcon = (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -385,6 +386,82 @@ const ReviewBoard: React.FC<{ b: B }> = ({ b }) => (
   </section>
 );
 
+const ProcessItem: React.FC<{ item: ProcessItemModel }> = ({ item }) => {
+  const chips: string[] = [];
+  if (item.category) chips.push(item.category);
+  if (item.priority) chips.push(`Priority · ${item.priority}`);
+  if (item.owner) chips.push(`Owner · ${item.owner}`);
+  if (item.impact) chips.push(`Impact · ${item.impact}`);
+  if (item.effort) chips.push(`Effort · ${item.effort}`);
+  (item.badges || []).forEach((x) => chips.push(x));
+  const rows: [string, string][] = [];
+  if (item.files?.length) rows.push(["Files", item.files.join(", ")]);
+  if (item.dependencies?.length) rows.push(["Depends on", item.dependencies.join(", ")]);
+  if (item.verification?.length) rows.push(["Verification", item.verification.join(", ")]);
+  if (item.risks?.length) rows.push(["Risks", item.risks.join(", ")]);
+  if (item.evidence?.length) rows.push(["Evidence", item.evidence.join(", ")]);
+  Object.entries(item.details || {}).forEach(([k, v]) => rows.push([k, v]));
+  const verdict = PROCESS_VERDICTS.includes(item.verdict || "") ? item.verdict || "undecided" : "undecided";
+  const searchText = [item.title, item.summary, item.category, item.owner, item.body, ...(item.files || []), ...(item.verification || [])].filter(Boolean).join(" ").toLowerCase();
+  const hasRef = !!(item.body || (item.blocks && item.blocks.length) || rows.length);
+  return (
+    <article className={`ds-ritem ds-pitem verdict-${verdict}`} data-process-item={item.id} data-text={searchText}>
+      <div className="ds-ritem-head" data-ptoggle>
+        <div className="ds-ritem-titles">
+          <h4>{item.title}</h4>
+          {item.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(item.summary)} />}
+          {chips.length > 0 && <div className="ds-chips">{chips.map((x, i) => <span className="ds-chip" key={i}>{x}</span>)}</div>}
+        </div>
+        <div className="ds-ritem-aside">
+          {item.status && <span className={`ds-status s-${slugify(item.status)}`}>{item.status}</span>}
+          <label className="ds-process-verdict-wrap" data-stop>
+            <span>Verdict</span>
+            <select className="ds-process-verdict" data-process-verdict={item.id} defaultValue={verdict}>
+              {PROCESS_VERDICTS.map((v) => <option value={v} key={v}>{v}</option>)}
+            </select>
+          </label>
+          <span className="ds-chev" aria-hidden="true">▾</span>
+        </div>
+      </div>
+      <div className="ds-ritem-wrap">
+        <div className="ds-ritem-body">
+          {hasRef && (
+            <div className="ds-ref">
+              {item.body && item.body.split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
+              {(item.blocks || []).map((x, i) => <Block b={x} key={x.id || i} />)}
+              {rows.length > 0 && (
+                <dl className="ds-detailgrid">
+                  {rows.map(([k, v], i) => (
+                    <div className="ds-detail" key={i}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          )}
+          <label className="ds-notes"><span>Notes</span><textarea data-process-notes={item.id} placeholder="Verdict notes, constraints, follow-up instructions" /></label>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const ProcessBoard: React.FC<{ b: B }> = ({ b }) => (
+  <section className="ds-block ds-reviewboard ds-processboard" data-block="process-board" data-id={b.id}>
+    {b.title && <h2 id={b.id}>{b.title}</h2>}
+    <div className="ds-review-bar">
+      <input className="ds-review-search" type="search" placeholder="Filter…" data-process-search aria-label="Filter process items" />
+      <label className="ds-review-only"><input type="checkbox" data-process-only /> With verdict only</label>
+      <button className="ds-btn ds-btn-line" type="button" data-process-expand>Expand all</button>
+      <span className="ds-review-count" data-process-count>0 verdicts</span>
+      <button className="ds-btn ds-btn-line" type="button" data-export-process>Export process JSON</button>
+      <button className="ds-btn ds-btn-line" type="button" data-import-process>Import</button>
+    </div>
+    <div className="ds-rlist">
+      {(b.items || []).map((item: ProcessItemModel, i: number) => <ProcessItem item={item} key={item.id || i} />)}
+    </div>
+  </section>
+);
+
 const Prose: React.FC<{ b: B }> = ({ b }) => (
   <Wrap type="prose" id={b.id}>
     {b.heading && <h2 id={b.id} data-edit={`${b.id}:heading`}>{b.heading}</h2>}
@@ -489,6 +566,7 @@ export const Block: React.FC<{ b: B }> = ({ b }) => {
     case "glossary": return <Glossary b={b} />;
     case "diagram": return <Diagram b={b} />;
     case "review-board": return <ReviewBoard b={b} />;
+    case "process-board": return <ProcessBoard b={b} />;
     case "figure": return <Figure b={b} />;
     case "math": return <Math b={b} />;
     case "footnotes": return <Footnotes b={b} />;

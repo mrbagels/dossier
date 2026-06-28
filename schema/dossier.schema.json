@@ -312,6 +312,9 @@
           "$ref": "#/$defs/blocks/reviewBoard"
         },
         {
+          "$ref": "#/$defs/blocks/processBoard"
+        },
+        {
           "$ref": "#/$defs/blocks/figure"
         },
         {
@@ -1195,6 +1198,133 @@
                 "details": {
                   "type": "object",
                   "description": "Label -> value rows shown in the expanded detail.",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "badges": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "processBoard": {
+        "description": "Interactive process/work surface: work items with verdicts, notes, references, and JSON round-trip.",
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "const": "process-board"
+          },
+          "title": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "title"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "impact": {
+                  "type": "string"
+                },
+                "effort": {
+                  "type": "string"
+                },
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "undecided",
+                    "approve",
+                    "revise",
+                    "skip",
+                    "defer",
+                    "split",
+                    "retry",
+                    "block"
+                  ],
+                  "default": "undecided"
+                },
+                "files": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "verification": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "risks": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "body": {
+                  "type": "string",
+                  "description": "Rich reference text revealed when the work item is expanded."
+                },
+                "blocks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/block"
+                  },
+                  "description": "Rich reference blocks revealed when the work item is expanded."
+                },
+                "details": {
+                  "type": "object",
                   "additionalProperties": {
                     "type": "string"
                   }

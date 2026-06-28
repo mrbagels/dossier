@@ -41,21 +41,24 @@
       ]
     },
     {
-      "type": "review-board",
+      "type": "process-board",
       "title": "Work items",
-      "candidates": [
+      "items": [
         {
           "id": "work-item-one",
           "title": "Work item one",
           "summary": "Atomic edit or behavior change.",
           "category": "Code",
           "status": "proposed",
+          "owner": "agent",
+          "priority": "P1",
           "impact": "Medium",
           "effort": "Small",
+          "verdict": "undecided",
+          "files": ["replace/with/file.ts"],
+          "verification": ["npm test -- replace"],
           "body": "Describe the edit, target files, expected patch shape, risks, and verification command.",
           "details": {
-            "Target files": "`replace/with/file.ts`",
-            "Verification": "`npm test -- replace`",
             "Verdict": "approve | revise | skip | defer"
           }
         }

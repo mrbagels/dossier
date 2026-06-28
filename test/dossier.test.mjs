@@ -49,6 +49,42 @@ test("every block in the sample renders (no 'unsupported')", async () => {
   assert.ok(!/Unsupported block type/.test(html));
 });
 
+test("process-board renders controls and nested reference blocks", async () => {
+  const model = {
+    dossierVersion: "1.0",
+    kind: "implementation",
+    meta: { title: "Implementation", slug: "impl" },
+    blocks: [
+      {
+        type: "process-board",
+        title: "Work",
+        items: [
+          {
+            id: "work-one",
+            title: "Work one",
+            summary: "Do the thing.",
+            status: "proposed",
+            owner: "agent",
+            priority: "P1",
+            verdict: "approve",
+            files: ["src/file.ts"],
+            verification: ["npm test"],
+            blocks: [{ type: "code", lang: "ts", code: "const ok = true" }],
+          },
+        ],
+      },
+    ],
+  };
+  const result = validateModel(model);
+  assert.deepEqual(result.errors, []);
+  const { html, md } = await generate(structuredClone(model), {});
+  assert.ok(html.includes('data-block="process-board"'), "renders the block");
+  assert.ok(html.includes('data-process-verdict="work-one"'), "renders verdict control");
+  assert.ok(html.includes("dossier.process/v1"), "runtime can export a process packet");
+  assert.ok(html.includes("const ok"), "renders nested reference blocks");
+  assert.ok(md.includes("### Work one ("), "exports process items to Markdown");
+});
+
 test("plugins: a registered block validates and renders", async () => {
   const { registerBlock } = await import("../src/index.mjs");
   registerBlock("badge-test", (b) => `<section class="ds-block" data-block="badge-test">${b.label || ""}</section>`);

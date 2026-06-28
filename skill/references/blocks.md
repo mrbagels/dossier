@@ -38,7 +38,7 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 
 ## stat-strip, KPI figures
 ```json
-{ "type": "stat-strip", "stats": [ { "value": "21", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
+{ "type": "stat-strip", "stats": [ { "value": "27", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
 ```
 
 ## flow, numbered steps
@@ -174,3 +174,25 @@ field. Reader filters, searches, ticks decisions, writes notes, exports a decisi
       "badges": ["nav"] } ] }
 ```
 `candidate.id` must be kebab-case (it keys the exported decisions JSON).
+
+## process-board, interactive work / implementation surface
+Each item is an expandable work row with owner, priority, status, files, verification,
+risks, evidence, full reference detail, a verdict dropdown, and notes. Reader verdicts
+persist locally and export as a process JSON packet:
+`{ "schema": "dossier.process/v1", "slug": "...", "process": { "id": { "verdict": "approve", "notes": "..." } } }`.
+Agents should read that packet with `dossier_read_process`.
+```json
+{ "type": "process-board", "title": "Implementation work",
+  "items": [
+    { "id": "extract-token-store", "title": "Extract token store",
+      "summary": "Move token persistence behind a narrow helper.",
+      "category": "Code", "status": "proposed", "owner": "agent", "priority": "P1",
+      "impact": "Medium", "effort": "Small", "verdict": "undecided",
+      "files": ["src/auth/session.ts"], "dependencies": ["audit-current-session-api"],
+      "verification": ["npm test -- auth"],
+      "body": "Full technical reference in **markdown**.",
+      "blocks": [ { "type": "code", "lang": "diff", "code": "diff --git ..." } ],
+      "details": { "Compatibility": "Keep the public session API stable." },
+      "badges": ["auth"] } ] }
+```
+`item.id` must be kebab-case (it keys the exported process JSON).

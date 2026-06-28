@@ -125,7 +125,8 @@ It bundles a [block cheatsheet](skill/references/blocks.md) and a
 `dossier mcp` runs a [Model Context Protocol](https://modelcontextprotocol.io) server over
 stdio, so any MCP-capable agent can drive Dossier, including the full human-and-agent loop.
 Tools: `dossier_render`, `dossier_validate`, `dossier_read_decisions` (read back the options a
-human selected on a review board), `dossier_get_schema`, `dossier_get_starter`.
+human selected on a review board), `dossier_read_process` (read process-board verdicts and
+notes), `dossier_get_schema`, `dossier_get_starter`.
 
 ```jsonc
 // e.g. an MCP client config
@@ -165,7 +166,7 @@ Full contract: [`schema/dossier.schema.json`](schema/dossier.schema.json).
 
 ## Block types
 
-26 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
+27 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
 example in [`skill/references/blocks.md`](skill/references/blocks.md):
 
 | Group | Blocks |
@@ -174,7 +175,7 @@ example in [`skill/references/blocks.md`](skill/references/blocks.md):
 | **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
 | **Reference** | `table`, `code` (Shiki), `diagram` (DOT or Mermaid to SVG), `references`, `faq`, `glossary` |
 | **Media & data** | `figure` (inlined), `math` (KaTeX to MathML), `chart` (bar/line/area SVG), `footnotes` |
-| **Decisions & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `receipt` |
+| **Decisions, process & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `process-board`, `receipt` |
 
 ## Review / triage
 
@@ -202,8 +203,8 @@ work loop:
 | `release` | Release readiness, checks, risks, approvals, and closeout. |
 | `incident` | Timeline, mitigation decisions, evidence, and follow-ups. |
 
-They use the existing block catalog today, especially `review-board`, `action-items`,
-`risk-register`, `code`, `timeline`, and `receipt`. Dedicated process blocks for work items,
+They use the existing block catalog plus the dedicated `process-board` block for work items,
+verdicts, notes, process JSON export/import, and MCP readback. Follow-on process blocks for
 patchsets, diffs, embedded editors, verification runs, and process receipts are tracked in
 [`docs/product/process-dossiers/process-dossiers-scope.md`](docs/product/process-dossiers/process-dossiers-scope.md).
 
@@ -223,7 +224,7 @@ import { DossierDocument } from "@mrbagels/dossier-react";
 <DossierDocument model={model} animate />
 ```
 
-The `<Block>` dispatcher covers all 26 block types and reuses the core's CSS, runtime, and
+The `<Block>` dispatcher covers all 27 block types and reuses the core's CSS, runtime, and
 enrichment, so SSR output matches the Node generator. See [`react/README.md`](react/README.md).
 
 ## Plugins & CLI

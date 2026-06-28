@@ -58,6 +58,18 @@ const TOOLS = [
     },
   },
   {
+    name: "dossier_read_process",
+    description:
+      "Read a process packet exported from a process-board ({ schema: 'dossier.process/v1', slug, process: { id: { verdict, notes } } }) and return verdict-grouped work items for an agent to act on.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        process: { type: "object", description: "The exported process JSON, or its `process` map." },
+        path: { type: "string", description: "Alternatively, a path to a .process.json file." },
+      },
+    },
+  },
+  {
     name: "dossier_get_schema",
     description: "Return the Dossier JSON Schema so you can author a valid model.",
     inputSchema: { type: "object", properties: {} },
@@ -106,6 +118,26 @@ async function handle(name, args) {
       else if (d && d.notes) noted.push({ id, notes: d.notes });
     }
     return text({ slug: packet.slug, selected, notedButNotSelected: noted, totals: { selected: selected.length, considered: Object.keys(map).length } });
+  }
+
+  if (name === "dossier_read_process") {
+    let packet = args.process;
+    if (!packet && args.path) packet = JSON.parse(readFileSync(args.path, "utf8"));
+    if (!packet) return fail("provide `process` or `path`");
+    const map = packet.process || packet.items || packet;
+    const byVerdict = {};
+    const noted = [];
+    for (const [id, entry] of Object.entries(map)) {
+      if (!entry || typeof entry !== "object") continue;
+      const verdict = entry.verdict || "undecided";
+      const row = { id, verdict, notes: entry.notes || "" };
+      if (verdict && verdict !== "undecided") {
+        byVerdict[verdict] = byVerdict[verdict] || [];
+        byVerdict[verdict].push(row);
+      } else if (entry.notes) noted.push(row);
+    }
+    const totals = Object.fromEntries(Object.entries(byVerdict).map(([k, v]) => [k, v.length]));
+    return text({ schema: packet.schema || "dossier.process/v1", slug: packet.slug, byVerdict, notedButUndecided: noted, totals: { ...totals, considered: Object.keys(map).length } });
   }
 
   if (name === "dossier_get_schema") {

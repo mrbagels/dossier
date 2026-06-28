@@ -29,7 +29,7 @@ export type BlockType =
   | "hero" | "prose" | "section" | "two-col" | "summary-cards" | "stat-strip"
   | "flow" | "timeline" | "table" | "callout" | "code" | "tabs" | "faq"
   | "references" | "decision-matrix" | "risk-register" | "action-items"
-  | "assumptions" | "glossary" | "diagram" | "review-board"
+  | "assumptions" | "glossary" | "diagram" | "review-board" | "process-board"
   | "figure" | "math" | "chart" | "footnotes" | "receipt";
 
 // A block is discriminated by `type`; variant fields are loosely typed for the dispatcher.
@@ -51,6 +51,28 @@ export interface ReviewCandidate {
   status?: string;
   impact?: string;
   effort?: string;
+  body?: string;
+  blocks?: Block[];
+  details?: Record<string, string>;
+  badges?: string[];
+}
+
+export interface ProcessItem {
+  id: string;
+  title: string;
+  summary?: string;
+  category?: string;
+  status?: string;
+  owner?: string;
+  priority?: string;
+  impact?: string;
+  effort?: string;
+  verdict?: string;
+  files?: string[];
+  dependencies?: string[];
+  verification?: string[];
+  risks?: string[];
+  evidence?: string[];
   body?: string;
   blocks?: Block[];
   details?: Record<string, string>;

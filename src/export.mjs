@@ -196,6 +196,22 @@ async function block(b, out, ctx) {
         Object.entries(c.details || {}).forEach(([k, v]) => out.push(P(k + ": " + plain(v))));
       }
       break;
+    case "process-board":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      for (const it of b.items || []) {
+        out.push(H(plain(it.title) + (it.status ? " (" + it.status + ")" : ""), HeadingLevel.HEADING_3));
+        if (it.summary) out.push(P(it.summary));
+        if (it.owner) out.push(P("Owner: " + plain(it.owner)));
+        if (it.priority) out.push(P("Priority: " + plain(it.priority)));
+        if (it.verdict) out.push(P("Verdict: " + plain(it.verdict)));
+        if (it.files && it.files.length) out.push(P("Files: " + it.files.map(plain).join(", ")));
+        if (it.dependencies && it.dependencies.length) out.push(P("Depends on: " + it.dependencies.map(plain).join(", ")));
+        if (it.verification && it.verification.length) out.push(P("Verification: " + it.verification.map(plain).join(", ")));
+        if (it.body) String(it.body).split(/\n{2,}/).forEach((p) => out.push(P(p)));
+        for (const x of it.blocks || []) await block(x, out, ctx);
+        Object.entries(it.details || {}).forEach(([k, v]) => out.push(P(k + ": " + plain(v))));
+      }
+      break;
     case "footnotes":
       out.push(H(b.title || "Notes", HeadingLevel.HEADING_3));
       (b.items || []).forEach((it, i) => out.push(P((i + 1) + ". " + plain(it.text))));
