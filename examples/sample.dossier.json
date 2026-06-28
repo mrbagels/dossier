@@ -33,7 +33,7 @@
     {
       "type": "stat-strip",
       "stats": [
-        { "value": "29", "label": "Block types" },
+        { "value": "30", "label": "Block types" },
         { "value": "18", "label": "Selected features" },
         { "value": "1", "label": "JSON file to author" },
         { "value": "0", "label": "Runtime dependencies" }

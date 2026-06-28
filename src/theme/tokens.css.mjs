@@ -222,6 +222,19 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-diagram-svg{display:flex;justify-content:center;padding:18px;background:#fff;border:0}
 .ds-diagram-svg svg{max-width:100%;height:auto}
 
+/* code editor */
+.ds-codeedit{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);overflow:hidden;margin-top:12px}
+.ds-codeedit.dirty{border-color:var(--ds-accent)}
+.ds-codeedit-bar{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--ds-line);background:var(--ds-bg-2);font-family:var(--ds-mono);font-size:12px;color:var(--ds-ink-3)}
+.ds-codeedit-bar .ds-lang{color:var(--ds-accent)}
+.ds-codeedit-meta{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;font-family:var(--ds-font)}
+.ds-codeedit-meta span{border:1px solid var(--ds-line-2);border-radius:999px;padding:2px 8px;background:var(--ds-bg);font-size:11.5px;color:var(--ds-ink-2)}
+.ds-codeedit-area{display:block;width:100%;min-height:220px;border:0;border-radius:0;background:var(--ds-bg);color:var(--ds-ink);font-family:var(--ds-mono);font-size:13px;line-height:1.55;padding:14px 16px;resize:vertical;tab-size:2}
+.ds-codeedit-area:focus{outline:2px solid var(--ds-accent-tint);outline-offset:-2px}
+.ds-codeedit-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;padding:10px 12px;border-top:1px solid var(--ds-line);background:var(--ds-bg-2)}
+.ds-codeedit-state{margin-right:auto;color:var(--ds-ink-3);font-size:12px;font-weight:680;letter-spacing:.04em;text-transform:uppercase}
+.ds-codeedit.dirty .ds-codeedit-state{color:var(--ds-accent)}
+
 /* patch and diff blocks */
 .ds-patchlist{display:grid;gap:12px;margin-top:14px}
 .ds-patch{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);padding:15px 17px}
@@ -476,13 +489,13 @@ tbody tr:hover td{color:var(--ds-ink)}
 @media print{
   :root{--ds-bg:#fff;--ds-bg-2:#fff;--ds-ink:#111;--ds-ink-2:#333;--ds-ink-3:#666;--ds-line:#ddd;--ds-line-2:#ccc}
   html{font-size:11pt}
-  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy,.ds-diff-files{display:none!important}
+  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy,.ds-codeedit-actions,.ds-diff-files{display:none!important}
   .ds-layout{display:block}
   .ds-content{max-width:none}
   .ds-shell{width:100%}
   .ds-section[data-collapsed="1"] .ds-section-body{display:grid!important}
   .ds-ritem-wrap{grid-template-rows:1fr!important}
-  .ds-section,.ds-block,.ds-ritem,.ds-card,.ds-stat,.ds-chart,.ds-figure,.ds-patch,.ds-diff-file,.ds-hunk,table,pre{break-inside:avoid}
+  .ds-section,.ds-block,.ds-ritem,.ds-card,.ds-stat,.ds-chart,.ds-figure,.ds-codeedit,.ds-patch,.ds-diff-file,.ds-hunk,table,pre{break-inside:avoid}
   .ds-reveal{opacity:1!important;transform:none!important}
   h1,h2,h3,h4{break-after:avoid}
   a{color:inherit;text-decoration:none}

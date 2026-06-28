@@ -61,7 +61,7 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 --open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
 `dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
 and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
-render/validate/read-decisions/read-process as MCP tools. Block types beyond the basics, `figure`,
+render/validate/read-decisions/read-process/read-edits as MCP tools. Block types beyond the basics, `figure`,
 `math`, `chart`, `footnotes` (with inline `[^id]`), and `receipt` (provenance), are in
 `references/blocks.md`.
 
@@ -91,7 +91,7 @@ Top-level shape:
   `owner`, `updated`, `version`, `tags[]`, `baseUrl` (for hosted cross-links),
   `theme` (per-project token overrides), `lifecycle` (banner), `changelog`.
 - **`blocks[]`**: ordered. `section`, `two-col`, and `tabs` nest other blocks. Lead with
-  a `hero`. See `references/blocks.md` for all 29 types.
+  a `hero`. See `references/blocks.md` for all 30 types.
 - **Inline markdown** in text fields: `**bold**`, `` `code` ``, `[label](url)`,
   `[[other-slug]]` (cross-artifact link), `[[Term]]` (glossary tooltip).
 - **Code**: `{ "type": "code", "lang": "ts", "code": "..." }`, highlighted at build
@@ -119,9 +119,10 @@ Use process starters when the user wants to steer the actual work, not only read
 - `release`: release readiness, checks, risks, approvals, and closeout.
 - `incident`: timeline, mitigation decisions, evidence, and follow-ups.
 
-These starters use today's blocks plus `process-board` for work items, `patch-set` for
-proposed edit packets, `diff-view` for unified diff review, and MCP readback. The richer
-embedded editor surface is the next layer.
+These starters use today's blocks plus `process-board` for work items, `code-editor` for
+bounded editable snippets, `patch-set` for proposed edit packets, `diff-view` for unified
+diff review, and MCP readback. A richer CodeMirror host enhancement can attach to the
+same editor block hooks.
 
 ## What the reader gets (built in)
 

@@ -177,6 +177,42 @@ const Code: React.FC<{ b: B }> = ({ b }) => (
   </Wrap>
 );
 
+const CodeEditor: React.FC<{ b: B }> = ({ b }) => {
+  const id = b.id || slugify(b.title || b.filename || b.targetPath || "code-editor");
+  const meta: string[] = [];
+  if (b.lang) meta.push(b.lang);
+  if (b.targetPath) meta.push(b.targetPath);
+  if (b.workItems?.length) meta.push(`Work · ${b.workItems.join(", ")}`);
+  return (
+    <Wrap type="code-editor" id={id}>
+      {b.title && <h3 id={id}>{b.title}</h3>}
+      {b.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(b.summary)} />}
+      <div className="ds-codeedit" data-editor-shell={id}>
+        <div className="ds-codeedit-bar">
+          <span className="ds-lang">{b.filename || b.targetPath || b.lang || "code"}</span>
+          <div className="ds-codeedit-meta">{meta.map((x, i) => <span key={i}>{x}</span>)}</div>
+        </div>
+        <textarea
+          className="ds-codeedit-area"
+          data-code-editor={id}
+          data-editor-lang={b.lang || ""}
+          data-editor-filename={b.filename || ""}
+          data-editor-target={b.targetPath || ""}
+          spellCheck={false}
+          readOnly={!!b.readonly}
+          defaultValue={b.code || ""}
+        />
+        <div className="ds-codeedit-actions">
+          <span className="ds-codeedit-state" data-editor-state={id}>clean</span>
+          <button className="ds-btn ds-btn-line" type="button" data-editor-reset={id}>Reset</button>
+          <button className="ds-btn ds-btn-line" type="button" data-export-editors>Export edits JSON</button>
+          <button className="ds-btn ds-btn-line" type="button" data-import-editors>Import</button>
+        </div>
+      </div>
+    </Wrap>
+  );
+};
+
 const diffFileLabel = (file: any) => (file.newPath && file.newPath !== "/dev/null" ? file.newPath : file.oldPath || "diff");
 
 const DiffViewInner: React.FC<{ b: B; nested?: boolean }> = ({ b, nested = false }) => {
@@ -640,6 +676,7 @@ export const Block: React.FC<{ b: B }> = ({ b }) => {
     case "table": return <Table b={b} />;
     case "callout": return <Callout b={b} />;
     case "code": return <Code b={b} />;
+    case "code-editor": return <CodeEditor b={b} />;
     case "patch-set": return <PatchSet b={b} />;
     case "diff-view": return <DiffView b={b} />;
     case "tabs": return <Tabs b={b} />;

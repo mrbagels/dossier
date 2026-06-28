@@ -30,7 +30,7 @@ export type BlockType =
   | "flow" | "timeline" | "table" | "callout" | "code" | "tabs" | "faq"
   | "references" | "decision-matrix" | "risk-register" | "action-items"
   | "assumptions" | "glossary" | "diagram" | "review-board" | "process-board"
-  | "patch-set" | "diff-view" | "figure" | "math" | "chart" | "footnotes" | "receipt";
+  | "code-editor" | "patch-set" | "diff-view" | "figure" | "math" | "chart" | "footnotes" | "receipt";
 
 // A block is discriminated by `type`; variant fields are loosely typed for the dispatcher.
 // `_hl` / `_svg` are populated by the build-time enrichment pass.
@@ -91,6 +91,19 @@ export interface PatchItem {
   verification?: string[];
   details?: Record<string, string>;
   diff?: string;
+}
+
+export interface CodeEditorBlock {
+  id?: string;
+  type: "code-editor";
+  title?: string;
+  summary?: string;
+  lang?: string;
+  filename?: string;
+  targetPath?: string;
+  workItems?: string[];
+  readonly?: boolean;
+  code: string;
 }
 
 export interface DossierModel {

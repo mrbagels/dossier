@@ -154,7 +154,7 @@
             ["`process-board`", "Expandable work items with status, owner, lane, dependencies, risks, evidence links, and human verdict controls.", "Verdicts, notes, priority, assigned agent, blocked reason, selected verification."],
             ["`patch-set`", "Patch summary grouped by file, operation, risk, and relation to work items.", "Patch ids, target files, apply strategy, accepted/skipped/revise state."],
             ["`diff-view`", "Unified diff with file tree, hunks, additions/deletions, copy, collapse, and comments.", "Per-file and per-hunk verdicts, comments, requested changes."],
-            ["`code-editor`", "Embeddable CodeMirror editor for snippets, config, prompts, JSON, markdown, and small patches.", "Edited text, language, dirty state, optional target path."],
+            ["`code-editor`", "Embeddable editor block for snippets, config, prompts, JSON, markdown, and small patches. Static artifacts use a textarea fallback; hosts can enhance with CodeMirror.", "Edited text, language, dirty state, optional target path."],
             ["`verification-run`", "Commands, expected results, actual results, logs, artifacts, and rerun guidance.", "Pass/fail/blocked state, command receipt refs, selected rerun requests."],
             ["`evidence-log`", "Append-only observations: screenshots, logs, links, command outputs, API responses, source refs.", "Evidence ids, trust level, source, created time, linked work items."],
             ["`verdict-gate`", "A focused approval surface for apply/revise/skip/defer/split/retry decisions.", "Structured verdict packet for agents and MCP tools."],
@@ -220,9 +220,9 @@
             { "label": "M1", "body": "Schema and starter foundation: add process-oriented kinds, starters, validation coverage, README positioning, and MCP starter discovery.", "status": "done" },
             { "label": "M2", "body": "Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.", "status": "done" },
             { "label": "M3", "body": "Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.", "status": "done" },
-            { "label": "M4", "body": "Embeddable editor: add CodeMirror-backed code-editor blocks in serve/live mode, static fallback in built artifacts, edited-text export, and validation.", "status": "in-progress" },
+            { "label": "M4", "body": "Embeddable editor foundation: add code-editor blocks, static fallback, host enhancement hooks for CodeMirror, edited-text export/import, validation, docs, and examples.", "status": "done" },
             { "label": "M5", "body": "Process MCP protocol: render, validate, read process verdicts, record run receipts, attach patchsets, and return closeout digest.", "status": "planned" },
-            { "label": "M6", "body": "Live Studio: save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.", "status": "planned" },
+            { "label": "M6", "body": "Live Studio: CodeMirror bundling, save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.", "status": "planned" },
             { "label": "M7", "body": "Integration-loop dossiers: producer/consumer packet templates, cycle control, closeout packets, and dogfood examples.", "status": "planned" },
             { "label": "M8", "body": "Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, and release readiness.", "status": "planned" }
           ]
@@ -235,7 +235,7 @@
             { "title": "Commit M1 process kinds, starters, README and skill positioning.", "owner": "Codex", "status": "done" },
             { "title": "Commit M2 process-board render and verdict export loop.", "owner": "Codex", "status": "done" },
             { "title": "Commit M3 diff-view and patch-set static rendering.", "owner": "Codex", "status": "done" },
-            { "title": "Commit M4 CodeMirror-backed live editor mode.", "owner": "Codex", "status": "todo" }
+            { "title": "Commit M4 code-editor block and edit packet export.", "owner": "Codex", "status": "done" }
           ]
         }
       ]

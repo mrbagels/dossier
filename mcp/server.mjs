@@ -70,6 +70,18 @@ const TOOLS = [
     },
   },
   {
+    name: "dossier_read_edits",
+    description:
+      "Read an edits packet exported from code-editor blocks ({ schema: 'dossier.edits/v1', slug, edits: { id: { text, lang, filename, targetPath, dirty } } }) and return edited text grouped by target path.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        edits: { type: "object", description: "The exported edits JSON, or its `edits` map." },
+        path: { type: "string", description: "Alternatively, a path to a .edits.json file." },
+      },
+    },
+  },
+  {
     name: "dossier_get_schema",
     description: "Return the Dossier JSON Schema so you can author a valid model.",
     inputSchema: { type: "object", properties: {} },
@@ -138,6 +150,31 @@ async function handle(name, args) {
     }
     const totals = Object.fromEntries(Object.entries(byVerdict).map(([k, v]) => [k, v.length]));
     return text({ schema: packet.schema || "dossier.process/v1", slug: packet.slug, byVerdict, notedButUndecided: noted, totals: { ...totals, considered: Object.keys(map).length } });
+  }
+
+  if (name === "dossier_read_edits") {
+    let packet = args.edits;
+    if (!packet && args.path) packet = JSON.parse(readFileSync(args.path, "utf8"));
+    if (!packet) return fail("provide `edits` or `path`");
+    const map = packet.edits || packet.items || packet;
+    const edits = [];
+    const byTargetPath = {};
+    for (const [id, entry] of Object.entries(map)) {
+      if (!entry || typeof entry !== "object") continue;
+      const row = {
+        id,
+        text: entry.text || "",
+        lang: entry.lang || "",
+        filename: entry.filename || "",
+        targetPath: entry.targetPath || "",
+        dirty: !!entry.dirty,
+      };
+      edits.push(row);
+      const key = row.targetPath || row.filename || "(untargeted)";
+      byTargetPath[key] = byTargetPath[key] || [];
+      byTargetPath[key].push(row);
+    }
+    return text({ schema: packet.schema || "dossier.edits/v1", slug: packet.slug, edits, byTargetPath, totals: { edits: edits.length, dirty: edits.filter((x) => x.dirty).length } });
   }
 
   if (name === "dossier_get_schema") {

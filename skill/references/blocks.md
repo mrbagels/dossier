@@ -38,7 +38,7 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 
 ## stat-strip, KPI figures
 ```json
-{ "type": "stat-strip", "stats": [ { "value": "29", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
+{ "type": "stat-strip", "stats": [ { "value": "30", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
 ```
 
 ## flow, numbered steps
@@ -68,6 +68,20 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 ## code, syntax-highlighted (Shiki, build-time)
 ```json
 { "type": "code", "lang": "ts", "filename": "optional.ts", "code": "const x = 1" }
+```
+
+## code-editor, bounded editable code/text
+Use for snippets, config, prompts, JSON, Markdown, or small files that should round-trip
+as an edits packet. The static artifact renders a textarea fallback, persists local edits,
+and exports:
+`{ "schema": "dossier.edits/v1", "slug": "...", "edits": { "id": { "text": "...", "lang": "ts", "targetPath": "..." } } }`.
+Host tools can enhance the same block with CodeMirror by targeting `data-code-editor`.
+```json
+{ "type": "code-editor", "title": "Editable target snippet",
+  "summary": "Bounded source text that can be edited and exported.",
+  "lang": "ts", "filename": "session.ts", "targetPath": "src/auth/session.ts",
+  "workItems": ["extract-token-store"],
+  "code": "export function readSession() {\n  return null;\n}\n" }
 ```
 
 ## patch-set, proposed edit packets

@@ -127,6 +127,33 @@ test("patch-set and diff-view render parsed unified diffs", async () => {
   assert.ok(md.includes("```diff"), "exports diff markdown");
 });
 
+test("code-editor renders editable text hooks and edit packet export", async () => {
+  const model = {
+    dossierVersion: "1.0",
+    kind: "implementation",
+    meta: { title: "Editor", slug: "editor" },
+    blocks: [
+      {
+        type: "code-editor",
+        title: "Editable config",
+        summary: "A bounded edit surface.",
+        lang: "json",
+        filename: "config.json",
+        targetPath: "config/config.json",
+        workItems: ["config-update"],
+        code: "{\n  \"enabled\": true\n}\n",
+      },
+    ],
+  };
+  const result = validateModel(model);
+  assert.deepEqual(result.errors, []);
+  const { html, md } = await generate(structuredClone(model), {});
+  assert.ok(html.includes('data-block="code-editor"'), "renders code-editor");
+  assert.ok(html.includes('data-code-editor="editable-config-0"'), "renders editor data hook");
+  assert.ok(html.includes("dossier.edits/v1"), "runtime can export edits packet");
+  assert.ok(md.includes("```json"), "exports editor content to Markdown");
+});
+
 test("plugins: a registered block validates and renders", async () => {
   const { registerBlock } = await import("../src/index.mjs");
   registerBlock("badge-test", (b) => `<section class="ds-block" data-block="badge-test">${b.label || ""}</section>`);

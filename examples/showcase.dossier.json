@@ -30,7 +30,7 @@
       "title": "One JSON file becomes this",
       "lede": "Everything below, navigation, search, theme, code, diagrams, charts, math, and an interactive review board, lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.",
       "pills": [
-        "29 block types",
+        "30 block types",
         "Self-contained",
         "Agent-readable",
         "Light + dark"
@@ -60,7 +60,7 @@
       "type": "stat-strip",
       "stats": [
         {
-          "value": "29",
+          "value": "30",
           "label": "Block types"
         },
         {
@@ -276,7 +276,7 @@
             },
             {
               "label": "Q3",
-              "value": 29
+              "value": 30
             },
             {
               "label": "Q4",
@@ -490,6 +490,18 @@
           "diff": "diff --git a/src/generate.mjs b/src/generate.mjs\n--- a/src/generate.mjs\n+++ b/src/generate.mjs\n@@ -1,2 +1,2 @@\n-// plan-only surface\n+// process-aware surface"
         }
       ]
+    },
+    {
+      "type": "code-editor",
+      "title": "Code editor, editable snippet",
+      "summary": "Small edits can round-trip as `dossier.edits/v1` without turning the artifact into a full IDE.",
+      "lang": "js",
+      "filename": "runtime.mjs",
+      "targetPath": "src/runtime/runtime.mjs",
+      "workItems": [
+        "extract-work-item"
+      ],
+      "code": "function exportEdits(state) {\n  return { schema: \"dossier.edits/v1\", edits: state.editors || {} };\n}\n"
     },
     {
       "type": "diff-view",

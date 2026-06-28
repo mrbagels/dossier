@@ -65,6 +65,16 @@
       ]
     },
     {
+      "type": "code-editor",
+      "title": "Editable target snippet",
+      "summary": "Use this for small patches, config edits, prompt text, JSON, or other bounded content that should round-trip as an edits packet.",
+      "lang": "ts",
+      "filename": "file.ts",
+      "targetPath": "replace/with/file.ts",
+      "workItems": ["work-item-one"],
+      "code": "// old behavior\nexport const value = false;\n"
+    },
+    {
       "type": "patch-set",
       "title": "Patch set",
       "summary": "Proposed edits grouped by intent, files, linked work items, risk, and verification.",

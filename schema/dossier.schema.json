@@ -282,6 +282,9 @@
           "$ref": "#/$defs/blocks/code"
         },
         {
+          "$ref": "#/$defs/blocks/codeEditor"
+        },
+        {
           "$ref": "#/$defs/blocks/patchSet"
         },
         {
@@ -727,6 +730,54 @@
           },
           "filename": {
             "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "codeEditor": {
+        "description": "Editable code/text surface with static textarea fallback, local persistence, and edited-text packet export. Host tools can enhance it with CodeMirror.",
+        "allOf": [
+          {
+            "$ref": "#/$defs/blockBase"
+          }
+        ],
+        "required": [
+          "type",
+          "code"
+        ],
+        "properties": {
+          "type": {
+            "const": "code-editor"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string",
+            "description": "Language label and enhancement hint."
+          },
+          "filename": {
+            "type": "string"
+          },
+          "targetPath": {
+            "type": "string",
+            "description": "Optional path this editor content is intended to update."
+          },
+          "workItems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Linked process-board item ids."
+          },
+          "readonly": {
+            "type": "boolean",
+            "default": false
           },
           "code": {
             "type": "string"

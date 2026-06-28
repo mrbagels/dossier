@@ -132,6 +132,13 @@ async function block(b, out, ctx) {
       String(b.code || "").split("\n").forEach((line) => out.push(new Paragraph({ children: [new TextRun({ text: line || " ", font: "Consolas", size: 18 })] })));
       out.push(new Paragraph({ text: "" }));
       break;
+    case "code-editor":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      if (b.summary) out.push(P(b.summary));
+      if (b.targetPath || b.filename || b.lang) out.push(P([b.targetPath || b.filename, b.lang].filter(Boolean).join(" · ")));
+      String(b.code || "").split("\n").forEach((line) => out.push(new Paragraph({ children: [new TextRun({ text: line || " ", font: "Consolas", size: 18 })] })));
+      out.push(new Paragraph({ text: "" }));
+      break;
     case "patch-set":
       if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
       if (b.summary) out.push(P(b.summary));
