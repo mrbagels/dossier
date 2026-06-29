@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
-[![Version](https://img.shields.io/badge/version-0.6.0-7048e8.svg)](#release-status)
+[![Version](https://img.shields.io/badge/version-0.6.1-7048e8.svg)](#release-status)
 [![Output](https://img.shields.io/badge/output-single%20HTML%20file-7048e8.svg)](#how-dossier-works)
 [![Runtime](https://img.shields.io/badge/viewer%20runtime-zero%20external%20assets-c81e4a.svg)](#how-dossier-works)
 [![Agent Ready](https://img.shields.io/badge/agent%20ready-MCP%20%2B%20packets-0f7a52.svg)](#agent-workflows)
@@ -616,7 +616,7 @@ When adding a block type, update:
 | Showcase | `examples/showcase.dossier.json` |
 | Tests | `test/dossier.test.mjs` |
 
-CI runs tests on Node 18, 20, and 22. The Pages demo redeploys on pushes to `next`. Release evidence can be generated locally with `dossier release collect` or through the `Release Evidence` workflow.
+CI runs tests on Node 18, 20, and 22. The Pages demo redeploys on pushes to `master`. Release evidence can be generated locally with `dossier release collect` or through the `Release Evidence` workflow.
 
 ## License
 
