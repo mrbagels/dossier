@@ -145,10 +145,35 @@ function readPacket(args, keys) {
   return null;
 }
 
+function packetMap(packet, keys = []) {
+  let src = packet;
+  if (packet && typeof packet === "object") {
+    for (const key of keys) {
+      if (packet[key] !== undefined) {
+        src = packet[key];
+        break;
+      }
+    }
+  }
+  if (Array.isArray(src)) {
+    return Object.fromEntries(
+      src
+        .filter((entry) => entry && typeof entry === "object")
+        .map((entry, index) => [entry.id || String(index), entry])
+    );
+  }
+  return src && typeof src === "object" ? src : {};
+}
+
 function loadModel(args) {
   if (args.model) return { model: args.model, path: null };
   if (args.path) return { model: JSON.parse(readFileSync(args.path, "utf8")), path: args.path };
   return { model: null, path: null };
+}
+
+function assertValidModel(model) {
+  const v = validateModel(model);
+  if (!v.ok) throw new Error("invalid dossier after update:\n- " + v.errors.join("\n- "));
 }
 
 function writeModel(path, model) {
@@ -192,7 +217,7 @@ async function handle(name, args) {
   if (name === "dossier_read_decisions") {
     let packet = readPacket(args, ["decisions"]);
     if (!packet) return fail("provide `decisions` or `path`");
-    const map = packet.decisions || packet;
+    const map = packetMap(packet, ["decisions"]);
     const selected = [];
     const noted = [];
     for (const [id, d] of Object.entries(map)) {
@@ -205,7 +230,7 @@ async function handle(name, args) {
   if (name === "dossier_read_process") {
     let packet = readPacket(args, ["process"]);
     if (!packet) return fail("provide `process` or `path`");
-    const map = packet.process || packet.items || packet;
+    const map = packetMap(packet, ["process", "items"]);
     const byVerdict = {};
     const noted = [];
     for (const [id, entry] of Object.entries(map)) {
@@ -224,7 +249,7 @@ async function handle(name, args) {
   if (name === "dossier_read_edits") {
     let packet = readPacket(args, ["edits"]);
     if (!packet) return fail("provide `edits` or `path`");
-    const map = packet.edits || packet.items || packet;
+    const map = packetMap(packet, ["edits", "items"]);
     const edits = [];
     const byTargetPath = {};
     for (const [id, entry] of Object.entries(map)) {
@@ -249,7 +274,7 @@ async function handle(name, args) {
   if (name === "dossier_read_verdicts") {
     const packet = readPacket(args, ["verdicts"]);
     if (!packet) return fail("provide `verdicts` or `path`");
-    const map = packet.verdicts || packet.items || packet;
+    const map = packetMap(packet, ["verdicts", "items"]);
     const byVerdict = {};
     for (const [id, entry] of Object.entries(map)) {
       if (!entry || typeof entry !== "object") continue;
@@ -263,8 +288,14 @@ async function handle(name, args) {
   if (name === "dossier_read_release") {
     const packet = readPacket(args, ["release"]);
     if (!packet) return fail("provide `release` or `path`");
-    const map = packet.release || packet.gates || packet;
-    const gates = Object.entries(map).map(([id, entry]) => ({ id, done: !!(entry && entry.done), notes: (entry && entry.notes) || "" }));
+    const map = packetMap(packet, ["release", "gates"]);
+    const gates = Object.entries(map).map(([id, entry]) => ({
+      id,
+      done: !!(entry && entry.done),
+      notes: (entry && entry.notes) || "",
+      title: (entry && entry.title) || "",
+      required: !!(entry && entry.required),
+    }));
     return text({ schema: packet.schema || "dossier.release/v1", slug: packet.slug, gates, totals: { gates: gates.length, done: gates.filter((g) => g.done).length } });
   }
 
@@ -273,6 +304,7 @@ async function handle(name, args) {
     const { model, path } = loadModel(args);
     if (!model) return text({ type: "verification-run", title: args.title || "Verification runs", runs: [run] });
     const block = appendOrCreateBlock(model, "verification-run", args.title || "Verification runs", "runs", run);
+    assertValidModel(model);
     writeModel(path, model);
     return text({ ok: true, path, block });
   }
@@ -283,6 +315,7 @@ async function handle(name, args) {
     if (!model) return text(patchSet);
     model.blocks = Array.isArray(model.blocks) ? model.blocks : [];
     model.blocks.push(patchSet);
+    assertValidModel(model);
     writeModel(path, model);
     return text({ ok: true, path, block: patchSet });
   }
@@ -293,11 +326,11 @@ async function handle(name, args) {
     const digest = {
       title: model && model.meta && model.meta.title,
       slug: (model && model.meta && model.meta.slug) || packets.slug,
-      decisions: packets.decisions ? Object.keys(packets.decisions.decisions || packets.decisions).length : 0,
-      processItems: packets.process ? Object.keys(packets.process.process || packets.process).length : 0,
-      edits: packets.edits ? Object.keys(packets.edits.edits || packets.edits).length : 0,
-      verdicts: packets.verdicts ? Object.keys(packets.verdicts.verdicts || packets.verdicts).length : 0,
-      releaseGates: packets.release ? Object.keys(packets.release.release || packets.release).length : 0,
+      decisions: packets.decisions ? Object.keys(packetMap(packets.decisions, ["decisions"])).length : 0,
+      processItems: packets.process ? Object.keys(packetMap(packets.process, ["process", "items"])).length : 0,
+      edits: packets.edits ? Object.keys(packetMap(packets.edits, ["edits", "items"])).length : 0,
+      verdicts: packets.verdicts ? Object.keys(packetMap(packets.verdicts, ["verdicts", "items"])).length : 0,
+      releaseGates: packets.release ? Object.keys(packetMap(packets.release, ["release", "gates"])).length : 0,
       summary: "Closeout packet ready for handoff. Review non-approved verdicts, dirty edits, failed runs, and unresolved release gates before marking durable.",
     };
     return text(digest);
@@ -314,6 +347,8 @@ async function handle(name, args) {
 
   return fail("unknown tool: " + name);
 }
+
+export const handleTool = handle;
 
 export function createServer() {
   const server = new Server({ name: "dossier", version: "0.2.0" }, { capabilities: { tools: {} } });

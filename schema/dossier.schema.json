@@ -229,7 +229,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Stable id used for deep links, data-id, and machine addressing. Auto-derived from headings when omitted."
+          "description": "Stable kebab-case id used for deep links, data-id, and machine addressing. Auto-derived from headings when omitted.",
+          "pattern": "^[a-z0-9-]+$"
         },
         "type": {
           "type": "string"

@@ -1,8 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { tmpdir } from "node:os";
 import { generate, parseUnifiedDiff, validateModel } from "../src/index.mjs";
 import { diffModels } from "../src/diff.mjs";
 
@@ -31,6 +32,26 @@ test("validation catches unknown types and missing fields", () => {
   assert.ok(r.errors.some((e) => /unknown block type/.test(e)));
   assert.ok(r.errors.some((e) => /meta.title/.test(e)));
   assert.ok(r.errors.some((e) => /missing required "code"/.test(e)));
+});
+
+test("validation catches nested packet ids that agents depend on", () => {
+  const r = validateModel({
+    dossierVersion: "1.0",
+    meta: { title: "Bad nested ids" },
+    blocks: [
+      { type: "prose", id: "UpperCase", markdown: "Bad block id." },
+      { type: "process-board", title: "Work", items: [{ title: "No id" }] },
+      { type: "finding-list", title: "Findings", findings: [{ id: "UpperCase", title: "Bad nested id" }] },
+      { type: "release-checklist", title: "Release", gates: [{ id: "bad id", title: "Bad" }] },
+      { type: "patch-set", title: "Patches", patches: [] },
+    ],
+  });
+  assert.equal(r.ok, false);
+  assert.ok(r.errors.some((e) => /blocks\[0\]\.id/.test(e)), "block id must be lowercase kebab-case");
+  assert.ok(r.errors.some((e) => /items\[0\]\.id/.test(e)), "process item id is required");
+  assert.ok(r.errors.some((e) => /findings\[0\]\.id/.test(e)), "nested item id must be lowercase kebab-case");
+  assert.ok(r.errors.some((e) => /gates\[0\]\.id/.test(e)), "release gate id must be a slug");
+  assert.ok(r.errors.some((e) => /missing required "patches"/.test(e)), "empty patch set is rejected");
 });
 
 test("generate yields a self-contained, agent-readable artifact", async () => {
@@ -243,6 +264,105 @@ test("process closeout blocks render and export agent-readable packet hooks", as
   assert.ok(html.includes("Integration report"), "new titled blocks are present");
   assert.ok(md.includes("## Verification"), "exports verification markdown");
   assert.ok(md.includes("- [x] Tests pass"), "exports release checklist markdown");
+});
+
+test("process packet markup preserves current state for export and import", async () => {
+  const model = {
+    dossierVersion: "1.0",
+    kind: "release",
+    meta: { title: "Packets", slug: "packets" },
+    blocks: [
+      { type: "process-board", title: "Work", items: [{ id: "ship-work", title: "Ship work", verdict: "approve" }] },
+      { type: "verdict-gate", title: "Ship gate", prompt: "Ship?", gateId: "ship-gate", verdict: "approve" },
+      { type: "release-checklist", title: "Release", gates: [{ id: "tests", title: "Tests pass", status: "passed", required: true, evidence: "npm test" }] },
+    ],
+  };
+  const { html } = await generate(structuredClone(model), {});
+  assert.ok(html.includes('data-verdict-title="Ship gate"'), "verdict packet carries a title");
+  assert.ok(html.includes('data-release-title="Tests pass"'), "release packet carries a gate title");
+  assert.ok(html.includes('data-release-required="1"'), "release packet carries required state");
+  assert.ok(html.includes("function collectProcess()"), "process export collects current DOM state");
+  assert.ok(html.includes("function collectVerdicts()"), "verdict export collects current DOM state");
+  assert.ok(html.includes("function collectRelease()"), "release export collects current DOM state");
+  assert.ok(html.includes("function byAttr("), "imports avoid fragile selector string interpolation");
+});
+
+test("mcp helpers normalize packets and validate writes before touching disk", async () => {
+  const { handleTool } = await import("../mcp/server.mjs");
+  const release = await handleTool("dossier_read_release", {
+    release: {
+      schema: "dossier.release/v1",
+      release: [{ id: "tests", done: true, notes: "green", title: "Tests pass", required: true }],
+    },
+  });
+  const body = JSON.parse(release.content[0].text);
+  assert.equal(body.gates[0].id, "tests");
+  assert.equal(body.gates[0].title, "Tests pass");
+  assert.equal(body.totals.done, 1);
+
+  const dir = mkdtempSync(join(tmpdir(), "dossier-mcp-"));
+  const file = join(dir, "mcp.dossier.json");
+  writeFileSync(file, JSON.stringify({ dossierVersion: "1.0", meta: { title: "MCP" }, blocks: [] }, null, 2));
+  await handleTool("dossier_record_run", { path: file, run: { command: "npm test", status: "passed" } });
+  let model = JSON.parse(readFileSync(file, "utf8"));
+  assert.equal(model.blocks[0].type, "verification-run");
+  assert.equal(model.blocks[0].runs[0].command, "npm test");
+  await assert.rejects(
+    () => handleTool("dossier_attach_patchset", { path: file, patchSet: { type: "patch-set", title: "Empty", patches: [] } }),
+    /invalid dossier after update/
+  );
+  model = JSON.parse(readFileSync(file, "utf8"));
+  assert.equal(model.blocks.length, 1, "invalid write was not persisted");
+});
+
+test("serve exposes validated save-back and patch import endpoints", async () => {
+  const { serve } = await import("../src/serve.mjs");
+  const dir = mkdtempSync(join(tmpdir(), "dossier-serve-"));
+  const file = join(dir, "live.dossier.json");
+  writeFileSync(
+    file,
+    JSON.stringify(
+      {
+        dossierVersion: "1.0",
+        kind: "implementation",
+        meta: { title: "Live", slug: "live" },
+        blocks: [{ type: "code-editor", title: "Untitled editor", lang: "js", code: "const a = 1;\n" }],
+      },
+      null,
+      2
+    )
+  );
+  const live = await serve(file, { port: 0, quiet: true });
+  try {
+    let res = await fetch(live.url + "/__save-editor", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Untitled editor", text: "const a = 2;\n" }),
+    });
+    assert.equal(res.ok, true, await res.text());
+    let model = JSON.parse(readFileSync(file, "utf8"));
+    assert.equal(model.blocks[0].code, "const a = 2;\n");
+
+    res = await fetch(live.url + "/__append-patchset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "patch-set", title: "Empty", patches: [] }),
+    });
+    assert.equal(res.status, 400);
+    model = JSON.parse(readFileSync(file, "utf8"));
+    assert.equal(model.blocks.length, 1, "invalid patch import was not persisted");
+
+    res = await fetch(live.url + "/__append-patchset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "patch-set", title: "Imported", patches: [{ id: "patch-one", title: "Patch one" }] }),
+    });
+    assert.equal(res.ok, true, await res.text());
+    model = JSON.parse(readFileSync(file, "utf8"));
+    assert.equal(model.blocks[1].type, "patch-set");
+  } finally {
+    await live.close();
+  }
 });
 
 test("plugins: a registered block validates and renders", async () => {

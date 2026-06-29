@@ -3,6 +3,9 @@
 Every block is an object in `blocks[]` with a `type`. Text fields accept inline
 markdown (`**bold**`, `` `code` ``, `[label](url)`, `[[slug]]`, `[[Term]]`). `id` is
 optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
+Process packet collections require stable kebab-case ids on their nested items:
+`candidates`, `items`, `patches`, `runs`, `findings`, `threads`, `cycles`, `gates`,
+and `decisions`.
 
 ## hero, page opener (use one, first)
 ```json
@@ -219,7 +222,7 @@ field. Reader filters, searches, ticks decisions, writes notes, exports a decisi
 Each item is an expandable work row with owner, priority, status, files, verification,
 risks, evidence, full reference detail, a verdict dropdown, and notes. Reader verdicts
 persist locally and export as a process JSON packet:
-`{ "schema": "dossier.process/v1", "slug": "...", "process": { "id": { "verdict": "approve", "notes": "..." } } }`.
+`{ "schema": "dossier.process/v1", "slug": "...", "process": { "id": { "verdict": "approve", "notes": "...", "title": "..." } } }`.
 Agents should read that packet with `dossier_read_process`.
 ```json
 { "type": "process-board", "title": "Implementation work",
@@ -257,7 +260,7 @@ run with `dossier_record_run`.
 
 ## verdict-gate, focused approval packet
 Renders one approval control plus notes. It exports
-`{ "schema": "dossier.verdicts/v1", "verdicts": { "gate-id": { "verdict": "...", "notes": "..." } } }`.
+`{ "schema": "dossier.verdicts/v1", "verdicts": { "gate-id": { "verdict": "...", "notes": "...", "title": "..." } } }`.
 Agents should read it with `dossier_read_verdicts`.
 ```json
 { "type": "verdict-gate", "title": "Apply patch?", "gateId": "apply-auth-patch",
@@ -314,7 +317,7 @@ Agents should read it with `dossier_read_verdicts`.
 
 ## release-checklist, release readiness gates
 Interactive release gates persist locally and export
-`{ "schema": "dossier.release/v1", "release": { "gate-id": { "done": true, "notes": "..." } } }`.
+`{ "schema": "dossier.release/v1", "release": { "gate-id": { "done": true, "notes": "...", "title": "...", "required": true } } }`.
 Agents should read it with `dossier_read_release`.
 ```json
 { "type": "release-checklist", "title": "Release gates",

@@ -4,7 +4,7 @@
 
 import { createServer } from "node:http";
 import { watch, readFileSync, writeFileSync } from "node:fs";
-import { generateFile } from "./index.mjs";
+import { generateFile, validateModel } from "./index.mjs";
 
 const LIVE = `<script>
 try{new EventSource('/__reload').onmessage=function(){location.reload()}}catch(e){}
@@ -65,6 +65,11 @@ function writeSourceModel(file, model) {
   writeFileSync(file, JSON.stringify(model, null, 2) + "\n");
 }
 
+function assertValidModel(model) {
+  const v = validateModel(model);
+  if (!v.ok) throw new Error("invalid dossier after update:\n- " + v.errors.join("\n- "));
+}
+
 function saveEditorToModel(file, payload) {
   const model = readSourceModel(file);
   let found = false;
@@ -76,6 +81,7 @@ function saveEditorToModel(file, payload) {
     }
   });
   if (!found) throw new Error("matching code-editor block not found");
+  assertValidModel(model);
   writeSourceModel(file, model);
 }
 
@@ -84,6 +90,7 @@ function appendPatchSet(file, payload) {
   model.blocks = Array.isArray(model.blocks) ? model.blocks : [];
   const block = payload.type === "patch-set" ? payload : { type: "patch-set", title: payload.title || "Imported patch set", patches: payload.patches || [] };
   model.blocks.push(block);
+  assertValidModel(model);
   writeSourceModel(file, model);
 }
 
@@ -99,7 +106,7 @@ function openUrl(url) {
 }
 
 export async function serve(file, opts = {}) {
-  const port = Number(opts.port) || 4321;
+  const port = opts.port === undefined || opts.port === null ? 4321 : Number(opts.port);
   let htmlPath = null;
 
   async function rebuild() {
@@ -159,18 +166,25 @@ export async function serve(file, opts = {}) {
     }
   });
 
-  server.listen(port, () => {
-    const url = `http://localhost:${port}`;
-    console.log(`serving ${file} at ${url}\n  watching for changes, edit and save to live-reload`);
-    if (opts.open) openUrl(url);
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, () => {
+      server.off("error", reject);
+      resolve();
+    });
   });
+  const address = server.address();
+  const actualPort = typeof address === "object" && address ? address.port : port;
+  const url = `http://localhost:${actualPort}`;
+  if (!opts.quiet) console.log(`serving ${file} at ${url}\n  watching for changes, edit and save to live-reload`);
+  if (opts.open) openUrl(url);
 
   let t;
-  watch(file, () => {
+  const watcher = watch(file, () => {
     clearTimeout(t);
     t = setTimeout(async () => {
       if (await rebuild()) {
-        console.log("↻ rebuilt " + new Date().toLocaleTimeString());
+        if (!opts.quiet) console.log("↻ rebuilt " + new Date().toLocaleTimeString());
         clients.forEach((c) => {
           try {
             c.write("data: reload\n\n");
@@ -181,4 +195,21 @@ export async function serve(file, opts = {}) {
       }
     }, 80);
   });
+  return {
+    url,
+    server,
+    watcher,
+    close() {
+      clearTimeout(t);
+      watcher.close();
+      clients.forEach((c) => {
+        try {
+          c.end();
+        } catch {
+          /* ignore */
+        }
+      });
+      return new Promise((resolve, reject) => server.close((err) => (err ? reject(err) : resolve())));
+    },
+  };
 }

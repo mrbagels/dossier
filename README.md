@@ -8,7 +8,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
 [![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#how-it-works)
 [![Output](https://img.shields.io/badge/output-single%20.html%20file-7048e8.svg)](#how-it-works)
-[![Version](https://img.shields.io/badge/version-0.4.1-7048e8.svg)](#)
+[![Version](https://img.shields.io/badge/version-0.5.0-7048e8.svg)](#)
 [![Live demo](https://img.shields.io/badge/live%20demo-%E2%86%97-7048e8.svg)](https://mrbagels.github.io/dossier/)
 
 <a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="840"></a>

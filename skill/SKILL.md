@@ -61,8 +61,10 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 --open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
 `dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
 and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
-render/validate/read-decisions/read-process/read-edits/read-verdicts/read-release plus record-run,
-attach-patchset, and closeout-digest MCP tools. Block types beyond the basics, `figure`,
+`dossier_render`, `dossier_validate`, `dossier_read_decisions`, `dossier_read_process`,
+`dossier_read_edits`, `dossier_read_verdicts`, `dossier_read_release`,
+`dossier_record_run`, `dossier_attach_patchset`, and `dossier_closeout_digest`.
+Block types beyond the basics, `figure`,
 `math`, `chart`, `footnotes` (with inline `[^id]`), and `receipt` (provenance), are in
 `references/blocks.md`.
 

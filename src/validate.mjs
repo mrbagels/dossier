@@ -52,6 +52,46 @@ const REQUIRED = {
 const isEmpty = (v) =>
   v === undefined || v === null || (Array.isArray(v) && v.length === 0) || (typeof v === "string" && !v.trim());
 
+const ID_COLLECTIONS = {
+  "review-board": ["candidates"],
+  "process-board": ["items"],
+  "patch-set": ["patches"],
+  "verification-run": ["runs"],
+  "evidence-log": ["items"],
+  "finding-list": ["findings"],
+  "comment-thread": ["threads"],
+  "cycle-board": ["cycles"],
+  "integration-report": ["items"],
+  "release-checklist": ["gates"],
+  "decision-log": ["decisions"],
+  footnotes: ["items"],
+};
+
+function validateNestedIds(b, p, errors) {
+  for (const field of ID_COLLECTIONS[b.type] || []) {
+    if (b[field] === undefined) continue;
+    if (!Array.isArray(b[field])) {
+      errors.push(`${p}.${field}: must be an array`);
+      continue;
+    }
+    const seen = new Set();
+    b[field].forEach((item, i) => {
+      const ip = `${p}.${field}[${i}]`;
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        errors.push(`${ip}: must be an object`);
+        return;
+      }
+      if (typeof item.id !== "string" || !/^[a-z0-9-]+$/.test(item.id)) {
+        errors.push(`${ip}.id: required slug ([a-z0-9-]) is missing or invalid`);
+      } else if (seen.has(item.id)) {
+        errors.push(`${ip}.id: duplicate id "${item.id}" in ${field}`);
+      } else {
+        seen.add(item.id);
+      }
+    });
+  }
+}
+
 function walk(blocks, path, errors, known, seen) {
   if (!Array.isArray(blocks)) {
     errors.push(`${path}: must be an array of blocks`);
@@ -71,13 +111,14 @@ function walk(blocks, path, errors, known, seen) {
       errors.push(`${p}.type: unknown block type "${b.type}" (did you register a plugin?)`);
     }
     if (b.id !== undefined) {
-      if (typeof b.id !== "string" || !/^[a-z0-9-]+$/i.test(b.id)) errors.push(`${p}.id: must be a slug ([a-z0-9-])`);
+      if (typeof b.id !== "string" || !/^[a-z0-9-]+$/.test(b.id)) errors.push(`${p}.id: must be a slug ([a-z0-9-])`);
       else if (seen.has(b.id)) errors.push(`${p}.id: duplicate id "${b.id}"`);
       else seen.add(b.id);
     }
     for (const f of REQUIRED[b.type] || []) {
       if (isEmpty(b[f])) errors.push(`${p} (${b.type}): missing required "${f}"`);
     }
+    validateNestedIds(b, p, errors);
     if (b.blocks) walk(b.blocks, `${p}.blocks`, errors, known, seen);
     if (b.left) walk(b.left, `${p}.left`, errors, known, seen);
     if (b.right) walk(b.right, `${p}.right`, errors, known, seen);
