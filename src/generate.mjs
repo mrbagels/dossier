@@ -1209,6 +1209,13 @@ function eachBlock(blocks, fn) {
   });
 }
 
+function stripBuildFields(model) {
+  eachBlock(model.blocks || [], (b) => {
+    for (const k in b) if (k.charAt(0) === "_") delete b[k];
+  });
+  return model;
+}
+
 // Assign stable ids to every block (so a React render and the JS render agree).
 function assignIds(blocks) {
   let s = 0;
@@ -1357,9 +1364,7 @@ export async function generate(model, opts = {}) {
   // Underscore fields (_svg/_math/_hl/_src) are injected into HTML unescaped and must
   // only ever come from build-time enrichment of trusted libraries. Drop any that an
   // author smuggled in via the input model so they cannot inject raw markup.
-  eachBlock(model.blocks || [], (b) => {
-    for (const k in b) if (k.charAt(0) === "_") delete b[k];
-  });
+  stripBuildFields(model);
   await enrich(model, opts.baseDir);
   const meta = model.meta || {};
   const ctx = { seq: 0, glossary: new Map(), footnotes: new Map(), baseUrl: meta.baseUrl || "" };
@@ -1515,5 +1520,5 @@ function knownBlockTypes() {
 }
 
 // Helpers reused by the React port (single source of truth).
-export { esc, slugify, inlineMd, richTextHtml, toMarkdown, agentDigest, collectGlossary, collectFootnotes, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes, chartSvg };
+export { esc, slugify, inlineMd, richTextHtml, toMarkdown, agentDigest, collectGlossary, collectFootnotes, buildToc, assignIds, enrich, stripBuildFields, renderBlock, registerBlock, knownBlockTypes, chartSvg };
 // renderShell is exported at its definition (above).

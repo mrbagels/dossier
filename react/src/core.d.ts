@@ -11,6 +11,7 @@ declare module "*/generate.mjs" {
   export const buildToc: (blocks: any[]) => { id: string; label: string; level: number }[];
   export const assignIds: (blocks: any[]) => void;
   export const enrich: (model: any, baseDir?: string) => Promise<void>;
+  export const stripBuildFields: (model: any) => any;
   export const renderBlock: (b: any, ctx: any) => string;
   export const chartSvg: (b: any) => string;
   export const parseUnifiedDiff: (diff: string, label?: string) => any[];

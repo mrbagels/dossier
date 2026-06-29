@@ -1,6 +1,6 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { enrich, assignIds, collectGlossary, collectFootnotes, buildToc, toMarkdown, agentDigest, renderShell } from "../../src/generate.mjs";
+import { enrich, assignIds, collectGlossary, collectFootnotes, buildToc, toMarkdown, agentDigest, renderShell, stripBuildFields } from "../../src/generate.mjs";
 import { applyPresentationOptions } from "../../src/presentation.mjs";
 import { Block, setCtx } from "./blocks";
 import type { DossierModel } from "./types";
@@ -10,6 +10,7 @@ import type { DossierModel } from "./types";
 // shared renderShell(), so the body is React-rendered and the shell is identical.
 export async function renderDossier(model: DossierModel, opts: { baseDir?: string; theme?: string; skin?: string } = {}): Promise<{ html: string; embedHtml: string; md: string; digest: string }> {
   applyPresentationOptions(model, opts);
+  stripBuildFields(model);
   await enrich(model, opts.baseDir);
   assignIds(model.blocks);
 
