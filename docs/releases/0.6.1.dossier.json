@@ -19,11 +19,11 @@
       "type": "hero",
       "eyebrow": "Release evidence",
       "title": "Release 0.6.1",
-      "lede": "Evidence collected for changes from v0.6.0 to 04f7969.",
+      "lede": "Evidence collected for changes from v0.6.0 to 6cf6631.",
       "pills": [
-        "next",
-        "3 commits",
-        "12 files",
+        "master",
+        "5 commits",
+        "16 files",
         "clean tree"
       ]
     },
@@ -35,11 +35,11 @@
           "label": "Version"
         },
         {
-          "value": "3",
+          "value": "5",
           "label": "Commits"
         },
         {
-          "value": "12",
+          "value": "16",
           "label": "Changed files"
         },
         {
@@ -68,7 +68,7 @@
           "title": "Git HEAD resolved",
           "status": "passed",
           "required": true,
-          "evidence": "04f7969e3144ca99dc54ba92580713c316b75081"
+          "evidence": "6cf66318ed4dee4a9c37d257d3ce1139bb9e98bb"
         },
         {
           "id": "working-tree-clean",
@@ -82,14 +82,14 @@
           "title": "Release commits collected",
           "status": "passed",
           "required": true,
-          "evidence": "3 commit(s) from v0.6.0..HEAD"
+          "evidence": "5 commit(s) from v0.6.0..HEAD"
         },
         {
           "id": "verification-recorded",
           "title": "Verification commands recorded",
           "status": "passed",
           "required": true,
-          "evidence": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, node bin/dossier.mjs workspace index examples, cd react && npx tsc --noEmit, npm pack --dry-run --json"
+          "evidence": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, node bin/dossier.mjs workspace index examples, cd react && npx tsc --noEmit, npm pack --dry-run --json"
         },
         {
           "id": "package-dry-run",
@@ -116,8 +116,8 @@
         },
         {
           "id": "node-bin-dossier-mjs-validate-examples-dossier-json-docs-product",
-          "title": "node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json",
-          "command": "node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json",
+          "title": "node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json",
+          "command": "node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json",
           "status": "passed",
           "expected": "Command completes before release evidence collection.",
           "actual": "Completed before this release dossier was generated.",
@@ -170,6 +170,14 @@
       ],
       "rows": [
         [
+          "6cf6631",
+          "Use master as release branch"
+        ],
+        [
+          "9bd4c52",
+          "Add 0.6.1 release evidence"
+        ],
+        [
           "04f7969",
           "Bump version to 0.6.1"
         ],
@@ -192,11 +200,27 @@
       ],
       "rows": [
         [
+          ".github/workflows/pages.yml",
+          "changed"
+        ],
+        [
           "README.md",
           "changed"
         ],
         [
           "bin/dossier.mjs",
+          "changed"
+        ],
+        [
+          "docs/releases/0.6.1.dossier.json",
+          "changed"
+        ],
+        [
+          "docs/releases/release-0-6-1.html",
+          "changed"
+        ],
+        [
+          "docs/releases/release-0-6-1.md",
           "changed"
         ],
         [
@@ -251,7 +275,7 @@
           "kind": "command",
           "source": "git rev-parse HEAD",
           "trust": "high",
-          "body": "04f7969e3144ca99dc54ba92580713c316b75081"
+          "body": "6cf66318ed4dee4a9c37d257d3ce1139bb9e98bb"
         },
         {
           "id": "git-range",
@@ -281,7 +305,7 @@
           "label": "Git HEAD",
           "kind": "command",
           "trust": "high",
-          "summary": "04f7969e3144ca99dc54ba92580713c316b75081"
+          "summary": "6cf66318ed4dee4a9c37d257d3ce1139bb9e98bb"
         },
         {
           "id": "source-git-status",
@@ -295,13 +319,13 @@
           "label": "Verification commands",
           "kind": "command",
           "trust": "high",
-          "summary": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, node bin/dossier.mjs workspace index examples, cd react && npx tsc --noEmit, npm pack --dry-run --json"
+          "summary": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, node bin/dossier.mjs workspace index examples, cd react && npx tsc --noEmit, npm pack --dry-run --json"
         }
       ],
       "claims": [
         {
           "id": "claim-head-collected",
-          "claim": "Release evidence was collected from 04f7969.",
+          "claim": "Release evidence was collected from 6cf6631.",
           "status": "verified",
           "confidence": "high",
           "sources": [
@@ -349,8 +373,12 @@
       "owner": "release automation",
       "date": "2026-06-29T00:00:00.000Z",
       "changedFiles": [
+        ".github/workflows/pages.yml",
         "README.md",
         "bin/dossier.mjs",
+        "docs/releases/0.6.1.dossier.json",
+        "docs/releases/release-0-6-1.html",
+        "docs/releases/release-0-6-1.md",
         "examples/workspace-index.dossier.json",
         "examples/workspace-index.html",
         "examples/workspace-index.md",
@@ -364,7 +392,7 @@
       ],
       "commands": [
         "npm test",
-        "node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json",
+        "node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json",
         "node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json",
         "node bin/dossier.mjs workspace index examples",
         "cd react && npx tsc --noEmit",
