@@ -9,3 +9,6 @@ examples/*.md
 
 # built demo site (deployed by Actions)
 site/
+
+# transient MCP / playwright screenshots
+.playwright-mcp/
