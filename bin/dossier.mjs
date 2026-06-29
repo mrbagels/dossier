@@ -58,7 +58,7 @@ const USAGE = [
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
-  "Flags: --theme <pack>, --skin console-slate, --no-validate (build without validating)",
+  "Flags: --theme <pack>, --skin console-slate, --embed (write <slug>.embed.html), --no-validate (build without validating)",
 ].join("\n");
 
 if (cmd === "build" && args.length) {
@@ -75,8 +75,9 @@ if (cmd === "build" && args.length) {
   }
   for (const f of args) {
     try {
-      const r = await generateFile(f, { validate: flags["no-validate"] ? false : true, theme: flags.theme, skin: flags.skin });
+      const r = await generateFile(f, { validate: flags["no-validate"] ? false : true, theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
       console.log("✓ " + r.htmlPath);
+      if (r.embedPath) console.log("  embed: " + r.embedPath);
     } catch (e) {
       console.error("✗ " + f + ":\n  " + e.message.replace(/\n/g, "\n  "));
       process.exitCode = 1;
@@ -91,8 +92,9 @@ if (cmd === "build" && args.length) {
         clearTimeout(t);
         t = setTimeout(async () => {
           try {
-            const r = await generateFile(f, { validate: flags["no-validate"] ? false : true, theme: flags.theme, skin: flags.skin });
+            const r = await generateFile(f, { validate: flags["no-validate"] ? false : true, theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
             console.log("↻ " + r.htmlPath);
+            if (r.embedPath) console.log("  embed: " + r.embedPath);
           } catch (e) {
             console.error("✗ " + e.message.replace(/\n/g, "\n  "));
           }
@@ -139,8 +141,9 @@ if (cmd === "build" && args.length) {
     const { model, docs } = buildCatalogModel(dir, { title: flags.title, baseUrl: flags["base-url"] });
     const outPath = flags.out || join(dir, "index.dossier.json");
     writeFileSync(outPath, JSON.stringify(model, null, 2) + "\n");
-    const r = await generateFile(outPath, { theme: flags.theme, skin: flags.skin });
+    const r = await generateFile(outPath, { theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
     console.log(`✓ ${r.htmlPath}  (${docs.length} documents)`);
+    if (r.embedPath) console.log("  embed: " + r.embedPath);
   } catch (e) {
     console.error("✗ " + e.message);
     process.exitCode = 1;
@@ -148,9 +151,10 @@ if (cmd === "build" && args.length) {
 } else if (cmd === "publish" && args.length) {
   const { publishDir } = await import("../src/publish.mjs");
   try {
-    const r = await publishDir(args[0], { out: flags.out, title: flags.title, baseUrl: flags["base-url"], theme: flags.theme, skin: flags.skin });
+    const r = await publishDir(args[0], { out: flags.out, title: flags.title, baseUrl: flags["base-url"], theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
     console.log(`✓ published ${r.docs.length} dossier${r.docs.length === 1 ? "" : "s"} to ${r.outDir}`);
     console.log(`  index: ${r.index.htmlPath}`);
+    if (r.index.embedPath) console.log(`  embed index: ${r.index.embedPath}`);
   } catch (e) {
     console.error("✗ " + e.message);
     process.exitCode = 1;

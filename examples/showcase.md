@@ -8,7 +8,7 @@ updated: "2026-06-29"
 
 Everything below, navigation, search, theme, code, diagrams, charts, math, and an interactive review board, lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.
 
-> **Try the toolbar (top right).** Hit **Edit** to change any text in place, tap the color swatch to restyle live in the **Theme Studio**, or open **Export** for Markdown, JSON, or the agent digest. From the CLI, `dossier export` also writes **Word** (charts and diagrams embedded as images) or **PDF**.
+> **Use the full-page toolbar.** In the full HTML artifact, **Edit** changes text in place, the color swatch restyles live in the **Theme Studio**, and **Export** gives you Markdown, JSON, or the agent digest. From the CLI, `dossier export` also writes **Word** (charts and diagrams embedded as images) or **PDF**.
 
 **42** Block types (+5 process blocks) · **0** Runtime deps (view-time network free) · **2** Renderers (Node + React) (same model) · **100%** Self-contained (HTML + source)
 

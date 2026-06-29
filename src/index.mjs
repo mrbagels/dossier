@@ -23,11 +23,13 @@ export async function generateFile(path, opts = {}) {
     }
   }
   const dir = dirname(path);
-  const { html, md } = await generate(model, { baseDir: dir });
+  const { html, embedHtml, md } = await generate(model, { baseDir: dir });
   const slug = (model.meta && model.meta.slug) || basename(path).replace(/\.(dossier\.)?json$/i, "");
   const htmlPath = join(dir, slug + ".html");
+  const embedPath = join(dir, slug + ".embed.html");
   const mdPath = join(dir, slug + ".md");
   writeFileSync(htmlPath, html);
+  if (opts.embed) writeFileSync(embedPath, embedHtml);
   writeFileSync(mdPath, md);
-  return { htmlPath, mdPath, slug };
+  return { htmlPath, embedPath: opts.embed ? embedPath : null, mdPath, slug };
 }

@@ -29,7 +29,7 @@ Instead of asking an agent for a Markdown plan that gets lost in a thread, ask i
 AI produces structured model
         |
         v
-*.dossier.json  ->  dossier build  ->  self-contained .html + .md
+*.dossier.json  ->  dossier build  ->  self-contained .html + .md (+ .embed.html with --embed)
         ^                                  |
         |                                  v
 agent reads packets  <-  human decisions, edits, evidence, release gates
@@ -110,7 +110,7 @@ The Pages build also emits a hosted gallery at `examples.html`, with every examp
 
 | Area | What is included |
 |---|---|
-| Self-contained output | One HTML file, one Markdown export, embedded JSON model, no view-time network. |
+| Self-contained output | One full HTML file, optional chrome-stripped embed HTML, one Markdown export, embedded JSON model, no view-time network. |
 | Reader UX | Sticky TOC, search, command palette, scroll progress, dark mode, section collapse, copy buttons, heading anchors, row anchors. |
 | Agent usability | Embedded `#dossier-model`, agent digest, versioned packets, MCP read/write tools, starter templates. |
 | Human control | Review boards, process verdicts, release gates, patch verdicts, diff file and hunk comments. |
@@ -175,6 +175,23 @@ The generated HTML includes:
 - `#dossier-digest`: a compact agent-readable digest.
 - Inlined CSS and runtime JavaScript.
 - No external assets or remote scripts.
+
+### Embedding
+
+Use the full HTML file when you want the Dossier toolbar, TOC, exports, search, and theme controls:
+
+```html
+<iframe src="my-doc.html" title="Project dossier"></iframe>
+```
+
+Use `--embed` when a host app or docs page already supplies navigation and chrome:
+
+```bash
+dossier build my-doc.dossier.json --embed
+dossier publish docs --out site --embed
+```
+
+That writes `my-doc.embed.html`. The embed file removes the topbar, TOC, footer, source modal, command palette, and theme studio, but keeps block interactivity, packet exports, runtime state, and the same `#dossier-model`, `#dossier-markdown`, and `#dossier-digest` islands.
 
 ## Themes And Skins
 
@@ -324,12 +341,12 @@ Every block has a copy-paste example in [`skill/references/blocks.md`](skill/ref
 | Command | What it does |
 |---|---|
 | `dossier init [name] --kind <kind>` | Scaffold from a starter. |
-| `dossier build <file> [--watch] [--plugin a,b] [--theme <pack>] [--skin console-slate]` | Validate and render to `<slug>.html` plus `<slug>.md`. |
+| `dossier build <file> [--watch] [--plugin a,b] [--theme <pack>] [--skin console-slate] [--embed]` | Validate and render to `<slug>.html` plus `<slug>.md`; `--embed` also writes `<slug>.embed.html`. |
 | `dossier serve <file> [--open] [--port]` | Build, serve, live reload, and enable save-back tools. |
 | `dossier validate <file>` | Validate a model without rendering. |
 | `dossier diff <old> <new>` | Structural diff between two dossier models. |
 | `dossier catalog <dir>` | Build an index model for a folder of dossiers. |
-| `dossier publish <dir> --out site [--theme <pack>] [--skin console-slate]` | Build every dossier plus an `index.html` catalog into a static site. |
+| `dossier publish <dir> --out site [--theme <pack>] [--skin console-slate] [--embed]` | Build every dossier plus an `index.html` catalog into a static site; `--embed` writes sibling embed files. |
 | `dossier export <file> --format docx\|md\|pdf` | Export to Word, Markdown, or PDF. |
 | `dossier mcp` | Run the MCP server over stdio. |
 
@@ -340,7 +357,7 @@ Dossier also ships a typed React port in [`react/`](react/):
 ```ts
 import { renderDossier } from "@mrbagels/dossier-react";
 
-const { html, md } = await renderDossier(model);
+const { html, embedHtml, md } = await renderDossier(model);
 ```
 
 ```tsx

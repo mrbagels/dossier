@@ -54,8 +54,8 @@
     {
       "type": "callout",
       "tone": "tip",
-      "title": "Try the toolbar (top right).",
-      "body": "Hit **Edit** to change any text in place, tap the color swatch to restyle live in the **Theme Studio**, or open **Export** for Markdown, JSON, or the agent digest. From the CLI, `dossier export` also writes **Word** (charts and diagrams embedded as images) or **PDF**."
+      "title": "Use the full-page toolbar.",
+      "body": "In the full HTML artifact, **Edit** changes text in place, the color swatch restyles live in the **Theme Studio**, and **Export** gives you Markdown, JSON, or the agent digest. From the CLI, `dossier export` also writes **Word** (charts and diagrams embedded as images) or **PDF**."
     },
     {
       "type": "stat-strip",

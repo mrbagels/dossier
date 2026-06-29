@@ -9,16 +9,18 @@ import { registerBlock, esc, inlineMd, slugify } from "../../src/generate.mjs";
 const argv = process.argv.slice(2);
 const files: string[] = [];
 const plugins: string[] = [];
+let embed = false;
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a === "--plugin") plugins.push(...String(argv[++i] || "").split(","));
   else if (a.startsWith("--plugin=")) plugins.push(...a.slice(9).split(","));
+  else if (a === "--embed") embed = true;
   else files.push(a);
 }
 
 const path = files[0];
 if (!path) {
-  console.error("Usage: tsx src/cli.tsx <file.dossier.json> [--plugin a.mjs,b.mjs]");
+  console.error("Usage: tsx src/cli.tsx <file.dossier.json> [--plugin a.mjs,b.mjs] [--embed]");
   process.exit(1);
 }
 
@@ -30,8 +32,13 @@ for (const p of plugins.map((s) => s.trim()).filter(Boolean)) {
 }
 
 const model = JSON.parse(readFileSync(path, "utf8"));
-const { html } = await renderDossier(model, { baseDir: dirname(path) });
+const { html, embedHtml } = await renderDossier(model, { baseDir: dirname(path) });
 const slug = (model.meta && model.meta.slug) || basename(path).replace(/\.(dossier\.)?json$/i, "");
 const out = join(dirname(path), slug + ".react.html");
 writeFileSync(out, html);
 console.log("✓ " + out);
+if (embed) {
+  const embedOut = join(dirname(path), slug + ".react.embed.html");
+  writeFileSync(embedOut, embedHtml);
+  console.log("  embed: " + embedOut);
+}

@@ -17,7 +17,7 @@ This checklist covers the `0.5.x` functionality closeout:
 | Live authoring | `dossier serve`, live reload, editor save-back, model editor save-back, patch import validation. |
 | Export | Markdown, DOCX, PDF when Playwright is installed. |
 | React parity | React SSR/typecheck and native rendering for built-in blocks. |
-| Publishing | `catalog` and `publish` static site output. |
+| Publishing | `catalog`, `publish`, and optional `.embed.html` static site output. |
 
 ## Automated Baseline
 
@@ -34,8 +34,9 @@ node bin/dossier.mjs validate examples/showcase.dossier.json
 node bin/dossier.mjs validate docs/product/process-dossiers/process-dossiers-scope.dossier.json
 node bin/dossier.mjs build examples/sample.dossier.json
 node bin/dossier.mjs build examples/showcase.dossier.json
+node bin/dossier.mjs build examples/showcase.dossier.json --embed
 node bin/dossier.mjs build examples/sample.dossier.json --theme forest --skin console-slate
-node bin/dossier.mjs publish examples --out /tmp/dossier-public-qa --theme ocean --skin console-slate
+node bin/dossier.mjs publish examples --out /tmp/dossier-public-qa --theme ocean --skin console-slate --embed
 git diff --check
 npm pack --dry-run --json
 ```
@@ -71,6 +72,7 @@ Verify:
 - Theme toggle switches light/dark.
 - `examples/showcase.html` has the Console Slate skin, including wider layout, fused stat strip, and topbar polish.
 - A document built with `--theme forest --skin console-slate` keeps the skin while applying the final theme token overrides.
+- `examples/showcase.embed.html` loads without topbar, TOC, footer, source modal, command palette, or theme studio, while block controls and packet exports still work.
 - Copy buttons copy block text.
 - Export menu can copy Markdown, digest, and JSON.
 - Source modal opens and closes.

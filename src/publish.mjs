@@ -20,12 +20,14 @@ async function writeRendered(model, sourceFile, outDir, opts = {}) {
   const renderModel = structuredClone(model);
   renderModel.meta = renderModel.meta || { title: slug };
   if (opts.baseUrl) renderModel.meta.baseUrl = opts.baseUrl;
-  const { html, md } = await generate(renderModel, { baseDir: dirname(sourceFile), theme: opts.theme, skin: opts.skin });
+  const { html, embedHtml, md } = await generate(renderModel, { baseDir: dirname(sourceFile), theme: opts.theme, skin: opts.skin });
   const htmlPath = join(outDir, `${slug}.html`);
+  const embedPath = join(outDir, `${slug}.embed.html`);
   const mdPath = join(outDir, `${slug}.md`);
   writeFileSync(htmlPath, html);
+  if (opts.embed) writeFileSync(embedPath, embedHtml);
   writeFileSync(mdPath, md);
-  return { slug, htmlPath, mdPath };
+  return { slug, htmlPath, embedPath: opts.embed ? embedPath : null, mdPath };
 }
 
 export async function publishDir(dir, opts = {}) {

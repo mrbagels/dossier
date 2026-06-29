@@ -1372,17 +1372,20 @@ export async function generate(model, opts = {}) {
   const body = (model.blocks || []).map((b) => renderBlock(b, ctx)).join("\n");
   const md = toMarkdown(model);
   const digest = agentDigest(model);
-  return { html: renderShell(model, { body, toc, md, digest }), md, digest };
+  const html = renderShell(model, { body, toc, md, digest });
+  const embedHtml = renderShell(model, { body, toc, md, digest, chrome: "embed" });
+  return { html, embedHtml, md, digest };
 }
 
 // Shared HTML shell, used by the JS generator and the React SSR port so both
 // produce byte-identical scaffolding (single source of truth).
-export function renderShell(model, { body, toc, md, digest, generator = "dossier", footer = "Generated with Dossier" }) {
+export function renderShell(model, { body, toc, md, digest, generator = "dossier", footer = "Generated with Dossier", chrome = "full" }) {
   const meta = model.meta || {};
   const skin = resolveSkin(meta.skin);
   if (meta.skin && !skin) {
     throw new Error(`unknown skin: ${meta.skin} (supported: ${skinNames().join(", ")})`);
   }
+  const isEmbed = chrome === "embed";
   const wordCount = (md.match(/\S+/g) || []).length;
   const readMin = Math.max(1, Math.round(wordCount / 220));
 
@@ -1392,6 +1395,17 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
     .join("");
   const themeCss = themeVars ? `:root{${themeVars}}[data-theme="dark"]{${themeVars}}` : "";
   const skinCss = skin ? `\n/* skin:${String(meta.skin).replace(/[^a-z0-9-]/gi, "")} */\n${skin.css}` : "";
+  const embedCss = isEmbed
+    ? `
+html[data-dossier-embed="true"]{scroll-padding-top:0}
+body.ds-embed-body{background:transparent}
+body.ds-embed-body::before{display:none!important}
+.ds-embed-shell{width:min(var(--ds-frame),calc(100% - 32px));margin:0 auto;padding:24px 0 32px}
+.ds-embed-shell .ds-lifecycle{margin:0 0 18px}
+.ds-embed-content>.ds-block:first-child{margin-top:0}
+@media (max-width:720px){.ds-embed-shell{width:calc(100% - 24px);padding:18px 0 26px}}
+`
+    : "";
   const skinScript = skin && skin.script ? `<script id="ds-skin-runtime">${skin.script}</script>` : "";
 
   const tocHtml = toc
@@ -1405,9 +1419,40 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
 
   const crumbs = (meta.crumbs || []).join(" / ");
   const modelJson = JSON.stringify(model, (k, v) => (k.charAt(0) === "_" ? undefined : v)).replace(/</g, "\\u003c");
+  const htmlAttrs = `lang="en" data-theme="light"${skin ? ` data-skin="${esc(meta.skin)}"` : ""}${isEmbed ? ' data-dossier-embed="true"' : ""}`;
+  const dataIslands = `<script type="application/json" id="ds-themes">${JSON.stringify(THEMES).replace(/</g, "\\u003c")}</script>
+
+<script type="application/json" id="dossier-model">${modelJson}</script>
+<script type="text/markdown" id="dossier-markdown">${esc(md)}</script>
+<script type="text/plain" id="dossier-digest">${esc(digest)}</script>
+<script>${RUNTIME}</script>
+${skinScript}`;
+
+  if (isEmbed) {
+    return `<!doctype html>
+<html ${htmlAttrs}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="${esc(generator)}/${esc(model.dossierVersion || "1.0")}">
+<title>${esc(meta.title || "Dossier")} embed</title>
+<style>${CSS}${skinCss}${embedCss}${themeCss}</style>
+</head>
+<body class="ds-embed-body">
+<div class="ds-embed-shell">
+${lifecycle}
+<main class="ds-content ds-embed-content" id="main" tabindex="-1">
+${body}
+</main>
+</div>
+<div class="ds-toast" data-toast role="status" aria-live="polite"></div>
+${dataIslands}
+</body>
+</html>`;
+  }
 
   return `<!doctype html>
-<html lang="en" data-theme="light"${skin ? ` data-skin="${esc(meta.skin)}"` : ""}>
+<html ${htmlAttrs}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1455,13 +1500,7 @@ ${toc.length ? `<aside class="ds-toc"><div class="ds-search"><input type="search
 <div class="ds-studio-presets">${Object.entries(THEMES).filter(([, v]) => v.accent).map(([k, v]) => `<button class="ds-studio-sw" type="button" data-studio-preset="${esc(k)}" title="${esc(k)}" style="background:${esc(v.accent)}"></button>`).join("")}</div>
 <div class="ds-studio-actions"><button class="ds-btn ds-btn-line" type="button" data-studio-copy>Copy theme JSON</button><button class="ds-btn ds-btn-line" type="button" data-studio-reset>Reset</button></div>
 </div>
-<script type="application/json" id="ds-themes">${JSON.stringify(THEMES).replace(/</g, "\\u003c")}</script>
-
-<script type="application/json" id="dossier-model">${modelJson}</script>
-<script type="text/markdown" id="dossier-markdown">${esc(md)}</script>
-<script type="text/plain" id="dossier-digest">${esc(digest)}</script>
-<script>${RUNTIME}</script>
-${skinScript}
+${dataIslands}
 </body>
 </html>`;
 }

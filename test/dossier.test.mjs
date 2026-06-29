@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } fro
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
-import { generate, parseUnifiedDiff, validateModel } from "../src/index.mjs";
+import { generate, generateFile, parseUnifiedDiff, validateModel } from "../src/index.mjs";
 import { diffModels } from "../src/diff.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -61,7 +61,7 @@ test("validation catches nested packet ids that agents depend on", () => {
 });
 
 test("generate yields a self-contained, agent-readable artifact", async () => {
-  const { html, md, digest } = await generate(structuredClone(sample), { baseDir: examplesDir });
+  const { html, embedHtml, md, digest } = await generate(structuredClone(sample), { baseDir: examplesDir });
   assert.ok(html.includes('id="dossier-model"'), "has the data island");
   assert.ok(!/<(link|script)[^>]+(src|href)="https?:/.test(html), "no external assets");
   const island = html.match(/id="dossier-model">([\s\S]*?)<\/script>/)[1].replace(/\\u003c/g, "<");
@@ -69,6 +69,25 @@ test("generate yields a self-contained, agent-readable artifact", async () => {
   assert.equal(model.meta.title, sample.meta.title, "island round-trips");
   assert.ok(!/_hl|_svg/.test(island), "build fields stripped from island");
   assert.ok(md.length > 0 && digest.length > 0, "markdown + digest exported");
+  assert.ok(embedHtml.includes('data-dossier-embed="true"'), "has an embed variant");
+  assert.ok(embedHtml.includes('id="dossier-model"'), "embed keeps the source model island");
+  assert.ok(!embedHtml.includes('<header class="ds-topbar"'), "embed strips topbar chrome");
+  assert.ok(!embedHtml.includes('<aside class="ds-toc"'), "embed strips table-of-contents chrome");
+  assert.ok(!embedHtml.includes('<footer class="ds-footer"'), "embed strips footer chrome");
+});
+
+test("generateFile can write a chrome-stripped embed artifact", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "dossier-embed-"));
+  const file = join(dir, "embed.dossier.json");
+  writeFileSync(file, JSON.stringify({ dossierVersion: "1.0", meta: { title: "Embed", slug: "embed" }, blocks: [{ type: "prose", markdown: "Host me." }] }, null, 2));
+  const result = await generateFile(file, { embed: true });
+  assert.ok(existsSync(result.htmlPath), "writes full html");
+  assert.ok(existsSync(result.mdPath), "writes markdown");
+  assert.ok(existsSync(result.embedPath), "writes embed html");
+  const embed = readFileSync(result.embedPath, "utf8");
+  assert.ok(embed.includes('data-dossier-embed="true"'), "embed file is marked");
+  assert.ok(embed.includes("Host me."), "embed file contains content");
+  assert.ok(!embed.includes('<header class="ds-topbar"'), "embed file excludes topbar");
 });
 
 test("every block in the sample renders (no 'unsupported')", async () => {
@@ -327,9 +346,11 @@ test("mcp helpers normalize packets and validate writes before touching disk", a
     model: { dossierVersion: "1.0", meta: { title: "Rendered" }, blocks: [] },
     theme: "forest",
     skin: "console-slate",
+    embed: true,
   });
   assert.ok(rendered.content[1].text.includes('data-skin="console-slate"'), "MCP render applies skin flag");
   assert.ok(rendered.content[1].text.includes("--ds-accent: #2f7d55"), "MCP render applies theme flag");
+  assert.ok(rendered.content[2].text.includes('data-dossier-embed="true"'), "MCP render can return embed HTML");
 
   const release = await handleTool("dossier_read_release", {
     release: {
@@ -345,6 +366,9 @@ test("mcp helpers normalize packets and validate writes before touching disk", a
   const dir = mkdtempSync(join(tmpdir(), "dossier-mcp-"));
   const file = join(dir, "mcp.dossier.json");
   writeFileSync(file, JSON.stringify({ dossierVersion: "1.0", meta: { title: "MCP" }, blocks: [] }, null, 2));
+  const writeRender = await handleTool("dossier_render", { outPath: file, model: { dossierVersion: "1.0", meta: { title: "Written", slug: "written" }, blocks: [] }, embed: true });
+  const writeBody = JSON.parse(writeRender.content[0].text);
+  assert.ok(existsSync(writeBody.embedPath), "MCP render writes embed HTML when requested");
   await handleTool("dossier_record_run", { path: file, run: { command: "npm test", status: "passed" } });
   let model = JSON.parse(readFileSync(file, "utf8"));
   assert.equal(model.blocks[0].type, "verification-run");
@@ -593,15 +617,20 @@ test("publish builds a static dossier site with catalog index", async () => {
   const out = join(d, "public");
   writeFileSync(join(d, "a.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "A", slug: "a" }, blocks: [{ type: "prose", markdown: "see [[b]]" }] }, null, 2));
   writeFileSync(join(d, "b.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "B", slug: "b" }, blocks: [{ type: "callout", body: "B" }] }, null, 2));
-  const result = await publishDir(d, { out, title: "Published", theme: "forest", skin: "console-slate" });
+  const result = await publishDir(d, { out, title: "Published", theme: "forest", skin: "console-slate", embed: true });
   assert.equal(result.docs.length, 2);
   assert.ok(existsSync(join(out, "a.html")), "published document html");
+  assert.ok(existsSync(join(out, "a.embed.html")), "published document embed html");
   assert.ok(existsSync(join(out, "a.md")), "published document markdown");
   assert.ok(existsSync(join(out, "index.html")), "published catalog html");
+  assert.ok(existsSync(join(out, "index.embed.html")), "published catalog embed html");
   assert.ok(existsSync(join(out, "index.dossier.json")), "published catalog source");
   const html = readFileSync(join(out, "a.html"), "utf8");
   assert.ok(html.includes('data-skin="console-slate"'), "publish applies skin flag");
   assert.ok(html.includes("--ds-accent: #2f7d55"), "publish applies theme flag");
+  const embed = readFileSync(join(out, "a.embed.html"), "utf8");
+  assert.ok(embed.includes('data-dossier-embed="true"'), "publish applies embed flag");
+  assert.ok(embed.includes('data-skin="console-slate"'), "publish embed keeps skin flag");
 });
 
 test("diff detects added and changed blocks", () => {

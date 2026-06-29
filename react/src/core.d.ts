@@ -16,10 +16,10 @@ declare module "*/generate.mjs" {
   export const parseUnifiedDiff: (diff: string, label?: string) => any[];
   export const registerBlock: (type: string, fn: (b: any, ctx: any) => string) => void;
   export const knownBlockTypes: () => string[];
-  export const generate: (model: any) => Promise<{ html: string; md: string; digest: string }>;
+  export const generate: (model: any) => Promise<{ html: string; embedHtml: string; md: string; digest: string }>;
   export const renderShell: (
     model: any,
-    opts: { body: string; toc: any[]; md: string; digest: string; generator?: string; footer?: string }
+    opts: { body: string; toc: any[]; md: string; digest: string; generator?: string; footer?: string; chrome?: "full" | "embed" }
   ) => string;
 }
 declare module "*/tokens.css.mjs" {

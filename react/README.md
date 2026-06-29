@@ -8,7 +8,7 @@ SSR, or use the block components live inside a React/Next app.
 ```ts
 import { renderDossier } from "@mrbagels/dossier-react";
 
-const { html, md, digest } = await renderDossier(model); // model: DossierModel
+const { html, embedHtml, md, digest } = await renderDossier(model); // model: DossierModel
 ```
 
 Reuses the core design system, client runtime, and build-time enrichment (Shiki +
@@ -16,7 +16,7 @@ Graphviz), so the output matches the Node generator. `model.meta.skin` and
 `model.meta.theme` are honored by the shared shell. CLI:
 
 ```bash
-npx tsx src/cli.tsx ../examples/sample.dossier.json   # -> *.react.html
+npx tsx src/cli.tsx ../examples/sample.dossier.json --embed   # -> *.react.html + *.react.embed.html
 ```
 
 ## Use it live in a React app
@@ -55,7 +55,7 @@ runtime benefit (there is no client React at view time).
 
 | Export | Description |
 |---|---|
-| `renderDossier(model)` | SSR → `{ html, md, digest }` (self-contained file). |
+| `renderDossier(model)` | SSR -> `{ html, embedHtml, md, digest }` (self-contained full and embed files). |
 | `DossierDocument` | Live document component; `animate` adds a Motion scroll entrance (hydrated). |
 | `Block` | Component dispatcher over all built-in block types. |
 | `registerComponent(type, Comp)` | Register a React component for a custom block type, plugin parity with the Node generator's `registerBlock`. Unregistered-but-known types fall back to the Node string renderer. |

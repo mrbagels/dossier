@@ -7,7 +7,7 @@ import type { DossierModel } from "./types";
 // Render a Dossier to a self-contained HTML artifact (+ Markdown + agent digest)
 // via React SSR, reusing the core design system, runtime, enrichment, and the
 // shared renderShell(), so the body is React-rendered and the shell is identical.
-export async function renderDossier(model: DossierModel, opts: { baseDir?: string } = {}): Promise<{ html: string; md: string; digest: string }> {
+export async function renderDossier(model: DossierModel, opts: { baseDir?: string } = {}): Promise<{ html: string; embedHtml: string; md: string; digest: string }> {
   await enrich(model, opts.baseDir);
   assignIds(model.blocks);
 
@@ -34,6 +34,15 @@ export async function renderDossier(model: DossierModel, opts: { baseDir?: strin
     generator: "dossier-react",
     footer: "Generated with Dossier (React)",
   });
+  const embedHtml = renderShell(model, {
+    body,
+    toc,
+    md,
+    digest,
+    generator: "dossier-react",
+    footer: "Generated with Dossier (React)",
+    chrome: "embed",
+  });
 
-  return { html, md, digest };
+  return { html, embedHtml, md, digest };
 }

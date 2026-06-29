@@ -14,7 +14,7 @@ JSON island, so:
 - **Exports** (Markdown, JSON, agent digest) derive losslessly from the same model.
 
 It is a *companion* to a normal docs/wiki stack, not a replacement: artifacts are
-linkable and embeddable (iframe today, `*.embed.html` variant for inline use).
+linkable and embeddable (iframe today, opt-in `*.embed.html` variant for inline use).
 
 ## Locked decisions
 
@@ -57,8 +57,9 @@ display blocks only.)
 ## Embeddability & hosting
 
 - Every artifact is a complete, style-isolated HTML file → `<iframe src>` embeds today.
-- Generator also emits `*.embed.html` (chrome stripped) for inline embedding; all CSS is
-  namespaced under `ds-` to minimize host-page bleed.
+- Generator can emit `*.embed.html` with `--embed` or `embed: true`. The embed variant is
+  chrome stripped for inline embedding; all CSS is namespaced under `ds-` to minimize
+  host-page bleed.
 - Files are self-contained, so any static host works (docs site static dir, GitHub Pages).
 - Cross-artifact links (`[[slug]]`): relative file links when co-located (no hosting
   needed); absolute URLs when `meta.baseUrl` is set.

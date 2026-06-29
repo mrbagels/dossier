@@ -50,7 +50,8 @@ document: `dossier init <name>` writes `<name>.dossier.json` from the starter.
    ```
    dossier build path/to/<slug>.dossier.json
    ```
-   Writes `<slug>.html` and `<slug>.md` next to the JSON.
+   Writes `<slug>.html` and `<slug>.md` next to the JSON. Add `--embed` when the
+   host app needs a chrome-stripped `<slug>.embed.html` variant.
 3. **Show it.** `open <slug>.html` so the user can view it. For durable docs, save the
    `.dossier.json` + outputs under the project's `docs/`.
 
@@ -61,7 +62,7 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 --open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
 `dossier publish <dir> --out <dir>` (build a static folder with a catalog index),
 `dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
-`--theme <pack>`, `--skin console-slate`, and `--plugin <file>` to add custom block
+`--theme <pack>`, `--skin console-slate`, `--embed`, and `--plugin <file>` to add custom block
 types. For programmatic / multi-agent use, `dossier mcp` exposes
 `dossier_render`, `dossier_validate`, `dossier_read_decisions`, `dossier_read_process`,
 `dossier_read_edits`, `dossier_read_verdicts`, `dossier_read_release`,
@@ -153,5 +154,7 @@ Markdown / JSON / agent-digest, all inlined, all offline, fully responsive.
   `stat-strip`) for collections, not prose.
 - Set `meta.slug`; co-locate related dossiers so `[[slug]]` links resolve, or set
   `meta.baseUrl` when hosting.
-- Embed in a wiki with `<iframe src="<slug>.html">`, it's style-isolated.
+- Embed in a wiki with `<iframe src="<slug>.html">`, it's style-isolated. Use
+  `dossier build <file> --embed` for host apps that already provide navigation or page
+  chrome and should load `<slug>.embed.html`.
 - Do not hand-write HTML/CSS; only author the JSON model.

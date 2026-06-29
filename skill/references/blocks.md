@@ -22,6 +22,8 @@ Process packet collections require stable kebab-case ids on their nested items:
 ```
 Use `skin: "console-slate"` for the denser production skin. Use `theme` for final
 CSS token overrides; theme values win after the base CSS and selected skin.
+Build with `--embed` when a host app needs a chrome-stripped `<slug>.embed.html`
+variant that keeps block interactivity and the embedded model islands.
 
 ## hero, page opener (use one, first)
 ```json

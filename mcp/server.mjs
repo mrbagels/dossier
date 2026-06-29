@@ -30,7 +30,7 @@ const TOOLS = [
   {
     name: "dossier_render",
     description:
-      "Validate and render a Dossier model into a self-contained HTML page (+ Markdown). The page embeds the model as a #dossier-model island so it stays agent-readable. Provide `outPath` to write files, otherwise the HTML is returned inline.",
+      "Validate and render a Dossier model into a self-contained HTML page (+ Markdown). The page embeds the model as a #dossier-model island so it stays agent-readable. Provide `outPath` to write files, otherwise the HTML is returned inline. Set `embed` to also produce a chrome-stripped <slug>.embed.html variant.",
     inputSchema: {
       type: "object",
       properties: {
@@ -38,6 +38,7 @@ const TOOLS = [
         outPath: { type: "string", description: "Optional path to write <slug>.html and <slug>.md next to." },
         theme: { type: "string", description: "Optional built-in theme pack to merge before rendering." },
         skin: { type: "string", enum: ["console-slate"], description: "Optional presentation skin to apply before rendering." },
+        embed: { type: "boolean", description: "Also write or return the chrome-stripped embed HTML variant." },
       },
       required: ["model"],
     },
@@ -434,16 +435,20 @@ async function handle(name, args) {
     const v = validateModel(model);
     if (!v.ok) return fail("invalid dossier:\n- " + v.errors.join("\n- "));
     const baseDir = args.outPath ? dirname(args.outPath) : undefined;
-    const { html, md, digest } = await generate(model, { baseDir, theme: args.theme, skin: args.skin });
+    const { html, embedHtml, md, digest } = await generate(model, { baseDir, theme: args.theme, skin: args.skin });
     if (args.outPath) {
       const slug = (model.meta && model.meta.slug) || basename(args.outPath).replace(/\.(dossier\.)?(json|html)$/i, "");
       const htmlPath = join(dirname(args.outPath), slug + ".html");
+      const embedPath = join(dirname(args.outPath), slug + ".embed.html");
       const mdPath = join(dirname(args.outPath), slug + ".md");
       writeFileSync(htmlPath, html);
+      if (args.embed) writeFileSync(embedPath, embedHtml);
       writeFileSync(mdPath, md);
-      return text({ ok: true, slug, htmlPath, mdPath, bytes: html.length });
+      return text({ ok: true, slug, htmlPath, embedPath: args.embed ? embedPath : null, mdPath, bytes: html.length });
     }
-    return { content: [{ type: "text", text: `Rendered (${html.length} bytes). Digest:\n\n${digest}` }, { type: "text", text: html }] };
+    const content = [{ type: "text", text: `Rendered (${html.length} bytes). Digest:\n\n${digest}` }, { type: "text", text: html }];
+    if (args.embed) content.push({ type: "text", text: embedHtml });
+    return { content };
   }
 
   if (name === "dossier_read_decisions") {
