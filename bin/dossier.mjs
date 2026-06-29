@@ -3,11 +3,12 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { resolve, join, basename, dirname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateFile, validateModel, registerBlock, esc, inlineMd, slugify } from "../src/index.mjs";
+import { addPack, listPacks, loadTrustedPackPlugins, resolveTemplateRef, trustPack } from "../src/packs.mjs";
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
 // pull out --flags; rest are positional
-const VALUE_FLAGS = new Set(["kind", "out", "plugin", "port", "title", "base-url", "format", "theme", "skin"]);
+const VALUE_FLAGS = new Set(["kind", "out", "plugin", "pack", "template", "port", "title", "base-url", "format", "theme", "skin", "name", "ref"]);
 const flags = {};
 const args = [];
 const rest = argv.slice(1);
@@ -55,13 +56,28 @@ const USAGE = [
   "  dossier catalog <dir>                    index a folder of dossiers (+ link graph)",
   "  dossier publish <dir> [--out <dir>]      build a static dossier site with catalog index",
   "  dossier export <file> --format docx|md|pdf  export to Word, Markdown, or PDF",
+  "  dossier pack add <repo-or-path>          register a local or Git-backed template/plugin pack",
+  "  dossier pack trust <name>                allow a registered pack to load render plugins",
+  "  dossier pack list                        list registered packs from dossier.lock.json",
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
-  "Flags: --theme <pack>, --skin console-slate, --embed (write <slug>.embed.html), --no-validate (build without validating)",
+  "Flags: --theme <pack>, --skin console-slate, --embed (write <slug>.embed.html), --no-validate (build without validating), --pack <name>, --template <pack/id>",
 ].join("\n");
 
 if (cmd === "build" && args.length) {
+  if (flags.pack) {
+    try {
+      const packs = String(flags.pack)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      await loadTrustedPackPlugins(packs, { registerBlock, esc, inlineMd, slugify });
+    } catch (e) {
+      console.error("✗ pack plugin: " + e.message);
+      process.exit(1);
+    }
+  }
   if (flags.plugin) {
     for (const p of String(flags.plugin).split(",").map((s) => s.trim()).filter(Boolean)) {
       try {
@@ -191,18 +207,70 @@ if (cmd === "build" && args.length) {
     console.error("✗ " + e.message);
     process.exitCode = 1;
   }
+} else if (cmd === "pack") {
+  const sub = args[0];
+  try {
+    if (sub === "add" && args[1]) {
+      const pack = addPack(args[1], { name: flags.name, ref: flags.ref });
+      console.log(`✓ registered ${pack.name}`);
+      console.log(`  source: ${pack.sourceType === "git" ? pack.source : pack.path}`);
+      if (pack.manifest.templates.length) console.log(`  templates: ${pack.manifest.templates.map((t) => t.id).join(", ")}`);
+      if (pack.manifest.plugins.length) console.log(`  plugins: ${pack.manifest.plugins.map((p) => p.id).join(", ")} (run dossier pack trust ${pack.name} to enable)`);
+    } else if (sub === "trust" && args[1]) {
+      const pack = trustPack(args[1]);
+      console.log(`✓ trusted ${pack.name}`);
+    } else if (sub === "untrust" && args[1]) {
+      const pack = trustPack(args[1], { trusted: false });
+      console.log(`✓ untrusted ${pack.name}`);
+    } else if (sub === "list") {
+      const packs = listPacks();
+      if (flags.json) {
+        console.log(JSON.stringify(packs, null, 2));
+      } else if (!packs.length) {
+        console.log("No packs registered. Run dossier pack add <repo-or-path>.");
+      } else {
+        for (const pack of packs) {
+          const trust = pack.trusted ? "trusted" : "untrusted";
+          const templates = pack.manifest.templates.length ? ` templates=${pack.manifest.templates.map((t) => t.id).join(",")}` : "";
+          const plugins = pack.manifest.plugins.length ? ` plugins=${pack.manifest.plugins.map((p) => p.id).join(",")}` : "";
+          console.log(`${pack.name}  ${trust}  ${pack.sourceType}${templates}${plugins}`);
+        }
+      }
+    } else {
+      console.log("Usage: dossier pack add <repo-or-path> [--name <name>] [--ref <ref>]\n       dossier pack trust <name>\n       dossier pack untrust <name>\n       dossier pack list [--json]");
+      process.exit(sub ? 0 : 1);
+    }
+  } catch (e) {
+    console.error("✗ " + e.message);
+    process.exitCode = 1;
+  }
 } else if (cmd === "init") {
   const name = (args[0] || "dossier").replace(/\.dossier\.json$/i, "").replace(/\.json$/i, "");
-  const kind = STARTERS.includes(flags.kind) ? flags.kind : "dossier";
   const out = name + ".dossier.json";
   if (existsSync(out)) {
     console.error("✗ " + out + " already exists");
     process.exit(1);
   }
-  const starter = new URL(`../src/starters/${kind}.dossier.json`, import.meta.url);
-  const text = readFileSync(starter, "utf8").replace(/"slug": "replace-with-slug"/, `"slug": "${name}"`);
-  writeFileSync(out, text);
-  console.log(`✓ wrote ${out} (kind: ${kind})\n  edit it, then: dossier build ${out}  (writes ${name}.html)`);
+  if (flags.template) {
+    try {
+      const { model, template } = resolveTemplateRef(flags.template);
+      const next = structuredClone(model);
+      next.meta = next.meta || {};
+      if (!next.meta.slug || next.meta.slug === "replace-with-slug") next.meta.slug = name;
+      if (!next.meta.title) next.meta.title = template.title || name;
+      writeFileSync(out, JSON.stringify(next, null, 2) + "\n");
+      console.log(`✓ wrote ${out} (template: ${flags.template})\n  edit it, then: dossier build ${out}  (writes ${next.meta.slug || name}.html)`);
+    } catch (e) {
+      console.error("✗ " + e.message);
+      process.exitCode = 1;
+    }
+  } else {
+    const kind = STARTERS.includes(flags.kind) ? flags.kind : "dossier";
+    const starter = new URL(`../src/starters/${kind}.dossier.json`, import.meta.url);
+    const text = readFileSync(starter, "utf8").replace(/"slug": "replace-with-slug"/, `"slug": "${name}"`);
+    writeFileSync(out, text);
+    console.log(`✓ wrote ${out} (kind: ${kind})\n  edit it, then: dossier build ${out}  (writes ${name}.html)`);
+  }
 } else {
   console.log(USAGE);
   process.exit(cmd ? 0 : 1);

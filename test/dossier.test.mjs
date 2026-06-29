@@ -1,11 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
-import { generate, generateFile, parseUnifiedDiff, validateModel } from "../src/index.mjs";
+import { esc, generate, generateFile, inlineMd, parseUnifiedDiff, registerBlock, slugify, validateModel } from "../src/index.mjs";
 import { diffModels } from "../src/diff.mjs";
+import { addPack, listPacks, loadTrustedPackPlugins, resolveTemplateRef, trustPack } from "../src/packs.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const examplesDir = join(root, "examples");
@@ -537,6 +538,63 @@ test("plugins: a registered block validates and renders", async () => {
   assert.equal(validateModel(model).ok, true, "registered type passes validation");
   const { html } = await generate(structuredClone(model), {});
   assert.ok(/data-block="badge-test"/.test(html), "registered block renders");
+});
+
+test("packs register templates and only load trusted render plugins", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "dossier-pack-"));
+  const packDir = join(dir, "engineering-pack");
+  mkdirSync(join(packDir, "templates"), { recursive: true });
+  mkdirSync(join(packDir, "plugins"), { recursive: true });
+  writeFileSync(
+    join(packDir, "dossier.pack.json"),
+    JSON.stringify(
+      {
+        name: "Engineering Pack",
+        version: "1.0.0",
+        templates: [{ id: "security-review", title: "Security review", kind: "review", path: "templates/security-review.dossier.json" }],
+        plugins: [{ id: "badge", description: "Badge block", entry: "plugins/badge.plugin.mjs", permissions: ["render"] }],
+      },
+      null,
+      2
+    )
+  );
+  writeFileSync(
+    join(packDir, "templates/security-review.dossier.json"),
+    JSON.stringify({ dossierVersion: "1.0", kind: "review", meta: { title: "Security review", slug: "replace-with-slug" }, blocks: [{ type: "prose", markdown: "Review scope." }] }, null, 2)
+  );
+  writeFileSync(
+    join(packDir, "plugins/badge.plugin.mjs"),
+    `export default function ({ registerBlock, esc }) {
+  registerBlock("pack-badge-test", (b) => '<section class="ds-block" data-block="pack-badge-test">' + esc(b.label || "") + '</section>');
+}
+`
+  );
+
+  const entry = addPack(packDir, { cwd: dir });
+  assert.equal(entry.name, "engineering-pack");
+  assert.equal(entry.trusted, false);
+  assert.equal(listPacks({ cwd: dir }).length, 1);
+
+  const resolved = resolveTemplateRef("engineering-pack/security-review", { cwd: dir });
+  assert.equal(resolved.template.kind, "review");
+  assert.equal(resolved.model.meta.slug, "replace-with-slug");
+
+  await assert.rejects(
+    () => loadTrustedPackPlugins(["engineering-pack"], { registerBlock, esc, inlineMd, slugify }, { cwd: dir }),
+    /not trusted/
+  );
+
+  trustPack("engineering-pack", { cwd: dir });
+  const loaded = await loadTrustedPackPlugins(["engineering-pack"], { registerBlock, esc, inlineMd, slugify }, { cwd: dir });
+  assert.deepEqual(
+    loaded.map((plugin) => `${plugin.pack}/${plugin.id}`),
+    ["engineering-pack/badge"]
+  );
+  const model = { dossierVersion: "1.0", meta: { title: "Pack plugin" }, blocks: [{ type: "pack-badge-test", label: "<ready>" }] };
+  assert.equal(validateModel(model).ok, true);
+  const { html } = await generate(structuredClone(model), {});
+  assert.ok(html.includes('data-block="pack-badge-test"'));
+  assert.ok(html.includes("&lt;ready&gt;"));
 });
 
 test("renderer sanitizes hostile input (href schemes, theme vars, ragged rows)", async () => {
