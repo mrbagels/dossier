@@ -760,7 +760,7 @@ async function handle(name, args) {
 export const handleTool = handle;
 
 export function createServer() {
-  const server = new Server({ name: "dossier", version: "0.5.3" }, { capabilities: { tools: {} } });
+  const server = new Server({ name: "dossier", version: "0.5.4" }, { capabilities: { tools: {} } });
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
     try {

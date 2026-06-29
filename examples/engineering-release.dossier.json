@@ -3,7 +3,7 @@
   "dossierVersion": "1.0",
   "kind": "release",
   "meta": {
-    "title": "Release Readiness: 0.5.3",
+    "title": "Release Readiness: 0.5.4",
     "slug": "engineering-release",
     "eyebrow": "Release example",
     "crumbs": ["Examples", "Engineering release"],
@@ -29,7 +29,7 @@
       "lede": "Use this shape when a team needs public QA readiness, release notes, command receipts, and a durable closeout packet for agents.",
       "pills": ["Release gates", "Verification", "Manual QA", "Closeout"],
       "sideCards": [
-        { "label": "Release", "value": "0.5.3" },
+        { "label": "Release", "value": "0.5.4" },
         { "label": "Required gates", "value": "5" },
         { "label": "State", "value": "Manual QA" }
       ]

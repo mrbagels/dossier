@@ -326,7 +326,7 @@ Attach the verification run to the work item before closeout.
 - **producer:** dossier
 - **consumer:** lumen
 - **status:** accepted
-- **version:** 0.5.3
+- **version:** 0.5.4
 - **nextStep:** Dogfood against a live dependency change.
 - **Process packets:** Verdicts, releases, edits, and process state all export as structured packets.
 

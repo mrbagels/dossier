@@ -1,6 +1,6 @@
 {
   "name": "@mrbagels/dossier",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Generate polished, self-contained, agent-readable HTML briefs (plus Markdown) from a single JSON document model. Zero runtime dependencies.",
   "type": "module",
   "license": "MIT",

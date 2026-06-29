@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
-[![Version](https://img.shields.io/badge/version-0.5.3-7048e8.svg)](#release-status)
+[![Version](https://img.shields.io/badge/version-0.5.4-7048e8.svg)](#release-status)
 [![Output](https://img.shields.io/badge/output-single%20HTML%20file-7048e8.svg)](#how-dossier-works)
 [![Runtime](https://img.shields.io/badge/viewer%20runtime-zero%20external%20assets-c81e4a.svg)](#how-dossier-works)
 [![Agent Ready](https://img.shields.io/badge/agent%20ready-MCP%20%2B%20packets-0f7a52.svg)](#agent-workflows)
@@ -424,9 +424,10 @@ Current patch train:
 
 | Version | Focus |
 |---|---|
-| `0.5.1` | Live editor adapter, model editor, patch import, review packets, expanded MCP write tools. |
-| `0.5.2` | Static publishing, catalog index, React parity for process blocks. |
+| `0.5.4` | Chrome-stripped embed output, presentation flag parity, React render hardening, refreshed gallery docs. |
 | `0.5.3` | Trust reports, provenance packet, MCP trust tools, README and public manual QA readiness. |
+| `0.5.2` | Static publishing, catalog index, React parity for process blocks. |
+| `0.5.1` | Live editor adapter, model editor, patch import, review packets, expanded MCP write tools. |
 
 Manual QA entrypoint: [`docs/product/public-manual-qa.md`](docs/product/public-manual-qa.md).
 

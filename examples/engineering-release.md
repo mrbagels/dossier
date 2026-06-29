@@ -1,5 +1,5 @@
 ---
-title: "Release Readiness: 0.5.3"
+title: "Release Readiness: 0.5.4"
 slug: "engineering-release"
 status: "review"
 updated: "2026-06-29"
