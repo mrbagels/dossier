@@ -26,7 +26,7 @@ Drop the generated HTML into GitHub Pages, a docs site, or an iframe.
 
 A product page can mix human copy with operational launch state.
 
-**3** Launch audiences · **6** Beta workflows · **0** Runtime assets · **1** File to publish
+**3** Launch audiences (sales support, agents) · **6** Beta workflows (all source backed) · **0** Runtime assets (offline ready) · **1** File to publish (portable)
 
 ### Reader path
 

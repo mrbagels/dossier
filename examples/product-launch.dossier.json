@@ -56,10 +56,10 @@
         {
           "type": "stat-strip",
           "stats": [
-            { "value": "3", "label": "Launch audiences" },
-            { "value": "6", "label": "Beta workflows" },
-            { "value": "0", "label": "Runtime assets" },
-            { "value": "1", "label": "File to publish" }
+            { "value": "3", "label": "Launch audiences", "delta": { "value": "sales", "label": "support, agents", "tone": "up" } },
+            { "value": "6", "label": "Beta workflows", "delta": { "value": "all", "label": "source backed", "tone": "good" } },
+            { "value": "0", "label": "Runtime assets", "delta": "offline ready" },
+            { "value": "1", "label": "File to publish", "delta": { "value": "portable", "tone": "neutral" } }
           ]
         },
         {

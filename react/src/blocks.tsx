@@ -1,5 +1,5 @@
 import React from "react";
-import { inlineMd, slugify, chartSvg, renderBlock, knownBlockTypes, parseUnifiedDiff } from "../../src/generate.mjs";
+import { inlineMd, slugify, richTextHtml, chartSvg, renderBlock, knownBlockTypes, parseUnifiedDiff } from "../../src/generate.mjs";
 
 // React-side plugin registry, register a component for a custom block type so it renders
 // natively in the React port (parity with the Node generator's registerBlock).
@@ -16,8 +16,11 @@ export function setCtx(ctx: any) {
 }
 const md = (t?: string) => ({ __html: inlineMd(t ?? "", CTX) });
 const raw = (h?: string) => ({ __html: h ?? "" });
+const rich = (t?: string) => ({ __html: richTextHtml(t ?? "", CTX) });
 const PROCESS_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "split", "retry", "block"];
 const REVIEW_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "block"];
+const rowCode = (i: number) => `ITEM-${String(i + 1).padStart(3, "0")}`;
+const rowDomId = (blockId: string | undefined, itemId: string | undefined) => slugify(`${blockId || "block"}-${itemId || "item"}`);
 const detailRows = (rows: Array<[string, any]>): [string, string][] =>
   rows.filter(([, v]) => v !== undefined && v !== null && String(v).trim()).map(([k, v]) => [k, String(v)]);
 const asArray = (v: any) => (Array.isArray(v) ? v : v ? [v] : []);
@@ -110,9 +113,22 @@ const SummaryCards: React.FC<{ b: B }> = ({ b }) => (
 const StatStrip: React.FC<{ b: B }> = ({ b }) => (
   <Wrap type="stat-strip" id={b.id}>
     <div className="ds-statgrid">
-      {(b.stats || []).map((s: any, i: number) => (
-        <div className="ds-stat" key={i}><strong>{s.value}</strong><span>{s.label}</span></div>
-      ))}
+      {(b.stats || []).map((s: any, i: number) => {
+        const deltaValue = typeof s.delta === "object" ? s.delta.value || s.delta.label || "" : s.delta;
+        const deltaLabel = typeof s.delta === "object" && s.delta.label && s.delta.label !== deltaValue ? s.delta.label : "";
+        return (
+          <div className="ds-stat" key={i}>
+            <strong>{s.value}</strong>
+            <span>{s.label}</span>
+            {deltaValue && (
+              <small className={`ds-stat-delta${typeof s.delta === "object" && s.delta.tone ? " tone-" + slugify(s.delta.tone) : ""}`}>
+                <span dangerouslySetInnerHTML={md(deltaValue)} />
+                {deltaLabel && <> <span dangerouslySetInnerHTML={md(deltaLabel)} /></>}
+              </small>
+            )}
+          </div>
+        );
+      })}
     </div>
   </Wrap>
 );
@@ -479,7 +495,9 @@ const Diagram: React.FC<{ b: B }> = ({ b }) => (
   </Wrap>
 );
 
-const ReviewItem: React.FC<{ c: ReviewCandidate }> = ({ c }) => {
+const ReviewItem: React.FC<{ c: ReviewCandidate; blockId?: string; index: number }> = ({ c, blockId, index }) => {
+  const itemId = c.id || rowCode(index).toLowerCase();
+  const domId = rowDomId(blockId, itemId);
   const chips: string[] = [];
   if (c.category) chips.push(c.category);
   if (c.impact) chips.push(`Impact · ${c.impact}`);
@@ -488,10 +506,11 @@ const ReviewItem: React.FC<{ c: ReviewCandidate }> = ({ c }) => {
   const searchText = [c.title, c.summary, c.category, c.body].filter(Boolean).join(" ").toLowerCase();
   const hasRef = !!(c.body || (c.blocks && c.blocks.length) || (c.details && Object.keys(c.details).length));
   return (
-    <article className="ds-ritem" data-candidate={c.id} {...(c.scope ? { "data-scope": c.scope } : {})} data-text={searchText}>
+    <article id={domId} className="ds-ritem" data-candidate={itemId} {...(c.scope ? { "data-scope": c.scope } : {})} data-text={searchText}>
       <div className="ds-ritem-head" data-rtoggle>
-        <span className="ds-ritem-check" data-stop><input type="checkbox" data-select={c.id} aria-label={`Select ${c.title}`} /></span>
+        <span className="ds-ritem-check" data-stop><input type="checkbox" data-select={itemId} aria-label={`Select ${c.title}`} /></span>
         <div className="ds-ritem-titles">
+          <a className="ds-row-anchor" href={`#${domId}`}>{rowCode(index)}</a>
           <h4>{c.title}</h4>
           <p className="ds-muted" dangerouslySetInnerHTML={md(c.summary)} />
           {chips.length > 0 && <div className="ds-chips">{chips.map((x, i) => <span className="ds-chip" key={i}>{x}</span>)}</div>}
@@ -505,7 +524,7 @@ const ReviewItem: React.FC<{ c: ReviewCandidate }> = ({ c }) => {
         <div className="ds-ritem-body">
           {hasRef && (
             <div className="ds-ref">
-              {c.body && c.body.split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
+              {c.body && <div className="ds-prose" dangerouslySetInnerHTML={rich(c.body)} />}
               {(c.blocks || []).map((x, i) => <Block b={x} key={x.id || i} />)}
               {c.details && Object.keys(c.details).length > 0 && (
                 <dl className="ds-detailgrid">
@@ -516,7 +535,7 @@ const ReviewItem: React.FC<{ c: ReviewCandidate }> = ({ c }) => {
               )}
             </div>
           )}
-          <label className="ds-notes"><span>Notes</span><textarea data-notes={c.id} placeholder="Decision notes, priority, constraints" /></label>
+          <label className="ds-notes"><span>Notes</span><textarea data-notes={itemId} placeholder="Decision notes, priority, constraints" /></label>
         </div>
       </div>
     </article>
@@ -535,12 +554,14 @@ const ReviewBoard: React.FC<{ b: B }> = ({ b }) => (
       <button className="ds-btn ds-btn-line" type="button" data-import-decisions>Import</button>
     </div>
     <div className="ds-rlist">
-      {(b.candidates || []).map((c: ReviewCandidate, i: number) => <ReviewItem c={c} key={c.id || i} />)}
+      {(b.candidates || []).map((c: ReviewCandidate, i: number) => <ReviewItem c={c} blockId={b.id} index={i} key={c.id || i} />)}
     </div>
   </section>
 );
 
-const ProcessItem: React.FC<{ item: ProcessItemModel }> = ({ item }) => {
+const ProcessItem: React.FC<{ item: ProcessItemModel; blockId?: string; index: number }> = ({ item, blockId, index }) => {
+  const itemId = item.id || rowCode(index).toLowerCase();
+  const domId = rowDomId(blockId, itemId);
   const chips: string[] = [];
   if (item.category) chips.push(item.category);
   if (item.priority) chips.push(`Priority · ${item.priority}`);
@@ -559,9 +580,10 @@ const ProcessItem: React.FC<{ item: ProcessItemModel }> = ({ item }) => {
   const searchText = [item.title, item.summary, item.category, item.owner, item.body, ...(item.files || []), ...(item.verification || [])].filter(Boolean).join(" ").toLowerCase();
   const hasRef = !!(item.body || (item.blocks && item.blocks.length) || rows.length);
   return (
-    <article className={`ds-ritem ds-pitem verdict-${verdict}`} data-process-item={item.id} data-text={searchText}>
+    <article id={domId} className={`ds-ritem ds-pitem verdict-${verdict}`} data-process-item={itemId} data-text={searchText}>
       <div className="ds-ritem-head" data-ptoggle>
         <div className="ds-ritem-titles">
+          <a className="ds-row-anchor" href={`#${domId}`}>{rowCode(index)}</a>
           <h4>{item.title}</h4>
           {item.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(item.summary)} />}
           {chips.length > 0 && <div className="ds-chips">{chips.map((x, i) => <span className="ds-chip" key={i}>{x}</span>)}</div>}
@@ -570,7 +592,7 @@ const ProcessItem: React.FC<{ item: ProcessItemModel }> = ({ item }) => {
           {item.status && <span className={`ds-status s-${slugify(item.status)}`}>{item.status}</span>}
           <label className="ds-process-verdict-wrap" data-stop>
             <span>Verdict</span>
-            <select className="ds-process-verdict" data-process-verdict={item.id} defaultValue={verdict}>
+            <select className="ds-process-verdict" data-process-verdict={itemId} defaultValue={verdict}>
               {PROCESS_VERDICTS.map((v) => <option value={v} key={v}>{v}</option>)}
             </select>
           </label>
@@ -581,7 +603,7 @@ const ProcessItem: React.FC<{ item: ProcessItemModel }> = ({ item }) => {
         <div className="ds-ritem-body">
           {hasRef && (
             <div className="ds-ref">
-              {item.body && item.body.split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
+              {item.body && <div className="ds-prose" dangerouslySetInnerHTML={rich(item.body)} />}
               {(item.blocks || []).map((x, i) => <Block b={x} key={x.id || i} />)}
               {rows.length > 0 && (
                 <dl className="ds-detailgrid">
@@ -592,7 +614,7 @@ const ProcessItem: React.FC<{ item: ProcessItemModel }> = ({ item }) => {
               )}
             </div>
           )}
-          <label className="ds-notes"><span>Notes</span><textarea data-process-notes={item.id} placeholder="Verdict notes, constraints, follow-up instructions" defaultValue={(item as any).notes || ""} /></label>
+          <label className="ds-notes"><span>Notes</span><textarea data-process-notes={itemId} placeholder="Verdict notes, constraints, follow-up instructions" defaultValue={(item as any).notes || ""} /></label>
         </div>
       </div>
     </article>
@@ -611,7 +633,7 @@ const ProcessBoard: React.FC<{ b: B }> = ({ b }) => (
       <button className="ds-btn ds-btn-line" type="button" data-import-process>Import</button>
     </div>
     <div className="ds-rlist">
-      {(b.items || []).map((item: ProcessItemModel, i: number) => <ProcessItem item={item} key={item.id || i} />)}
+      {(b.items || []).map((item: ProcessItemModel, i: number) => <ProcessItem item={item} blockId={b.id} index={i} key={item.id || i} />)}
     </div>
   </section>
 );
@@ -845,9 +867,7 @@ const DecisionLog: React.FC<{ b: B }> = ({ b }) => (
 const Prose: React.FC<{ b: B }> = ({ b }) => (
   <Wrap type="prose" id={b.id}>
     {b.heading && <h2 id={b.id} data-edit={`${b.id}:heading`}>{b.heading}</h2>}
-    <div data-edit={`${b.id}:markdown`}>
-      {String(b.markdown || "").split(/\n{2,}/).map((p, i) => <p key={i} dangerouslySetInnerHTML={md(p)} />)}
-    </div>
+    <div className="ds-prose" data-edit={`${b.id}:markdown`} dangerouslySetInnerHTML={rich(b.markdown)} />
   </Wrap>
 );
 

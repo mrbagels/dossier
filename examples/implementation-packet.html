@@ -48,6 +48,9 @@ ul,ol{margin:0 0 13px;padding-left:21px}
 li{margin:5px 0}
 strong{font-weight:640}
 code{font-family:var(--ds-mono);font-size:.86em;background:var(--ds-bg-2);border:1px solid var(--ds-line);border-radius:5px;padding:.5px 5px;color:var(--ds-ink)}
+.ds-prose p:last-child,.ds-prose-list:last-child{margin-bottom:0}
+.ds-prose-list{color:var(--ds-ink-2)}
+.ds-prose-list strong{color:var(--ds-ink)}
 .ds-muted{color:var(--ds-ink-2)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 
@@ -173,19 +176,27 @@ mark{background:var(--ds-accent-tint);color:inherit;border-radius:3px;padding:0 
 .ds-stat{padding:16px 18px;border:1px solid var(--ds-line-2);border-radius:13px;background:var(--ds-bg)}
 .ds-stat strong{display:block;font-size:30px;font-weight:600;letter-spacing:-.022em;line-height:1;font-variant-numeric:tabular-nums}
 .ds-stat span{display:block;margin-top:8px;color:var(--ds-ink-2);font-size:13px}
+.ds-stat-delta{display:block;margin-top:10px;color:var(--ds-ink-3);font-size:12px;font-weight:620;font-variant-numeric:tabular-nums}
+.ds-stat-delta span{display:inline;margin:0;color:inherit;font-size:inherit}
+.ds-stat-delta.tone-up,.ds-stat-delta.tone-positive,.ds-stat-delta.tone-good{color:var(--ds-ok)}
+.ds-stat-delta.tone-down,.ds-stat-delta.tone-negative,.ds-stat-delta.tone-bad{color:var(--ds-danger)}
+.ds-stat-delta.tone-warn,.ds-stat-delta.tone-warning{color:var(--ds-warn)}
 
 /* flow */
-.ds-flow{display:grid;counter-reset:flow}
-.ds-flowstep{display:grid;grid-template-columns:32px 1fr;gap:18px;padding:15px 0;border-top:1px solid var(--ds-line);align-items:start}
+.ds-flow{position:relative;display:grid;counter-reset:flow}
+.ds-flow::before{content:"";position:absolute;left:15px;top:24px;bottom:24px;width:1px;background:var(--ds-line)}
+.ds-flowstep{position:relative;display:grid;grid-template-columns:32px 1fr;gap:18px;padding:15px 0;border-top:1px solid var(--ds-line);align-items:start}
 .ds-flowstep:first-child{border-top:0}
-.ds-flowstep::before{counter-increment:flow;content:counter(flow,decimal-leading-zero);font-family:var(--ds-mono);font-size:12.5px;color:var(--ds-accent);padding-top:3px}
+.ds-flowstep::before{position:relative;z-index:1;counter-increment:flow;content:counter(flow,decimal-leading-zero);display:inline-flex;align-items:center;justify-content:center;width:32px;height:24px;background:var(--ds-bg);font-family:var(--ds-mono);font-size:12.5px;color:var(--ds-accent);padding-top:3px}
 .ds-flowstep-body strong{display:block;margin-bottom:3px;font-size:15.5px}
 .ds-flowstep-body span{color:var(--ds-ink-2);font-size:15px}
 
 /* timeline */
-.ds-timeline{display:grid}
-.ds-phase{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:15px 0;border-top:1px solid var(--ds-line)}
+.ds-timeline{position:relative;display:grid}
+.ds-timeline::before{content:"";position:absolute;left:131px;top:24px;bottom:24px;width:1px;background:var(--ds-line)}
+.ds-phase{position:relative;display:grid;grid-template-columns:120px 1fr;gap:24px;padding:15px 0;border-top:1px solid var(--ds-line)}
 .ds-phase:first-child{border-top:0}
+.ds-phase::before{content:"";position:absolute;left:124px;top:24px;width:15px;height:15px;border-radius:50%;background:var(--ds-bg);border:1px solid var(--ds-line-strong)}
 .ds-phase-id{display:flex;flex-direction:column;gap:7px;color:var(--ds-ink);font-weight:600;font-size:14.5px;align-items:flex-start}
 .ds-date{color:var(--ds-ink-3);font-size:12px;font-weight:500}
 .ds-phase>div:last-child{color:var(--ds-ink-2)}
@@ -333,7 +344,12 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 /* charts (inline SVG) */
 .ds-chart{border:1px solid var(--ds-line);border-radius:12px;background:var(--ds-bg);padding:14px 12px}
 .ds-chart-svg{display:block;width:100%;height:auto}
-.ds-chart-label,.ds-chart-tick{fill:var(--ds-ink-3);font-family:var(--ds-font);font-size:11px}
+.ds-chart-label,.ds-chart-tick,.ds-chart-value{font-family:var(--ds-font);font-size:11px}
+.ds-chart-label,.ds-chart-tick{fill:var(--ds-ink-3)}
+.ds-chart-value{fill:var(--ds-ink-2);font-weight:650;font-variant-numeric:tabular-nums}
+.ds-chart-grid{stroke:var(--ds-line);stroke-width:1;stroke-dasharray:2 4}
+.ds-chart-axis{stroke:var(--ds-line-2);stroke-width:1.2}
+.ds-chart-zero{stroke:var(--ds-line-strong);stroke-width:1.2}
 
 /* provenance receipt */
 .ds-receipt{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg-2);padding:16px 18px;font-size:14px}
@@ -407,6 +423,9 @@ details.ds-faq p{margin:12px 0 2px;color:var(--ds-ink-2)}
 .ds-ritem-check{display:flex;align-items:center;padding-top:1px}
 .ds-ritem-check input{width:18px;height:18px;accent-color:var(--ds-accent);cursor:pointer}
 .ds-ritem-titles{min-width:0}
+.ds-row-anchor{display:inline-flex;width:max-content;margin:0 0 5px;padding:2px 7px;border:1px solid var(--ds-line);border-radius:999px;background:var(--ds-bg-2);color:var(--ds-ink-3);font-family:var(--ds-mono);font-size:10.5px;font-weight:650;letter-spacing:.04em;text-decoration:none}
+.ds-row-anchor:hover{border-color:var(--ds-line-strong);color:var(--ds-accent);text-decoration:none}
+.ds-ritem:target{border-color:var(--ds-accent);box-shadow:0 0 0 3px var(--ds-accent-tint)}
 .ds-ritem-titles h4{font-size:15.5px;margin:0 0 3px}
 .ds-ritem-titles .ds-muted{margin:0;font-size:14px}
 .ds-ritem-aside{display:flex;align-items:center;gap:11px;white-space:nowrap}
@@ -509,6 +528,7 @@ tbody tr:hover td{color:var(--ds-ink)}
   h2{font-size:20px}
   .ds-twocol{grid-template-columns:1fr;gap:18px}
   .ds-phase,.ds-gterm,.ds-detail{grid-template-columns:1fr;gap:5px}
+  .ds-timeline::before,.ds-phase::before{display:none}
   .ds-patch-head,.ds-process-card-head,.ds-hunk-head,.ds-diff-file summary{align-items:flex-start;flex-wrap:wrap}
   .ds-ritem-head,.ds-pitem .ds-ritem-head{grid-template-columns:1fr}
   .ds-ritem-aside{white-space:normal;flex-wrap:wrap}
@@ -535,6 +555,8 @@ tbody tr:hover td{color:var(--ds-ink)}
   .ds-ritem-body{padding:0 14px}
   .ds-palette{padding-top:9vh}
   .ds-flowstep{grid-template-columns:26px 1fr;gap:13px}
+  .ds-flow::before{left:12px}
+  .ds-flowstep::before{width:26px}
 }
 
 /* print / PDF */
@@ -579,7 +601,7 @@ tbody tr:hover td{color:var(--ds-ink)}
 <div class="ds-layout">
 <main class="ds-content" id="main" tabindex="-1">
 <section class="ds-hero ds-block" data-block="hero" data-id="a-code-editing-handoff-that-agents-can-actually-consume-0"><p class="ds-eyebrow">Implementation packet</p><h1 id="a-code-editing-handoff-that-agents-can-actually-consume-0" data-edit="a-code-editing-handoff-that-agents-can-actually-consume-0:title">A code editing handoff that agents can actually consume</h1><p class="ds-lede" data-edit="a-code-editing-handoff-that-agents-can-actually-consume-0:lede">This example shows the process Dossier shape for coding work: work items, editable snippets, patch proposals, diff review, verification receipts, trust claims, and closeout.</p><div class="ds-pillrow"><span class="ds-pill">Work items</span><span class="ds-pill">Patch review</span><span class="ds-pill">Diff review</span><span class="ds-pill">MCP packets</span></div><div class="ds-meta"><div class="ds-meta-item"><span class="ds-label">Packet schemas</span><span class="ds-val">edits + process + trust</span></div><div class="ds-meta-item"><span class="ds-label">Human input</span><span class="ds-val">verdicts + notes</span></div><div class="ds-meta-item"><span class="ds-label">Agent readback</span><span class="ds-val">MCP tools</span></div></div></section>
-<section class="ds-block ds-reviewboard ds-processboard" data-block="process-board" data-id="work-plan-1"><h2 id="work-plan-1">Work plan</h2><div class="ds-review-bar"><input class="ds-review-search" type="search" placeholder="Filter…" data-process-search aria-label="Filter process items"><label class="ds-review-only"><input type="checkbox" data-process-only> With verdict only</label><button class="ds-btn ds-btn-line" type="button" data-process-expand>Expand all</button><span class="ds-review-count" data-process-count>0 verdicts</span><button class="ds-btn ds-btn-line" type="button" data-export-process>Export process JSON</button><button class="ds-btn ds-btn-line" type="button" data-import-process>Import</button></div><div class="ds-rlist"><article class="ds-ritem ds-pitem verdict-undecided" data-process-item="filter-state" data-text="persist selected filter save the active search filter in the url query so refresh and share links preserve state. frontend agent src/search/filter-state.ts src/search/searchpanel.tsx npm test npx tsc --noemit"><div class="ds-ritem-head" data-ptoggle><div class="ds-ritem-titles"><h4>Persist selected filter</h4><p class="ds-muted">Save the active search filter in the URL query so refresh and share links preserve state.</p><div class="ds-chips"><span class="ds-chip">Frontend</span><span class="ds-chip">Priority · P1</span><span class="ds-chip">Owner · agent</span><span class="ds-chip">Impact · Medium</span><span class="ds-chip">Effort · Small</span></div></div><div class="ds-ritem-aside"><span class="ds-status s-proposed">proposed</span><label class="ds-process-verdict-wrap" data-stop><span>Verdict</span><select class="ds-process-verdict" data-process-verdict="filter-state"><option value="undecided" selected>undecided</option><option value="approve">approve</option><option value="revise">revise</option><option value="skip">skip</option><option value="defer">defer</option><option value="split">split</option><option value="retry">retry</option><option value="block">block</option></select></label><span class="ds-chev" aria-hidden="true">▾</span></div></div><div class="ds-ritem-wrap"><div class="ds-ritem-body"><div class="ds-ref"><dl class="ds-detailgrid"><div class="ds-detail"><dt>Files</dt><dd>src/search/filter-state.ts, src/search/SearchPanel.tsx</dd></div><div class="ds-detail"><dt>Verification</dt><dd>npm test, npx tsc --noEmit</dd></div></dl></div><label class="ds-notes"><span>Notes</span><textarea data-process-notes="filter-state" placeholder="Verdict notes, constraints, follow-up instructions"></textarea></label></div></div></article><article class="ds-ritem ds-pitem verdict-undecided" data-process-item="empty-state" data-text="improve empty results state show the active filter and a clear reset action when no results match. ux agent src/search/searchresults.tsx"><div class="ds-ritem-head" data-ptoggle><div class="ds-ritem-titles"><h4>Improve empty results state</h4><p class="ds-muted">Show the active filter and a clear reset action when no results match.</p><div class="ds-chips"><span class="ds-chip">UX</span><span class="ds-chip">Priority · P2</span><span class="ds-chip">Owner · agent</span><span class="ds-chip">Impact · Medium</span><span class="ds-chip">Effort · Small</span></div></div><div class="ds-ritem-aside"><span class="ds-status s-proposed">proposed</span><label class="ds-process-verdict-wrap" data-stop><span>Verdict</span><select class="ds-process-verdict" data-process-verdict="empty-state"><option value="undecided" selected>undecided</option><option value="approve">approve</option><option value="revise">revise</option><option value="skip">skip</option><option value="defer">defer</option><option value="split">split</option><option value="retry">retry</option><option value="block">block</option></select></label><span class="ds-chev" aria-hidden="true">▾</span></div></div><div class="ds-ritem-wrap"><div class="ds-ritem-body"><div class="ds-ref"><dl class="ds-detailgrid"><div class="ds-detail"><dt>Files</dt><dd>src/search/SearchResults.tsx</dd></div></dl></div><label class="ds-notes"><span>Notes</span><textarea data-process-notes="empty-state" placeholder="Verdict notes, constraints, follow-up instructions"></textarea></label></div></div></article></div></section>
+<section class="ds-block ds-reviewboard ds-processboard" data-block="process-board" data-id="work-plan-1"><h2 id="work-plan-1">Work plan</h2><div class="ds-review-bar"><input class="ds-review-search" type="search" placeholder="Filter…" data-process-search aria-label="Filter process items"><label class="ds-review-only"><input type="checkbox" data-process-only> With verdict only</label><button class="ds-btn ds-btn-line" type="button" data-process-expand>Expand all</button><span class="ds-review-count" data-process-count>0 verdicts</span><button class="ds-btn ds-btn-line" type="button" data-export-process>Export process JSON</button><button class="ds-btn ds-btn-line" type="button" data-import-process>Import</button></div><div class="ds-rlist"><article id="work-plan-1-filter-state" class="ds-ritem ds-pitem verdict-undecided" data-process-item="filter-state" data-text="persist selected filter save the active search filter in the url query so refresh and share links preserve state. frontend agent src/search/filter-state.ts src/search/searchpanel.tsx npm test npx tsc --noemit"><div class="ds-ritem-head" data-ptoggle><div class="ds-ritem-titles"><a class="ds-row-anchor" href="#work-plan-1-filter-state">ITEM-001</a><h4>Persist selected filter</h4><p class="ds-muted">Save the active search filter in the URL query so refresh and share links preserve state.</p><div class="ds-chips"><span class="ds-chip">Frontend</span><span class="ds-chip">Priority · P1</span><span class="ds-chip">Owner · agent</span><span class="ds-chip">Impact · Medium</span><span class="ds-chip">Effort · Small</span></div></div><div class="ds-ritem-aside"><span class="ds-status s-proposed">proposed</span><label class="ds-process-verdict-wrap" data-stop><span>Verdict</span><select class="ds-process-verdict" data-process-verdict="filter-state"><option value="undecided" selected>undecided</option><option value="approve">approve</option><option value="revise">revise</option><option value="skip">skip</option><option value="defer">defer</option><option value="split">split</option><option value="retry">retry</option><option value="block">block</option></select></label><span class="ds-chev" aria-hidden="true">▾</span></div></div><div class="ds-ritem-wrap"><div class="ds-ritem-body"><div class="ds-ref"><dl class="ds-detailgrid"><div class="ds-detail"><dt>Files</dt><dd>src/search/filter-state.ts, src/search/SearchPanel.tsx</dd></div><div class="ds-detail"><dt>Verification</dt><dd>npm test, npx tsc --noEmit</dd></div></dl></div><label class="ds-notes"><span>Notes</span><textarea data-process-notes="filter-state" placeholder="Verdict notes, constraints, follow-up instructions"></textarea></label></div></div></article><article id="work-plan-1-empty-state" class="ds-ritem ds-pitem verdict-undecided" data-process-item="empty-state" data-text="improve empty results state show the active filter and a clear reset action when no results match. ux agent src/search/searchresults.tsx"><div class="ds-ritem-head" data-ptoggle><div class="ds-ritem-titles"><a class="ds-row-anchor" href="#work-plan-1-empty-state">ITEM-002</a><h4>Improve empty results state</h4><p class="ds-muted">Show the active filter and a clear reset action when no results match.</p><div class="ds-chips"><span class="ds-chip">UX</span><span class="ds-chip">Priority · P2</span><span class="ds-chip">Owner · agent</span><span class="ds-chip">Impact · Medium</span><span class="ds-chip">Effort · Small</span></div></div><div class="ds-ritem-aside"><span class="ds-status s-proposed">proposed</span><label class="ds-process-verdict-wrap" data-stop><span>Verdict</span><select class="ds-process-verdict" data-process-verdict="empty-state"><option value="undecided" selected>undecided</option><option value="approve">approve</option><option value="revise">revise</option><option value="skip">skip</option><option value="defer">defer</option><option value="split">split</option><option value="retry">retry</option><option value="block">block</option></select></label><span class="ds-chev" aria-hidden="true">▾</span></div></div><div class="ds-ritem-wrap"><div class="ds-ritem-body"><div class="ds-ref"><dl class="ds-detailgrid"><div class="ds-detail"><dt>Files</dt><dd>src/search/SearchResults.tsx</dd></div></dl></div><label class="ds-notes"><span>Notes</span><textarea data-process-notes="empty-state" placeholder="Verdict notes, constraints, follow-up instructions"></textarea></label></div></div></article></div></section>
 <section class="ds-block" data-block="code-editor" data-id="editable-helper-proposal-2"><button class="ds-copy" type="button" data-copy aria-label="Copy block" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><h3 id="editable-helper-proposal-2">Editable helper proposal</h3><p class="ds-muted">A host app can enhance this textarea with CodeMirror while Dossier still exports plain <code>dossier.edits/v1</code>.</p><div class="ds-codeedit" data-editor-shell="editable-helper-proposal-2"><div class="ds-codeedit-bar"><span class="ds-lang">filter-state.ts</span><div class="ds-codeedit-meta"><span>ts</span><span>src/search/filter-state.ts</span><span>Work · filter-state</span></div></div><textarea class="ds-codeedit-area" data-code-editor="editable-helper-proposal-2" data-editor-lang="ts" data-editor-filename="filter-state.ts" data-editor-target="src/search/filter-state.ts" data-editor-title="Editable helper proposal" spellcheck="false" rows="13">export function readFilter(search: string): string {
   const params = new URLSearchParams(search);
   return params.get(&quot;filter&quot;) || &quot;all&quot;;

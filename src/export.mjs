@@ -107,7 +107,13 @@ async function figureImage(b, baseDir) {
 
 // Chart SVG uses CSS variables for color; bind them to concrete values for raster.
 function chartPngSvg(b, accent) {
-  return chartSvg(b).replace(/var\(--ds-accent\)/g, accent).replace(/var\(--ds-line-2\)/g, "#dcd9e4");
+  return chartSvg(b)
+    .replace(/var\(--ds-accent\)/g, accent)
+    .replace(/var\(--ds-line-strong\)/g, "#c7c2d3")
+    .replace(/var\(--ds-line-2\)/g, "#dcd9e4")
+    .replace(/var\(--ds-line\)/g, "#e8e6ee")
+    .replace(/var\(--ds-ink-2\)/g, "#56525f")
+    .replace(/var\(--ds-ink-3\)/g, "#8b8698");
 }
 
 async function block(b, out, ctx) {
@@ -182,7 +188,10 @@ async function block(b, out, ctx) {
       (b.cards || []).forEach((c) => { out.push(H(c.title, HeadingLevel.HEADING_3)); out.push(P(c.body)); });
       break;
     case "stat-strip":
-      out.push(P((b.stats || []).map((s) => plain(s.value) + " " + plain(s.label)).join("   ")));
+      out.push(P((b.stats || []).map((s) => {
+        const delta = typeof s.delta === "object" ? [s.delta.value, s.delta.label].filter(Boolean).join(" ") : s.delta;
+        return plain(s.value) + " " + plain(s.label) + (delta ? " (" + plain(delta) + ")" : "");
+      }).join("   ")));
       break;
     case "flow":
       if (b.title) out.push(H(b.title, HeadingLevel.HEADING_3));

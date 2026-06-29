@@ -45,6 +45,57 @@ function inlineMd(s, ctx) {
   return t;
 }
 
+function richTextHtml(s, ctx) {
+  const lines = String(s || "").replace(/\r\n/g, "\n").split("\n");
+  const out = [];
+  let paragraph = [];
+  let list = null;
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    out.push(`<p>${inlineMd(paragraph.join(" "), ctx)}</p>`);
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (!list) return;
+    out.push(`<${list.type} class="ds-prose-list">${list.items.map((item) => `<li>${inlineMd(item, ctx)}</li>`).join("")}</${list.type}>`);
+    list = null;
+  };
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+    const unordered = /^[-*]\s+(.+)$/.exec(line);
+    const ordered = /^\d+[.)]\s+(.+)$/.exec(line);
+    if (unordered || ordered) {
+      flushParagraph();
+      const type = unordered ? "ul" : "ol";
+      if (!list || list.type !== type) {
+        flushList();
+        list = { type, items: [] };
+      }
+      list.items.push((unordered || ordered)[1]);
+      continue;
+    }
+    flushList();
+    paragraph.push(line);
+  }
+  flushParagraph();
+  flushList();
+  return out.join("");
+}
+
+function statDeltaHtml(stat, ctx) {
+  const delta = stat && stat.delta;
+  if (!delta) return "";
+  const value = typeof delta === "object" ? delta.value || delta.label || "" : delta;
+  const label = typeof delta === "object" && delta.label && delta.label !== value ? ` <span>${inlineMd(delta.label, ctx)}</span>` : "";
+  const tone = typeof delta === "object" && delta.tone ? slugify(delta.tone) : "";
+  return value ? `<small class="ds-stat-delta${tone ? ` tone-${esc(tone)}` : ""}">${inlineMd(value, ctx)}${label}</small>` : "";
+}
+
 const COPY_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
 const CHEVRON_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>`;
 const PROCESS_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "split", "retry", "block"];
@@ -59,6 +110,9 @@ const verdictOptions = (current) =>
 
 const reviewOptions = (current) =>
   REVIEW_VERDICTS.map((v) => `<option value="${esc(v)}"${(current || "undecided") === v ? " selected" : ""}>${esc(v)}</option>`).join("");
+
+const rowCode = (i) => `ITEM-${String(i + 1).padStart(3, "0")}`;
+const rowDomId = (blockId, itemId) => slugify(`${blockId || "block"}-${itemId || "item"}`);
 
 function stripDiffPath(s) {
   const raw = String(s || "").trim().replace(/^"(.*)"$/, "$1");
@@ -318,8 +372,7 @@ const renderers = {
   },
   prose(b, ctx) {
     const h = b.heading ? `<h2 id="${esc(b.id)}" data-edit="${esc(b.id)}:heading">${esc(b.heading)}</h2>` : "";
-    const paras = String(b.markdown).split(/\n{2,}/).map((p) => `<p>${inlineMd(p, ctx)}</p>`).join("");
-    return wrap("prose", b.id, h + `<div data-edit="${esc(b.id)}:markdown">${paras}</div>`);
+    return wrap("prose", b.id, h + `<div class="ds-prose" data-edit="${esc(b.id)}:markdown">${richTextHtml(b.markdown, ctx)}</div>`);
   },
   section(b, ctx) {
     const titles =
@@ -347,9 +400,9 @@ const renderers = {
       .join("");
     return wrap("summary-cards", b.id, `<div class="ds-cardgrid">${cards}</div>`);
   },
-  "stat-strip"(b) {
+  "stat-strip"(b, ctx) {
     const stats = (b.stats || [])
-      .map((s) => `<div class="ds-stat"><strong>${esc(s.value)}</strong><span>${esc(s.label)}</span></div>`)
+      .map((s) => `<div class="ds-stat"><strong>${esc(s.value)}</strong><span>${esc(s.label)}</span>${statDeltaHtml(s, ctx)}</div>`)
       .join("");
     return wrap("stat-strip", b.id, `<div class="ds-statgrid">${stats}</div>`);
   },
@@ -642,7 +695,10 @@ const renderers = {
   },
   "review-board"(b, ctx) {
     const items = (b.candidates || [])
-      .map((c) => {
+      .map((c, i) => {
+        const itemId = c.id || rowCode(i).toLowerCase();
+        const domId = rowDomId(b.id, itemId);
+        const anchor = `<a class="ds-row-anchor" href="#${esc(domId)}">${esc(rowCode(i))}</a>`;
         const chips = [];
         if (c.category) chips.push(`<span class="ds-chip">${esc(c.category)}</span>`);
         if (c.impact) chips.push(`<span class="ds-chip">Impact · ${esc(c.impact)}</span>`);
@@ -652,23 +708,21 @@ const renderers = {
         const details = Object.entries(c.details || {})
           .map(([k, v]) => `<div class="ds-detail"><dt>${esc(k)}</dt><dd>${inlineMd(v, ctx)}</dd></div>`)
           .join("");
-        const bodyMd = c.body
-          ? String(c.body).split(/\n{2,}/).map((p) => `<p>${inlineMd(p, ctx)}</p>`).join("")
-          : "";
+        const bodyMd = c.body ? richTextHtml(c.body, ctx) : "";
         const bodyBlocks = (c.blocks || []).map((x) => renderBlock(x, ctx)).join("");
         const refInner = bodyMd + bodyBlocks + (details ? `<dl class="ds-detailgrid">${details}</dl>` : "");
         const ref = refInner ? `<div class="ds-ref">${refInner}</div>` : "";
         const statusChip = c.status ? `<span class="ds-status s-${esc(slugify(c.status))}">${esc(c.status)}</span>` : "";
         const searchText = esc([c.title, c.summary, c.category, c.body].filter(Boolean).join(" ").toLowerCase());
         return (
-          `<article class="ds-ritem" data-candidate="${esc(c.id)}"${c.scope ? ` data-scope="${esc(c.scope)}"` : ""} data-text="${searchText}">` +
+          `<article id="${esc(domId)}" class="ds-ritem" data-candidate="${esc(itemId)}"${c.scope ? ` data-scope="${esc(c.scope)}"` : ""} data-text="${searchText}">` +
           `<div class="ds-ritem-head" data-rtoggle>` +
-          `<span class="ds-ritem-check" data-stop><input type="checkbox" data-select="${esc(c.id)}" aria-label="Select ${esc(c.title)}"></span>` +
-          `<div class="ds-ritem-titles"><h4>${esc(c.title)}</h4><p class="ds-muted">${inlineMd(c.summary, ctx)}</p>${chipsHtml}</div>` +
+          `<span class="ds-ritem-check" data-stop><input type="checkbox" data-select="${esc(itemId)}" aria-label="Select ${esc(c.title)}"></span>` +
+          `<div class="ds-ritem-titles">${anchor}<h4>${esc(c.title)}</h4><p class="ds-muted">${inlineMd(c.summary, ctx)}</p>${chipsHtml}</div>` +
           `<div class="ds-ritem-aside">${statusChip}<span class="ds-chev" aria-hidden="true">▾</span></div>` +
           `</div>` +
           `<div class="ds-ritem-wrap"><div class="ds-ritem-body">${ref}` +
-          `<label class="ds-notes"><span>Notes</span><textarea data-notes="${esc(c.id)}" placeholder="Decision notes, priority, constraints"></textarea></label>` +
+          `<label class="ds-notes"><span>Notes</span><textarea data-notes="${esc(itemId)}" placeholder="Decision notes, priority, constraints"></textarea></label>` +
           `</div></div></article>`
         );
       })
@@ -689,7 +743,10 @@ const renderers = {
   },
   "process-board"(b, ctx) {
     const items = (b.items || [])
-      .map((it) => {
+      .map((it, i) => {
+        const itemId = it.id || rowCode(i).toLowerCase();
+        const domId = rowDomId(b.id, itemId);
+        const anchor = `<a class="ds-row-anchor" href="#${esc(domId)}">${esc(rowCode(i))}</a>`;
         const chips = [];
         if (it.category) chips.push(`<span class="ds-chip">${esc(it.category)}</span>`);
         if (it.priority) chips.push(`<span class="ds-chip">Priority · ${esc(it.priority)}</span>`);
@@ -706,7 +763,7 @@ const renderers = {
         if (it.evidence && it.evidence.length) rows.push(["Evidence", it.evidence.join(", ")]);
         Object.entries(it.details || {}).forEach(([k, v]) => rows.push([k, v]));
         const details = rows.map(([k, v]) => `<div class="ds-detail"><dt>${esc(k)}</dt><dd>${inlineMd(v, ctx)}</dd></div>`).join("");
-        const bodyMd = it.body ? String(it.body).split(/\n{2,}/).map((p) => `<p>${inlineMd(p, ctx)}</p>`).join("") : "";
+        const bodyMd = it.body ? richTextHtml(it.body, ctx) : "";
         const bodyBlocks = (it.blocks || []).map((x) => renderBlock(x, ctx)).join("");
         const refInner = bodyMd + bodyBlocks + (details ? `<dl class="ds-detailgrid">${details}</dl>` : "");
         const ref = refInner ? `<div class="ds-ref">${refInner}</div>` : "";
@@ -714,13 +771,13 @@ const renderers = {
         const searchText = esc([it.title, it.summary, it.category, it.owner, it.body, ...(it.files || []), ...(it.verification || [])].filter(Boolean).join(" ").toLowerCase());
         const verdict = PROCESS_VERDICTS.includes(it.verdict) ? it.verdict : "undecided";
         return (
-          `<article class="ds-ritem ds-pitem verdict-${esc(verdict)}" data-process-item="${esc(it.id)}" data-text="${searchText}">` +
+          `<article id="${esc(domId)}" class="ds-ritem ds-pitem verdict-${esc(verdict)}" data-process-item="${esc(itemId)}" data-text="${searchText}">` +
           `<div class="ds-ritem-head" data-ptoggle>` +
-          `<div class="ds-ritem-titles"><h4>${esc(it.title)}</h4><p class="ds-muted">${inlineMd(it.summary || "", ctx)}</p>${chipsHtml}</div>` +
-          `<div class="ds-ritem-aside">${statusChip}<label class="ds-process-verdict-wrap" data-stop><span>Verdict</span><select class="ds-process-verdict" data-process-verdict="${esc(it.id)}">${verdictOptions(verdict)}</select></label><span class="ds-chev" aria-hidden="true">▾</span></div>` +
+          `<div class="ds-ritem-titles">${anchor}<h4>${esc(it.title)}</h4><p class="ds-muted">${inlineMd(it.summary || "", ctx)}</p>${chipsHtml}</div>` +
+          `<div class="ds-ritem-aside">${statusChip}<label class="ds-process-verdict-wrap" data-stop><span>Verdict</span><select class="ds-process-verdict" data-process-verdict="${esc(itemId)}">${verdictOptions(verdict)}</select></label><span class="ds-chev" aria-hidden="true">▾</span></div>` +
           `</div>` +
           `<div class="ds-ritem-wrap"><div class="ds-ritem-body">${ref}` +
-          `<label class="ds-notes"><span>Notes</span><textarea data-process-notes="${esc(it.id)}" placeholder="Verdict notes, constraints, follow-up instructions">${esc(it.notes || "")}</textarea></label>` +
+          `<label class="ds-notes"><span>Notes</span><textarea data-process-notes="${esc(itemId)}" placeholder="Verdict notes, constraints, follow-up instructions">${esc(it.notes || "")}</textarea></label>` +
           `</div></div></article>`
         );
       })
@@ -807,7 +864,14 @@ function blockMd(b) {
   } else if (t === "summary-cards") {
     (b.cards || []).forEach((c) => lines.push(`### ${c.title}`, "", c.body, ""));
   } else if (t === "stat-strip") {
-    lines.push((b.stats || []).map((s) => `**${s.value}** ${s.label}`).join(" · "));
+    lines.push(
+      (b.stats || [])
+        .map((s) => {
+          const delta = typeof s.delta === "object" ? [s.delta.value, s.delta.label].filter(Boolean).join(" ") : s.delta;
+          return `**${s.value}** ${s.label}${delta ? ` (${delta})` : ""}`;
+        })
+        .join(" · ")
+    );
   } else if (t === "flow") {
     if (b.title) lines.push(`### ${b.title}`, "");
     (b.steps || []).forEach((s, i) => lines.push(`${i + 1}. **${s.title}**, ${s.body}`));
@@ -1051,7 +1115,7 @@ function chartSvg(b) {
   const data = (b.data || []).map((d) => ({ label: String(d.label ?? ""), value: Number(d.value) || 0 }));
   if (!data.length) return "";
   const type = b.chartType || "bar";
-  const W = 640, H = 280, padL = 44, padB = 38, padT = 14, padR = 14;
+  const W = 640, H = 300, padL = 52, padB = 46, padT = 24, padR = 24;
   const iw = W - padL - padR, ih = H - padT - padB;
   const max = Math.max(...data.map((d) => d.value), 0);
   const min = Math.min(...data.map((d) => d.value), 0);
@@ -1060,8 +1124,16 @@ function chartSvg(b) {
   const y = (v) => padT + ih - ((v - bottom) / span) * ih;
   const n = data.length;
   const y0 = y(0);
-  let inner = `<line x1="${padL}" y1="${y0}" x2="${W - padR}" y2="${y0}" stroke="var(--ds-line-2)"/>`;
-  inner += `<text x="${padL - 7}" y="${y(top) + 4}" text-anchor="end" class="ds-chart-tick">${esc(fmtNum(top))}</text>`;
+  const tickCount = 4;
+  let inner = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" class="ds-chart-axis" stroke="var(--ds-line-2)"/>`;
+  inner += `<line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" class="ds-chart-axis" stroke="var(--ds-line-2)"/>`;
+  for (let i = 0; i <= tickCount; i++) {
+    const value = bottom + (span * i) / tickCount;
+    const ty = y(value);
+    inner += `<line x1="${padL}" y1="${ty.toFixed(1)}" x2="${W - padR}" y2="${ty.toFixed(1)}" class="ds-chart-grid" stroke="var(--ds-line)"/>`;
+    inner += `<text x="${padL - 9}" y="${(ty + 4).toFixed(1)}" text-anchor="end" class="ds-chart-tick" fill="var(--ds-ink-3)">${esc(fmtNum(Math.round(value * 100) / 100))}</text>`;
+  }
+  inner += `<line x1="${padL}" y1="${y0.toFixed(1)}" x2="${W - padR}" y2="${y0.toFixed(1)}" class="ds-chart-zero" stroke="var(--ds-line-strong)"/>`;
   if (type === "bar") {
     const gap = iw / n;
     const bw = Math.min(gap * 0.62, 56);
@@ -1069,7 +1141,8 @@ function chartSvg(b) {
       const cx = padL + gap * i + gap / 2;
       const yy = y(d.value);
       inner += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${Math.min(yy, y0).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.abs(y0 - yy).toFixed(1)}" rx="3" fill="var(--ds-accent)"><title>${esc(d.label)}: ${esc(fmtNum(d.value))}</title></rect>`;
-      inner += `<text x="${cx.toFixed(1)}" y="${H - padB + 16}" text-anchor="middle" class="ds-chart-label">${esc(d.label)}</text>`;
+      inner += `<text x="${cx.toFixed(1)}" y="${(d.value >= 0 ? Math.min(yy, y0) - 7 : Math.max(yy, y0) + 15).toFixed(1)}" text-anchor="middle" class="ds-chart-value" fill="var(--ds-ink-2)">${esc(fmtNum(d.value))}</text>`;
+      inner += `<text x="${cx.toFixed(1)}" y="${H - padB + 21}" text-anchor="middle" class="ds-chart-label" fill="var(--ds-ink-3)">${esc(d.label)}</text>`;
     });
   } else {
     const step = n > 1 ? iw / (n - 1) : 0;
@@ -1078,8 +1151,11 @@ function chartSvg(b) {
       inner += `<polygon points="${padL},${y0.toFixed(1)} ${pts.join(" ")} ${(padL + step * (n - 1)).toFixed(1)},${y0.toFixed(1)}" fill="var(--ds-accent)" fill-opacity="0.12"/>`;
     inner += `<polyline points="${pts.join(" ")}" fill="none" stroke="var(--ds-accent)" stroke-width="2"/>`;
     data.forEach((d, i) => {
-      inner += `<circle cx="${(padL + step * i).toFixed(1)}" cy="${y(d.value).toFixed(1)}" r="3" fill="var(--ds-accent)"><title>${esc(d.label)}: ${esc(fmtNum(d.value))}</title></circle>`;
-      inner += `<text x="${(padL + step * i).toFixed(1)}" y="${H - padB + 16}" text-anchor="middle" class="ds-chart-label">${esc(d.label)}</text>`;
+      const cx = padL + step * i;
+      const cy = y(d.value);
+      inner += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3" fill="var(--ds-accent)"><title>${esc(d.label)}: ${esc(fmtNum(d.value))}</title></circle>`;
+      inner += `<text x="${cx.toFixed(1)}" y="${(cy - 8).toFixed(1)}" text-anchor="middle" class="ds-chart-value" fill="var(--ds-ink-2)">${esc(fmtNum(d.value))}</text>`;
+      inner += `<text x="${cx.toFixed(1)}" y="${H - padB + 21}" text-anchor="middle" class="ds-chart-label" fill="var(--ds-ink-3)">${esc(d.label)}</text>`;
     });
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="ds-chart-svg" role="img" aria-label="${esc(b.title || type + " chart")}">${inner}</svg>`;
@@ -1389,5 +1465,5 @@ function knownBlockTypes() {
 }
 
 // Helpers reused by the React port (single source of truth).
-export { esc, slugify, inlineMd, toMarkdown, agentDigest, collectGlossary, collectFootnotes, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes, chartSvg };
+export { esc, slugify, inlineMd, richTextHtml, toMarkdown, agentDigest, collectGlossary, collectFootnotes, buildToc, assignIds, enrich, renderBlock, registerBlock, knownBlockTypes, chartSvg };
 // renderShell is exported at its definition (above).

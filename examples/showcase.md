@@ -10,7 +10,7 @@ Everything below, navigation, search, theme, code, diagrams, charts, math, and a
 
 > **Try the toolbar (top right).** Hit **Edit** to change any text in place, tap the color swatch to restyle live in the **Theme Studio**, or open **Export** for Markdown, JSON, or the agent digest. From the CLI, `dossier export` also writes **Word** (charts and diagrams embedded as images) or **PDF**.
 
-**42** Block types · **0** Runtime deps · **2** Renderers (Node + React) · **100%** Self-contained
+**42** Block types (+5 process blocks) · **0** Runtime deps (view-time network free) · **2** Renderers (Node + React) (same model) · **100%** Self-contained (HTML + source)
 
 ### For humans
 
@@ -30,6 +30,12 @@ One portable file, link it, email it, or `<iframe>` it anywhere.
 Sections nest other blocks; text fields take inline markdown.
 
 This is a **prose** block with `inline code`, a [link](https://github.com/mrbagels/dossier), and a footnote.[^island]
+
+- Bullet lists render as real lists.
+- Inline markdown still works inside list items.
+
+1. Numbered lists work too.
+2. Paragraph rhythm stays intact.
 
 A second paragraph to show vertical rhythm.
 

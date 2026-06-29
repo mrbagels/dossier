@@ -622,6 +622,42 @@
                 },
                 "label": {
                   "type": "string"
+                },
+                "delta": {
+                  "description": "Optional compact change line shown below the stat value.",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "value"
+                      ],
+                      "properties": {
+                        "value": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "tone": {
+                          "type": "string",
+                          "enum": [
+                            "neutral",
+                            "up",
+                            "down",
+                            "positive",
+                            "negative",
+                            "good",
+                            "bad",
+                            "warn",
+                            "warning"
+                          ]
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }

@@ -61,19 +61,23 @@
       "stats": [
         {
           "value": "42",
-          "label": "Block types"
+          "label": "Block types",
+          "delta": { "value": "+5", "label": "process blocks", "tone": "up" }
         },
         {
           "value": "0",
-          "label": "Runtime deps"
+          "label": "Runtime deps",
+          "delta": { "value": "view-time", "label": "network free", "tone": "good" }
         },
         {
           "value": "2",
-          "label": "Renderers (Node + React)"
+          "label": "Renderers (Node + React)",
+          "delta": "same model"
         },
         {
           "value": "100%",
-          "label": "Self-contained"
+          "label": "Self-contained",
+          "delta": { "value": "HTML + source", "tone": "neutral" }
         }
       ]
     },
@@ -104,7 +108,7 @@
       "blocks": [
         {
           "type": "prose",
-          "markdown": "This is a **prose** block with `inline code`, a [link](https://github.com/mrbagels/dossier), and a footnote.[^island]\n\nA second paragraph to show vertical rhythm."
+          "markdown": "This is a **prose** block with `inline code`, a [link](https://github.com/mrbagels/dossier), and a footnote.[^island]\n\n- Bullet lists render as real lists.\n- Inline markdown still works inside list items.\n\n1. Numbered lists work too.\n2. Paragraph rhythm stays intact.\n\nA second paragraph to show vertical rhythm."
         },
         {
           "type": "flow",
