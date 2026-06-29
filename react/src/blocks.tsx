@@ -172,7 +172,7 @@ const Table: React.FC<{ b: B }> = ({ b }) => (
         <thead><tr>{(b.columns || []).map((c: string, i: number) => <th key={i}>{c}</th>)}</tr></thead>
         <tbody>
           {(b.rows || []).map((r: string[], i: number) => (
-            <tr key={i}>{r.map((c: string, j: number) => <td key={j} dangerouslySetInnerHTML={md(c)} />)}</tr>
+            <tr key={i}>{(Array.isArray(r) ? r : []).map((c: string, j: number) => <td key={j} dangerouslySetInnerHTML={md(c)} />)}</tr>
           ))}
         </tbody>
       </table>
@@ -385,7 +385,7 @@ const References: React.FC<{ b: B }> = ({ b }) => (
         <tbody>
           {(b.items || []).map((r: any, i: number) => (
             <tr key={i}>
-              <td>{r.url ? <a href={r.url}>{r.label}</a> : r.label}</td>
+              <td>{r.url ? <a href={safeUrl(r.url)}>{r.label}</a> : r.label}</td>
               <td dangerouslySetInnerHTML={md(r.signal)} />
               <td dangerouslySetInnerHTML={md(r.use)} />
             </tr>
@@ -934,7 +934,7 @@ const Receipt: React.FC<{ b: B }> = ({ b }) => {
         {b.sources?.length > 0 && (
           <div className="ds-receipt-sources">
             <span className="ds-label">Sources</span>
-            <ul>{b.sources.map((s: any, i: number) => <li key={i}>{s.url ? <a href={s.url}>{s.label || s.url}</a> : s.label}</li>)}</ul>
+            <ul>{b.sources.map((s: any, i: number) => <li key={i}>{s.url ? <a href={safeUrl(s.url)}>{s.label || s.url}</a> : s.label}</li>)}</ul>
           </div>
         )}
         {b.notes && <p className="ds-muted" dangerouslySetInnerHTML={md(b.notes)} />}
