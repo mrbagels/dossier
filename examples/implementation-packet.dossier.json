@@ -63,7 +63,7 @@
     {
       "type": "code-editor",
       "title": "Editable helper proposal",
-      "summary": "A host app can enhance this textarea with CodeMirror while Dossier still exports plain `dossier.edits/v1`.",
+      "summary": "`dossier serve` enhances this textarea with CodeMirror 6 while Dossier still exports plain `dossier.edits/v1`.",
       "lang": "ts",
       "filename": "filter-state.ts",
       "targetPath": "src/search/filter-state.ts",

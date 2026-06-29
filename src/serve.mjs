@@ -1,11 +1,11 @@
 // Dev server: build a dossier, serve it, watch the source, rebuild + live-reload on
-// change. The reload script is injected only when serving (never written to the file).
-// No dependencies.
+// change. The live runtime is injected only when serving, never written to the file.
 
 import { createServer } from "node:http";
 import { watch, readFileSync, writeFileSync } from "node:fs";
 import { generateFile, validateModel } from "./index.mjs";
 import { LIVE } from "./live-runtime.mjs";
+import { CODEMIRROR_BOOTSTRAP, CODEMIRROR_BOOTSTRAP_PATH, codeMirrorModuleSource, codeMirrorSpecForPath } from "./live-codemirror.mjs";
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -114,11 +114,28 @@ export async function serve(file, opts = {}) {
 
   const clients = new Set();
   const server = createServer(async (req, res) => {
+    const url = new URL(req.url || "/", "http://localhost");
     if (req.url === "/__reload") {
       res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
       res.write("\n");
       clients.add(res);
       req.on("close", () => clients.delete(res));
+      return;
+    }
+    if (req.method === "GET" && url.pathname === CODEMIRROR_BOOTSTRAP_PATH) {
+      res.writeHead(200, { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-cache" });
+      res.end(CODEMIRROR_BOOTSTRAP);
+      return;
+    }
+    const cmSpec = req.method === "GET" ? codeMirrorSpecForPath(url.pathname) : null;
+    if (cmSpec) {
+      try {
+        res.writeHead(200, { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-cache" });
+        res.end(codeMirrorModuleSource(cmSpec));
+      } catch (e) {
+        res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+        res.end(e.message);
+      }
       return;
     }
     if (req.method === "POST" && req.url === "/__save-editor") {
@@ -155,7 +172,7 @@ export async function serve(file, opts = {}) {
       return;
     }
     try {
-      const html = readFileSync(htmlPath, "utf8").replace("</body>", LIVE + "</body>");
+      const html = readFileSync(htmlPath, "utf8").replace("</body>", () => LIVE + "</body>");
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(html);
     } catch {

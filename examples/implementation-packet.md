@@ -30,7 +30,7 @@ Show the active filter and a clear reset action when no results match.
 
 ## Editable helper proposal
 
-A host app can enhance this textarea with CodeMirror while Dossier still exports plain `dossier.edits/v1`.
+`dossier serve` enhances this textarea with CodeMirror 6 while Dossier still exports plain `dossier.edits/v1`.
 
 ```ts
 export function readFilter(search: string): string {

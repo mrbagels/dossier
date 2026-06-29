@@ -333,10 +333,10 @@ Attach the verification run to the work item before closeout.
 ## Upstream response
 
 - **upstream:** CodeMirror host adapter
-- **status:** tracked
-- **request:** Enhance `data-code-editor` hooks in a host runtime.
-- **response:** Ready for a hosted adapter without changing the dossier model.
-- **nextStep:** Build the adapter in the consuming app.
+- **status:** accepted
+- **request:** Enhance `data-code-editor` hooks in the local serve runtime.
+- **response:** `dossier serve` now loads CodeMirror 6 locally and keeps textarea-backed packet export/save-back intact.
+- **nextStep:** Keep Monaco reserved for hosted Studio or Lumen integrations.
 
 ## Release checklist
 

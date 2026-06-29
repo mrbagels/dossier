@@ -106,7 +106,7 @@ Verify:
 
 - Page reloads after saving the source JSON.
 - Served HTML keeps the requested theme and skin.
-- `code-editor` blocks show enhanced controls.
+- `code-editor` blocks mount the CodeMirror 6 live editor while keeping export/save-back controls.
 - Search inside an editor works.
 - JSON format button formats valid JSON and reports invalid JSON without saving.
 - Cmd/Ctrl-S saves edited editor content back to the source model.

@@ -314,12 +314,15 @@ dossier serve my-doc.dossier.json --open
 `dossier serve` adds development-only live tools:
 
 - Live reload when the source model changes.
+- CodeMirror 6 enhancement for `code-editor` blocks, loaded only by the local serve runtime.
 - Save-back for `code-editor` blocks.
-- Line numbers, search, JSON formatting, tab indentation, copy, and Cmd/Ctrl-S in editor blocks.
+- Language-aware editing for JavaScript, TypeScript, JSON, Markdown, HTML, CSS, Python, SQL, and YAML.
+- Search, JSON formatting, wrapping, copy, and Cmd/Ctrl-S in editor blocks.
 - A live model editor that can validate and save the full JSON model.
 - Patch import that appends a validated `patch-set` block.
 
 The saved model is validated before writing. Invalid saves return a 400 and do not touch disk.
+The generated static HTML still keeps the dependency-free textarea fallback, so shared artifacts do not bundle CodeMirror. Monaco stays a host-only option for a future Studio or Lumen integration where bundle size and worker setup are acceptable.
 
 ## Block Catalog
 

@@ -100,7 +100,8 @@ Use for snippets, config, prompts, JSON, Markdown, or small files that should ro
 as an edits packet. The static artifact renders a textarea fallback, persists local edits,
 and exports:
 `{ "schema": "dossier.edits/v1", "slug": "...", "edits": { "id": { "text": "...", "lang": "ts", "targetPath": "..." } } }`.
-Host tools can enhance the same block with CodeMirror by targeting `data-code-editor`.
+`dossier serve` enhances the same block with CodeMirror 6 while keeping the textarea
+as the packet source of truth. Static artifacts keep the textarea fallback.
 ```json
 { "type": "code-editor", "title": "Editable target snippet",
   "summary": "Bounded source text that can be edited and exported.",

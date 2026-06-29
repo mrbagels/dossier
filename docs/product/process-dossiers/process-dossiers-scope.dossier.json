@@ -154,7 +154,7 @@
             ["`process-board`", "Expandable work items with status, owner, lane, dependencies, risks, evidence links, and human verdict controls.", "Verdicts, notes, priority, assigned agent, blocked reason, selected verification."],
             ["`patch-set`", "Patch summary grouped by file, operation, risk, and relation to work items.", "Patch ids, target files, apply strategy, accepted/skipped/revise state."],
             ["`diff-view`", "Unified diff with file tree, hunks, additions/deletions, copy, collapse, and comments.", "Per-file and per-hunk verdicts, comments, requested changes."],
-            ["`code-editor`", "Embeddable editor block for snippets, config, prompts, JSON, markdown, and small patches. Static artifacts use a textarea fallback; hosts can enhance with CodeMirror.", "Edited text, language, dirty state, optional target path."],
+            ["`code-editor`", "Embeddable editor block for snippets, config, prompts, JSON, markdown, and small patches. Static artifacts use a textarea fallback; `dossier serve` enhances it with CodeMirror 6.", "Edited text, language, dirty state, optional target path."],
             ["`verification-run`", "Commands, expected results, actual results, logs, artifacts, and rerun guidance.", "Pass/fail/blocked state, command receipt refs, selected rerun requests."],
             ["`evidence-log`", "Append-only observations: screenshots, logs, links, command outputs, API responses, source refs.", "Evidence ids, trust level, source, created time, linked work items."],
             ["`trust-report`", "Source-backed claims with status, confidence, source ids, and evidence ids.", "Versioned `dossier.trust/v1` claim/source packet for MCP readback."],
@@ -187,7 +187,7 @@
           "title": "Editor, diff, and workflow source posture",
           "columns": ["Source", "Role", "License posture", "Consumption mode"],
           "rows": [
-            ["CodeMirror 6", "Embeddable editor, small language packages, merge/diff editing surface.", "MIT, good fit.", "Primary editor for static/live Dossier blocks. Bundle only when a model uses editor blocks."],
+            ["CodeMirror 6", "Embeddable editor, small language packages, merge/diff editing surface.", "MIT, good fit.", "Primary editor for live `dossier serve` blocks. Static artifacts keep the textarea fallback."],
             ["Monaco Editor", "Full IDE-grade editor and diff editor.", "MIT, but large.", "Optional live Studio mode, not default self-contained artifact runtime."],
             ["Shiki", "Build-time syntax highlighting already used by Dossier.", "MIT, already aligned.", "Keep for static code/diff highlighting and no-client-JS output."],
             ["Diff2Html / react-diff-view / gitdiff-parser", "Unified diff parse/render references.", "Permissive options exist; verify before vendoring.", "Prefer a tiny local parser first, then adopt a library if hunk/comment complexity grows."],
@@ -288,7 +288,7 @@
           "type": "risk-register",
           "title": "Risks",
           "risks": [
-            { "risk": "Static artifact bloat from bundling a full editor into every output.", "likelihood": "medium", "impact": "high", "mitigation": "Gate editor runtime by block usage and prefer CodeMirror over Monaco for artifact mode." },
+            { "risk": "Static artifact bloat from bundling a full editor into every output.", "likelihood": "medium", "impact": "high", "mitigation": "Load CodeMirror only in `dossier serve`; keep generated artifacts dependency-free." },
             { "risk": "Dossier accidentally becomes a half-built IDE.", "likelihood": "medium", "impact": "high", "mitigation": "Keep execution, filesystem writes, Git operations, and sandboxing in host tools. Dossier coordinates and records." },
             { "risk": "Process state grows incompatible with current decisions export.", "likelihood": "high", "impact": "medium", "mitigation": "Introduce a versioned process packet and keep decision export as a compatibility layer." },
             { "risk": "OSS license leakage from farming AGPL/GPL projects.", "likelihood": "medium", "impact": "high", "mitigation": "Record license posture per source. Copy permissive code only; use AGPL/GPL as pattern or sidecar only unless deliberately accepted." },
@@ -299,8 +299,8 @@
           "type": "assumptions",
           "title": "Open decisions",
           "items": [
-            { "statement": "Use CodeMirror as the default embeddable editor for Dossier artifact/live mode.", "kind": "assumption", "status": "unverified" },
-            { "statement": "Use Monaco only for a future hosted Studio or Lumen integration where bundle size and worker setup are acceptable.", "kind": "assumption", "status": "unverified" },
+            { "statement": "Use CodeMirror 6 as the default live editor enhancer in `dossier serve`, while static artifacts keep the textarea fallback.", "kind": "decision", "status": "verified" },
+            { "statement": "Reserve Monaco for a future hosted Studio or Lumen integration where bundle size and worker setup are acceptable.", "kind": "decision", "status": "verified" },
             { "statement": "A tiny first-party unified diff renderer may be enough for M3, with a library adopted only if inline comments and complex hunk mapping require it.", "kind": "assumption", "status": "unverified" },
             { "statement": "Dossier should remain useful without Lumen, but become more powerful when Lumen or another host consumes the same MCP/process contracts.", "kind": "assumption", "status": "verified" }
           ]

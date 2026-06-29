@@ -508,9 +508,23 @@ test("serve exposes validated save-back and patch import endpoints", async () =>
     res = await fetch(live.url);
     const html = await res.text();
     assert.ok(html.includes("DossierEditorEnhancer"), "live runtime includes editor enhancer");
+    assert.ok(html.includes("DossierCodeMirrorEnhancer"), "live runtime includes CodeMirror enhancer bootstrap");
+    assert.ok(html.includes("__dossier-codemirror.mjs"), "live runtime loads the local CodeMirror module");
+    assert.ok(html.includes("function $$(s,r)"), "live runtime keeps literal selector helper names when injected");
     assert.ok(html.includes("data-live-model-open"), "live runtime includes model editor control");
     assert.ok(html.includes('data-skin="console-slate"'), "serve applies skin flag");
     assert.ok(html.includes("--ds-accent: #2f7d55"), "serve applies theme flag");
+
+    res = await fetch(live.url + "/__dossier-codemirror.mjs");
+    const bootstrap = await res.text();
+    assert.equal(res.ok, true, bootstrap);
+    assert.ok(bootstrap.includes("EditorView.updateListener"), "CodeMirror bootstrap syncs editor changes");
+    assert.ok(bootstrap.includes("dossier:codemirror-ready"), "CodeMirror bootstrap notifies the host adapter");
+
+    res = await fetch(live.url + "/__cm/codemirror.mjs");
+    const cmModule = await res.text();
+    assert.equal(res.ok, true, cmModule);
+    assert.ok(cmModule.includes("basicSetup"), "serve exposes local CodeMirror package modules");
   } finally {
     await live.close();
   }

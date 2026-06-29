@@ -137,8 +137,9 @@ These starters use `process-board` for work items, `code-editor` for bounded edi
 snippets, `patch-set` for proposed edit packets, `diff-view` for unified diff review,
 `verification-run` for commands and outcomes, `evidence-log` for source material,
 `trust-report` for source-backed claims, `verdict-gate` for approvals, and closeout blocks
-for release, incident, review, and integration loops. `dossier serve` can save editor
-changes back to the source model and import patches into a new `patch-set` block. MCP
+for release, incident, review, and integration loops. `dossier serve` enhances
+`code-editor` with CodeMirror 6, can save editor changes back to the source model,
+and can import patches into a new `patch-set` block. MCP
 tools can read human state and append run, claim, or patch evidence without scraping the
 HTML.
 
