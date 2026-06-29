@@ -148,9 +148,9 @@
               "status": "done"
             },
             {
-              "label": "next",
-              "body": "Hosting + in-browser editor.",
-              "status": "planned"
+              "label": "0.5",
+              "body": "Process workflows, publishing, embed output, and live editor hooks.",
+              "status": "done"
             }
           ]
         },

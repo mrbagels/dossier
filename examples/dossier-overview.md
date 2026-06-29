@@ -44,7 +44,7 @@ The agent writes JSON; the generator owns all design and interactivity.
 - **Phase 2** (done), Generator engine + data island + Markdown export.
 - **Phase 3** (done), Full static catalog.
 - **Phase 4** (done), Process dossier closeout.
-- **Phase 5** (planned), Bug bash and release polish.
+- **Phase 5** (done), Bug bash, release polish, gallery examples, and public QA guide.
 
 
 ## Reference
@@ -128,11 +128,11 @@ const commands = toc.map(t => ({ label: t.label, run: () => jump(t.id) }))
 - **Shortcut:** Cmd/Ctrl-K
 - **Source:** Built from TOC
 
-### Changelog / version diff (planned)
+### Changelog / version diff (shipped)
 
-Diff the embedded model against a prior version's JSON.
+Diff two dossier models structurally from the CLI.
 
-Because every Brief embeds its full source model, two versions can be compared structurally rather than as text. The diff highlights added, removed, and changed blocks and surfaces a per-version changelog.
+Because every Dossier embeds its full source model, two versions can be compared structurally rather than as text. Run `dossier diff old.dossier.json new.dossier.json` to see added, removed, and changed blocks.
 
 | Change | Block | Detail |
 | --- | --- | --- |
@@ -140,17 +140,17 @@ Because every Brief embeds its full source model, two versions can be compared s
 | Changed | timeline | Phase 3 set to in-progress |
 
 
-### Syntax highlighting (Shiki) (in-progress)
+### Syntax highlighting (Shiki) (shipped)
 
 Build-time, theme-aware highlighting with zero client JS.
 
 Run Shiki at generate time to emit pre-highlighted, inline-styled code with light and dark variants driven by CSS variables. No client runtime and no network: the highlighted HTML is baked into the file.
 
 
-### Diagram to inline SVG (planned)
+### Diagram to inline SVG (shipped)
 
-Render Mermaid or D2 to static SVG at build time.
+Render Graphviz DOT and Mermaid to static SVG at build time.
 
-Use a browserless WASM renderer (Graphviz or D2) to turn diagram specs into inline SVG during generation, keeping the artifact self-contained with no headless browser dependency.
+DOT diagrams render through Graphviz WASM, and Mermaid diagrams render through the optional headless browser path when available. The resulting SVG is inlined into the artifact so view-time loading stays self-contained.
 
 

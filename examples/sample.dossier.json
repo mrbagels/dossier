@@ -83,7 +83,7 @@
             { "label": "Phase 2", "body": "Generator engine + data island + Markdown export.", "status": "done" },
             { "label": "Phase 3", "body": "Full static catalog.", "status": "done" },
             { "label": "Phase 4", "body": "Process dossier closeout.", "status": "done" },
-            { "label": "Phase 5", "body": "Bug bash and release polish.", "status": "planned" }
+            { "label": "Phase 5", "body": "Bug bash, release polish, gallery examples, and public QA guide.", "status": "done" }
           ]
         }
       ]
@@ -188,12 +188,12 @@
         {
           "id": "version-diff",
           "title": "Changelog / version diff",
-          "summary": "Diff the embedded model against a prior version's JSON.",
+          "summary": "Diff two dossier models structurally from the CLI.",
           "category": "Trust",
-          "status": "planned",
+          "status": "shipped",
           "impact": "Medium",
           "effort": "Medium",
-          "body": "Because every Brief embeds its full source model, two versions can be compared structurally rather than as text. The diff highlights added, removed, and changed blocks and surfaces a per-version changelog.",
+          "body": "Because every Dossier embeds its full source model, two versions can be compared structurally rather than as text. Run `dossier diff old.dossier.json new.dossier.json` to see added, removed, and changed blocks.",
           "blocks": [
             { "type": "table", "columns": ["Change", "Block", "Detail"], "rows": [["Added", "risk-register", "New risks section"], ["Changed", "timeline", "Phase 3 set to in-progress"]] }
           ]
@@ -203,7 +203,7 @@
           "title": "Syntax highlighting (Shiki)",
           "summary": "Build-time, theme-aware highlighting with zero client JS.",
           "category": "Content",
-          "status": "in-progress",
+          "status": "shipped",
           "impact": "High",
           "effort": "Medium",
           "body": "Run Shiki at generate time to emit pre-highlighted, inline-styled code with light and dark variants driven by CSS variables. No client runtime and no network: the highlighted HTML is baked into the file."
@@ -211,12 +211,12 @@
         {
           "id": "diagram-svg",
           "title": "Diagram to inline SVG",
-          "summary": "Render Mermaid or D2 to static SVG at build time.",
+          "summary": "Render Graphviz DOT and Mermaid to static SVG at build time.",
           "category": "Content",
-          "status": "planned",
+          "status": "shipped",
           "impact": "Medium",
           "effort": "Large",
-          "body": "Use a browserless WASM renderer (Graphviz or D2) to turn diagram specs into inline SVG during generation, keeping the artifact self-contained with no headless browser dependency."
+          "body": "DOT diagrams render through Graphviz WASM, and Mermaid diagrams render through the optional headless browser path when available. The resulting SVG is inlined into the artifact so view-time loading stays self-contained."
         }
       ]
     }

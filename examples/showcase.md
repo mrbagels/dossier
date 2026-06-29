@@ -50,7 +50,7 @@ A second paragraph to show vertical rhythm.
 
 - **0.1** (done), Generator, catalog, features.
 - **0.2** (done), MCP, plugins, new blocks.
-- **next** (planned), Hosting + in-browser editor.
+- **0.5** (done), Process workflows, publishing, embed output, and live editor hooks.
 
 > **Composable.** Sections, two-col, and tabs nest other blocks.
 
