@@ -27,14 +27,16 @@ linkable and embeddable (iframe today, `*.embed.html` variant for inline use).
 | Generator stack | Zero-dependency Node, single-file-style ESM modules. Runs via `node` / `npx`. |
 | First build | Full design system + full component catalog + selected features (not a minimal slice). |
 | Name | **Dossier.** Skill `dossier`, schema namespace `dossier/v1`, CSS prefix `ds-`, header field `dossierVersion`. |
-| Brand | Berry: crimson/rose accent (`#e11d48`), purple highlight (`#7048e8`), plum neutral. Light + dark. Per-project token overrides via `meta.theme`. |
+| Brand | Default Berry theme: crimson/rose accent (`#e11d48`), purple highlight (`#7048e8`), plum neutral. Light + dark. Per-project token overrides via `meta.theme`. |
+| Skins | Optional full presentation skins layer after base CSS. `console-slate` is the production skin for dense, process-heavy demos and docs. `meta.theme` still wins after a skin. |
 
 ## Foundation (always built)
 
 Data backbone (embedded JSON island, stable `data-id`/`data-block` typing, canonical
 front-matter, `dossierVersion`/schema header) · pipeline (schema, generator,
 validation+lint, presets, the `dossier` skill) · render baseline (hybrid render,
-light/dark theming + per-project overrides, Markdown + JSON export) · the full
+light/dark theming + theme packs + `console-slate` skin + per-project overrides,
+Markdown + JSON export) · the full
 42-block catalog, including process, trust, review, release, media, and export-oriented
 blocks.
 
@@ -63,7 +65,7 @@ display blocks only.)
 
 ## Build order
 
-1. Schema + design tokens/themes. ✅
+1. Schema + design tokens/themes/skins. ✅
 2. Generator engine + data island + Markdown export. ✅
 3. Full static catalog. ✅
 4. The 18 selected features. ✅

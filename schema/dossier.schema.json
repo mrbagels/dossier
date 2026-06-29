@@ -134,6 +134,13 @@
             "type": "string"
           }
         },
+        "skin": {
+          "type": "string",
+          "description": "Optional layout and component skin layered after the base theme. meta.theme overrides still win.",
+          "enum": [
+            "console-slate"
+          ]
+        },
         "features": {
           "type": "object",
           "description": "Toggle optional runtime features. Defaults come from `kind`. Set false to disable.",

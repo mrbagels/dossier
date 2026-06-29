@@ -61,7 +61,8 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 --open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
 `dossier publish <dir> --out <dir>` (build a static folder with a catalog index),
 `dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
-and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
+`--theme <pack>`, `--skin console-slate`, and `--plugin <file>` to add custom block
+types. For programmatic / multi-agent use, `dossier mcp` exposes
 `dossier_render`, `dossier_validate`, `dossier_read_decisions`, `dossier_read_process`,
 `dossier_read_edits`, `dossier_read_verdicts`, `dossier_read_release`,
 `dossier_read_patch_review`, `dossier_read_diff_review`, `dossier_read_trust`,
@@ -99,7 +100,8 @@ Top-level shape:
   comparison | implementation | review | debug | integration-loop | release | incident`.
 - **`meta`**: `title` (required), `slug`, `eyebrow`, `lede`, `crumbs[]`, `status`,
   `owner`, `updated`, `version`, `tags[]`, `baseUrl` (for hosted cross-links),
-  `theme` (per-project token overrides), `lifecycle` (banner), `changelog`.
+  `theme` (per-project token overrides), `skin` (`console-slate` for a denser
+  production skin), `lifecycle` (banner), `changelog`.
 - **`blocks[]`**: ordered. `section`, `two-col`, and `tabs` nest other blocks. Lead with
   a `hero`. See `references/blocks.md` for all 42 types.
 - **Inline markdown** in text fields: `**bold**`, `` `code` ``, `[label](url)`,

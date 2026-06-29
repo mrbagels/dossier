@@ -20,7 +20,7 @@ async function writeRendered(model, sourceFile, outDir, opts = {}) {
   const renderModel = structuredClone(model);
   renderModel.meta = renderModel.meta || { title: slug };
   if (opts.baseUrl) renderModel.meta.baseUrl = opts.baseUrl;
-  const { html, md } = await generate(renderModel, { baseDir: dirname(sourceFile), theme: opts.theme });
+  const { html, md } = await generate(renderModel, { baseDir: dirname(sourceFile), theme: opts.theme, skin: opts.skin });
   const htmlPath = join(outDir, `${slug}.html`);
   const mdPath = join(outDir, `${slug}.md`);
   writeFileSync(htmlPath, html);

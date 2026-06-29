@@ -37,6 +37,7 @@ const { model: catalog } = buildCatalogModel(join(root, "examples"), {
 });
 catalog.meta.slug = "examples";
 catalog.meta.crumbs = ["Dossier", "Examples"];
+catalog.meta.skin = "console-slate";
 catalog.meta.lifecycle = {
   stage: "durable",
   note: "A browsable set of focused Dossier examples.",

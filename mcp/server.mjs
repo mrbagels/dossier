@@ -36,6 +36,8 @@ const TOOLS = [
       properties: {
         model: { type: "object", description: "A Dossier document model: { dossierVersion, kind, meta, blocks[] }." },
         outPath: { type: "string", description: "Optional path to write <slug>.html and <slug>.md next to." },
+        theme: { type: "string", description: "Optional built-in theme pack to merge before rendering." },
+        skin: { type: "string", enum: ["console-slate"], description: "Optional presentation skin to apply before rendering." },
       },
       required: ["model"],
     },
@@ -432,7 +434,7 @@ async function handle(name, args) {
     const v = validateModel(model);
     if (!v.ok) return fail("invalid dossier:\n- " + v.errors.join("\n- "));
     const baseDir = args.outPath ? dirname(args.outPath) : undefined;
-    const { html, md, digest } = await generate(model, { baseDir });
+    const { html, md, digest } = await generate(model, { baseDir, theme: args.theme, skin: args.skin });
     if (args.outPath) {
       const slug = (model.meta && model.meta.slug) || basename(args.outPath).replace(/\.(dossier\.)?(json|html)$/i, "");
       const htmlPath = join(dirname(args.outPath), slug + ".html");

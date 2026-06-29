@@ -1193,6 +1193,8 @@ function buildToc(blocks) {
 import { CSS } from "./theme/tokens.css.mjs";
 import { RUNTIME } from "./runtime/runtime.mjs";
 import { THEMES } from "./themes.mjs";
+import { applyPresentationOptions } from "./presentation.mjs";
+import { resolveSkin, skinNames } from "./skins.mjs";
 
 // Visit every block in the tree, including nested ones.
 function eachBlock(blocks, fn) {
@@ -1351,6 +1353,7 @@ async function enrich(model, baseDir) {
 }
 
 export async function generate(model, opts = {}) {
+  applyPresentationOptions(model, opts);
   // Underscore fields (_svg/_math/_hl/_src) are injected into HTML unescaped and must
   // only ever come from build-time enrichment of trusted libraries. Drop any that an
   // author smuggled in via the input model so they cannot inject raw markup.
@@ -1376,6 +1379,10 @@ export async function generate(model, opts = {}) {
 // produce byte-identical scaffolding (single source of truth).
 export function renderShell(model, { body, toc, md, digest, generator = "dossier", footer = "Generated with Dossier" }) {
   const meta = model.meta || {};
+  const skin = resolveSkin(meta.skin);
+  if (meta.skin && !skin) {
+    throw new Error(`unknown skin: ${meta.skin} (supported: ${skinNames().join(", ")})`);
+  }
   const wordCount = (md.match(/\S+/g) || []).length;
   const readMin = Math.max(1, Math.round(wordCount / 220));
 
@@ -1383,6 +1390,9 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
   const themeVars = Object.entries(meta.theme || {})
     .map(([k, v]) => `--ds-${String(k).replace(/[^a-z0-9-]/gi, "")}: ${String(v).replace(/[<>{};]/g, "")};`)
     .join("");
+  const themeCss = themeVars ? `:root{${themeVars}}[data-theme="dark"]{${themeVars}}` : "";
+  const skinCss = skin ? `\n/* skin:${String(meta.skin).replace(/[^a-z0-9-]/gi, "")} */\n${skin.css}` : "";
+  const skinScript = skin && skin.script ? `<script id="ds-skin-runtime">${skin.script}</script>` : "";
 
   const tocHtml = toc
     .map((t) => `<a class="ds-toc-link lvl-${t.level}" href="#${esc(t.id)}" data-toc="${esc(t.id)}">${esc(t.label)}</a>`)
@@ -1397,13 +1407,13 @@ export function renderShell(model, { body, toc, md, digest, generator = "dossier
   const modelJson = JSON.stringify(model, (k, v) => (k.charAt(0) === "_" ? undefined : v)).replace(/</g, "\\u003c");
 
   return `<!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light"${skin ? ` data-skin="${esc(meta.skin)}"` : ""}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="${esc(generator)}/${esc(model.dossierVersion || "1.0")}">
 <title>${esc(meta.title || "Dossier")}</title>
-<style>:root{${themeVars}}${CSS}${themeVars ? `[data-theme="dark"]{${themeVars}}` : ""}</style>
+<style>${CSS}${skinCss}${themeCss}</style>
 </head>
 <body>
 <a class="ds-skip" href="#main">Skip to content</a>
@@ -1451,6 +1461,7 @@ ${toc.length ? `<aside class="ds-toc"><div class="ds-search"><input type="search
 <script type="text/markdown" id="dossier-markdown">${esc(md)}</script>
 <script type="text/plain" id="dossier-digest">${esc(digest)}</script>
 <script>${RUNTIME}</script>
+${skinScript}
 </body>
 </html>`;
 }

@@ -2,19 +2,18 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { generate } from "./generate.mjs";
 import { validateModel } from "./validate.mjs";
-import { THEMES } from "./themes.mjs";
+import { applyPresentationOptions } from "./presentation.mjs";
 
 export { generate, validateModel };
 export { publishDir } from "./publish.mjs";
+export { THEMES } from "./themes.mjs";
+export { SKINS, resolveSkin, skinNames } from "./skins.mjs";
 // Plugin authoring surface.
 export { registerBlock, esc, inlineMd, richTextHtml, slugify, chartSvg, knownBlockTypes, parseUnifiedDiff } from "./generate.mjs";
 
 export async function generateFile(path, opts = {}) {
   const model = JSON.parse(readFileSync(path, "utf8"));
-  if (opts.theme && THEMES[opts.theme]) {
-    // A document's own meta.theme always wins over the named pack.
-    model.meta = { ...(model.meta || {}), theme: { ...THEMES[opts.theme], ...((model.meta || {}).theme || {}) } };
-  }
+  applyPresentationOptions(model, opts);
   if (opts.validate !== false) {
     const { ok, errors } = validateModel(model);
     if (!ok) {

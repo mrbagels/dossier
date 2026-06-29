@@ -3,6 +3,7 @@
 // ids, broken structure) with path-pointed messages. No dependencies.
 
 import { knownBlockTypes } from "./generate.mjs";
+import { SKINS, skinNames } from "./skins.mjs";
 
 // Required fields per built-in block type (plugins are allowed without required-field checks).
 const REQUIRED = {
@@ -146,6 +147,9 @@ export function validateModel(model) {
   } else {
     if (typeof meta.title !== "string" || !meta.title.trim()) errors.push("meta.title: required non-empty string");
     if (meta.slug !== undefined && !/^[a-z0-9-]+$/.test(meta.slug)) errors.push(`meta.slug: must be kebab-case ([a-z0-9-]); got ${JSON.stringify(meta.slug)}`);
+    if (meta.skin !== undefined && (typeof meta.skin !== "string" || !SKINS[meta.skin])) {
+      errors.push(`meta.skin: unknown skin ${JSON.stringify(meta.skin)} (supported: ${skinNames().join(", ")})`);
+    }
   }
   walk(model.blocks, "blocks", errors, new Set(knownBlockTypes()), new Set());
   return { ok: errors.length === 0, errors };

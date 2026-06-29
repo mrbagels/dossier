@@ -10,6 +10,7 @@ This checklist covers the `0.5.x` functionality closeout:
 |---|---|
 | Core rendering | Sample and showcase build to self-contained HTML and Markdown. |
 | Reader UX | TOC, search, command palette, theme toggle, copy controls, anchors, collapsed sections. |
+| Presentation | Default theme, theme pack flags, `meta.theme` overrides, and `console-slate` skin. |
 | Process workflows | `process-board`, `code-editor`, `patch-set`, `diff-view`, `verification-run`, `release-checklist`, `process-receipt`. |
 | Trust workflows | `trust-report`, `receipt`, `evidence-log`, source/claim/evidence linkage. |
 | Agent access | MCP render, validate, read packets, apply packets, record run, record claim, closeout. |
@@ -33,7 +34,8 @@ node bin/dossier.mjs validate examples/showcase.dossier.json
 node bin/dossier.mjs validate docs/product/process-dossiers/process-dossiers-scope.dossier.json
 node bin/dossier.mjs build examples/sample.dossier.json
 node bin/dossier.mjs build examples/showcase.dossier.json
-node bin/dossier.mjs publish examples --out /tmp/dossier-public-qa
+node bin/dossier.mjs build examples/sample.dossier.json --theme forest --skin console-slate
+node bin/dossier.mjs publish examples --out /tmp/dossier-public-qa --theme ocean --skin console-slate
 git diff --check
 npm pack --dry-run --json
 ```
@@ -67,6 +69,8 @@ Verify:
 - Search filters visible TOC/content.
 - Command palette opens with Cmd/Ctrl-K and closes with Escape.
 - Theme toggle switches light/dark.
+- `examples/showcase.html` has the Console Slate skin, including wider layout, fused stat strip, and topbar polish.
+- A document built with `--theme forest --skin console-slate` keeps the skin while applying the final theme token overrides.
 - Copy buttons copy block text.
 - Export menu can copy Markdown, digest, and JSON.
 - Source modal opens and closes.

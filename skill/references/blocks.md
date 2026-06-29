@@ -8,6 +8,21 @@ Process packet collections require stable kebab-case ids on their nested items:
 `candidates`, `items`, `patches`, `runs`, `findings`, `threads`, `cycles`, `gates`,
 `decisions`, `sources`, and `claims`.
 
+## document presentation
+```json
+{
+  "meta": {
+    "title": "Release packet",
+    "skin": "console-slate",
+    "theme": {
+      "accent": "#2563eb"
+    }
+  }
+}
+```
+Use `skin: "console-slate"` for the denser production skin. Use `theme` for final
+CSS token overrides; theme values win after the base CSS and selected skin.
+
 ## hero, page opener (use one, first)
 ```json
 { "type": "hero", "eyebrow": "Kicker", "title": "The headline",

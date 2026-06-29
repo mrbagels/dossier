@@ -20,6 +20,7 @@ export interface DossierMeta {
   tags?: string[];
   baseUrl?: string;
   theme?: Record<string, string>;
+  skin?: "console-slate";
   features?: Record<string, boolean>;
   lifecycle?: Lifecycle;
   changelog?: ChangelogEntry[];

@@ -34,6 +34,12 @@ test("validation catches unknown types and missing fields", () => {
   assert.ok(r.errors.some((e) => /missing required "code"/.test(e)));
 });
 
+test("validation catches unknown presentation skins", () => {
+  const r = validateModel({ dossierVersion: "1.0", meta: { title: "Bad skin", skin: "console-sltae" }, blocks: [] });
+  assert.equal(r.ok, false);
+  assert.ok(r.errors.some((e) => /meta\.skin: unknown skin/.test(e)));
+});
+
 test("validation catches nested packet ids that agents depend on", () => {
   const r = validateModel({
     dossierVersion: "1.0",
@@ -317,6 +323,14 @@ test("process packet markup preserves current state for export and import", asyn
 
 test("mcp helpers normalize packets and validate writes before touching disk", async () => {
   const { handleTool } = await import("../mcp/server.mjs");
+  const rendered = await handleTool("dossier_render", {
+    model: { dossierVersion: "1.0", meta: { title: "Rendered" }, blocks: [] },
+    theme: "forest",
+    skin: "console-slate",
+  });
+  assert.ok(rendered.content[1].text.includes('data-skin="console-slate"'), "MCP render applies skin flag");
+  assert.ok(rendered.content[1].text.includes("--ds-accent: #2f7d55"), "MCP render applies theme flag");
+
   const release = await handleTool("dossier_read_release", {
     release: {
       schema: "dossier.release/v1",
@@ -494,11 +508,34 @@ test("renderer sanitizes hostile input (href schemes, theme vars, ragged rows)",
       { type: "table", columns: ["A"], rows: [["fine"], "notarow", null] },
     ],
   });
-  const themeDecl = html.match(/<style>:root\{([^}]*)\}/)[1]; // the injected theme vars only
+  const style = html.match(/<style>([\s\S]*?)<\/style>/)[1];
+  const themeDecl = [...style.matchAll(/:root\{([^}]*)\}/g)].map((m) => m[1]).find((decl) => decl.includes("--ds-accent: red"));
   assert.ok(!/href="javascript:/.test(html), "javascript: href is neutralized");
   assert.ok(html.includes('href="https://example.com"'), "safe href passes through");
+  assert.ok(themeDecl, "the sanitized document theme declaration is present");
   assert.ok(!themeDecl.includes("{") && !themeDecl.includes("<"), "theme value cannot break out of its CSS declaration");
   assert.ok(html.includes("<td>fine</td>"), "valid row renders; non-array rows do not crash");
+});
+
+test("presentation options layer base CSS, skin CSS, and document theme overrides", async () => {
+  const model = {
+    dossierVersion: "1.0",
+    meta: { title: "Styled", slug: "styled", theme: { accent: "#123456" } },
+    blocks: [{ type: "hero", title: "Styled", sideCards: [{ label: "Skin", value: "Console Slate" }] }],
+  };
+  const { html } = await generate(model, { theme: "amber", skin: "console-slate" });
+  const style = html.match(/<style>([\s\S]*?)<\/style>/)[1];
+  assert.ok(html.includes('data-skin="console-slate"'), "HTML records the active skin");
+  assert.ok(style.includes("skin:console-slate"), "skin CSS is present");
+  assert.ok(
+    style.indexOf("--ds-accent:#c81e4a") < style.indexOf("skin:console-slate") &&
+      style.indexOf("skin:console-slate") < style.lastIndexOf("--ds-accent: #123456"),
+    "cascade order is base CSS, then skin, then explicit meta.theme"
+  );
+  assert.ok(style.includes("--ds-accent-2: #a06409"), "theme pack tokens are merged when not overridden");
+  const island = JSON.parse(html.match(/id="dossier-model">([\s\S]*?)<\/script>/)[1].replace(/\\u003c/g, "<"));
+  assert.equal(island.meta.skin, "console-slate");
+  assert.equal(island.meta.theme.accent, "#123456");
 });
 
 test("author-supplied _svg/_math fields are dropped (no raw HTML injection)", async () => {
@@ -556,12 +593,15 @@ test("publish builds a static dossier site with catalog index", async () => {
   const out = join(d, "public");
   writeFileSync(join(d, "a.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "A", slug: "a" }, blocks: [{ type: "prose", markdown: "see [[b]]" }] }, null, 2));
   writeFileSync(join(d, "b.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "B", slug: "b" }, blocks: [{ type: "callout", body: "B" }] }, null, 2));
-  const result = await publishDir(d, { out, title: "Published" });
+  const result = await publishDir(d, { out, title: "Published", theme: "forest", skin: "console-slate" });
   assert.equal(result.docs.length, 2);
   assert.ok(existsSync(join(out, "a.html")), "published document html");
   assert.ok(existsSync(join(out, "a.md")), "published document markdown");
   assert.ok(existsSync(join(out, "index.html")), "published catalog html");
   assert.ok(existsSync(join(out, "index.dossier.json")), "published catalog source");
+  const html = readFileSync(join(out, "a.html"), "utf8");
+  assert.ok(html.includes('data-skin="console-slate"'), "publish applies skin flag");
+  assert.ok(html.includes("--ds-accent: #2f7d55"), "publish applies theme flag");
 });
 
 test("diff detects added and changed blocks", () => {

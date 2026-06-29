@@ -96,7 +96,7 @@ npm run site
 
 | Example | Source | What it showcases | Use it when |
 |---|---|---|---|
-| [Block showcase](examples/showcase.html) | [`examples/showcase.dossier.json`](examples/showcase.dossier.json) | All 42 blocks, reader controls, export packets, process blocks, trust reports. | You want to inspect the full product surface. |
+| [Block showcase](examples/showcase.html) | [`examples/showcase.dossier.json`](examples/showcase.dossier.json) | All 42 blocks, Console Slate skin, reader controls, export packets, process blocks, trust reports. | You want to inspect the full product surface. |
 | [System overview](examples/dossier-overview.html) | [`examples/sample.dossier.json`](examples/sample.dossier.json) | Compact overview, hero, stats, flow, tables, and core export behavior. | You want the smallest useful starting point. |
 | [Product launch](examples/product-launch.html) | [`examples/product-launch.dossier.json`](examples/product-launch.dossier.json) | Product microsite, hero media, FAQ, launch claims, and polished public copy. | You need a product page, feature brief, or launch note. |
 | [Research brief](examples/research-brief.html) | [`examples/research-brief.dossier.json`](examples/research-brief.dossier.json) | Decision matrix, assumptions, references, and source-backed trust ledger. | You need research synthesis or competitive analysis. |
@@ -121,6 +121,7 @@ The Pages build also emits a hosted gallery at `examples.html`, with every examp
 | Trust | Structured source records, per-claim status and confidence, source/evidence links, MCP trust readback. |
 | Publishing | `catalog` and `publish` commands for static dossier sites. |
 | Export | HTML, Markdown, DOCX, PDF through Playwright, plus React SSR/components. |
+| Presentation | Theme packs, per-document `meta.theme` tokens, and the opt-in `console-slate` skin. |
 | Extensibility | Plugin renderer registry for Node and React block components. |
 
 ## How Dossier Works
@@ -134,7 +135,8 @@ Dossier has one source of truth: the JSON model.
   "meta": {
     "title": "Session refactor",
     "slug": "session-refactor",
-    "status": "review"
+    "status": "review",
+    "skin": "console-slate"
   },
   "blocks": [
     { "type": "hero", "title": "Session refactor", "lede": "A bounded implementation packet." },
@@ -173,6 +175,32 @@ The generated HTML includes:
 - `#dossier-digest`: a compact agent-readable digest.
 - Inlined CSS and runtime JavaScript.
 - No external assets or remote scripts.
+
+## Themes And Skins
+
+Themes are token packs. Skins are fuller layout and component treatments.
+
+```bash
+dossier build my-doc.dossier.json --theme forest
+dossier build my-doc.dossier.json --skin console-slate
+dossier publish docs --out site --theme ocean --skin console-slate
+```
+
+You can also set presentation in the model:
+
+```json
+{
+  "meta": {
+    "title": "Release packet",
+    "skin": "console-slate",
+    "theme": {
+      "accent": "#2563eb"
+    }
+  }
+}
+```
+
+Cascade order is deliberate: base CSS, then the selected skin, then `meta.theme`. That means a skin can change density and component shape, while a project can still override final tokens such as `accent`, `bg`, or `frame`.
 
 ## Agent Workflows
 
@@ -296,12 +324,12 @@ Every block has a copy-paste example in [`skill/references/blocks.md`](skill/ref
 | Command | What it does |
 |---|---|
 | `dossier init [name] --kind <kind>` | Scaffold from a starter. |
-| `dossier build <file> [--watch] [--plugin a,b]` | Validate and render to `<slug>.html` plus `<slug>.md`. |
+| `dossier build <file> [--watch] [--plugin a,b] [--theme <pack>] [--skin console-slate]` | Validate and render to `<slug>.html` plus `<slug>.md`. |
 | `dossier serve <file> [--open] [--port]` | Build, serve, live reload, and enable save-back tools. |
 | `dossier validate <file>` | Validate a model without rendering. |
 | `dossier diff <old> <new>` | Structural diff between two dossier models. |
 | `dossier catalog <dir>` | Build an index model for a folder of dossiers. |
-| `dossier publish <dir> --out site` | Build every dossier plus an `index.html` catalog into a static site. |
+| `dossier publish <dir> --out site [--theme <pack>] [--skin console-slate]` | Build every dossier plus an `index.html` catalog into a static site. |
 | `dossier export <file> --format docx\|md\|pdf` | Export to Word, Markdown, or PDF. |
 | `dossier mcp` | Run the MCP server over stdio. |
 

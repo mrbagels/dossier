@@ -12,7 +12,8 @@ const { html, md, digest } = await renderDossier(model); // model: DossierModel
 ```
 
 Reuses the core design system, client runtime, and build-time enrichment (Shiki +
-Graphviz), so the output matches the Node generator. CLI:
+Graphviz), so the output matches the Node generator. `model.meta.skin` and
+`model.meta.theme` are honored by the shared shell. CLI:
 
 ```bash
 npx tsx src/cli.tsx ../examples/sample.dossier.json   # -> *.react.html

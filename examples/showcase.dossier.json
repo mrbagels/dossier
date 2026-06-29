@@ -18,6 +18,7 @@
       "blocks"
     ],
     "baseUrl": "https://mrbagels.github.io/dossier",
+    "skin": "console-slate",
     "lifecycle": {
       "stage": "durable",
       "note": "Every block type, in one self-contained file."
