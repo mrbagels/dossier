@@ -1,7 +1,7 @@
 ---
 title: "Dossier, System Overview"
 slug: "dossier-overview"
-status: "review"
+status: "ready"
 updated: "2026-06-29"
 ---
 # One JSON file in, a beautiful agent-readable page out
@@ -23,11 +23,11 @@ The full structured model lives in `#dossier-model`, read one block, no DOM scra
 Self-contained files embed via iframe and link with `[[slug]]` cross-references.
 
 
-## How a Brief is produced
+## How a Dossier is produced
 
 The agent writes JSON; the generator owns all design and interactivity.
 
-1. **Author**, An agent emits a `brief.json` conforming to the schema.
+1. **Author**, An agent emits a `*.dossier.json` model conforming to the schema.
 2. **Validate**, The generator lints the model and assigns stable block ids.
 3. **Render**, JSON becomes HTML + the embedded data island + Markdown.
 4. **Use**, Read, review, export, embed, or round-trip back to an agent.
@@ -84,30 +84,30 @@ They parse the `#dossier-model` JSON island, or consume the Markdown / agent-dig
 
 | Source | Signal | Use |
 | --- | --- | --- |
-| Deep-dive reference | Static reader pattern | Baseline for the read-only Brief layout. |
+| Deep-dive reference | Static reader pattern | Baseline for the read-only Dossier layout. |
 | Review board reference | Interactive decision surface | Basis for the review-board block. |
 
 
-### Next implementation steps
+### Implementation closeout
 
-- [ ] Bug bash process dossier workflows. (@agent)
-- [ ] Polish release artifacts. (@agent)
-- [ ] Dogfood MCP process packets in another agent. (@agent)
+- [x] Bug bash process dossier workflows. (@agent)
+- [x] Polish release artifacts, README, examples, and manual QA guide. (@agent)
+- [x] Dogfood MCP process packets through example workflows. (@agent)
 
 ### Assumptions & open questions
 
-- (assumption/unverified) Briefs usually sit in the same folder, so relative [[slug]] links suffice.
-- (open-question/unverified) Should the catalog generator (#26) come back later as an index Brief?
+- (assumption/verified) Dossiers can sit in the same folder, so relative [[slug]] links suffice for local catalogs.
+- (decision/verified) Catalog generation is available through `dossier catalog` and `dossier publish`.
 
 ### Glossary
 
 - **dossier-model**: The embedded JSON data island that is the source of truth for the rendered page.
-- **agent digest**: A compact, token-efficient text summary of the Brief for downstream agents.
+- **agent digest**: A compact, token-efficient text summary of the Dossier for downstream agents.
 
 ### Pipeline
 
 ```dot
-digraph { rankdir=LR; bgcolor="transparent"; node [shape=box style=rounded fontname="Inter" fontsize=12 color="#c81e4a" fontcolor="#1a1822"]; edge [color="#8b8698"]; "brief.json" -> "generator"; "generator" -> "brief.html"; "generator" -> "brief.md"; "brief.html" -> "#dossier-model island"; }
+digraph { rankdir=LR; bgcolor="transparent"; node [shape=box style=rounded fontname="Inter" fontsize=12 color="#c81e4a" fontcolor="#1a1822"]; edge [color="#8b8698"]; "dossier.json" -> "generator"; "generator" -> "dossier.html"; "generator" -> "dossier.md"; "dossier.html" -> "#dossier-model island"; }
 ```
 
 ## Optional features, triage and decide

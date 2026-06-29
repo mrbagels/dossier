@@ -6,15 +6,16 @@
     "title": "Dossier, System Overview",
     "slug": "dossier-overview",
     "crumbs": ["Dossier", "Overview"],
-    "status": "review",
+    "status": "ready",
     "owner": "Kyle",
     "project": "Dossier",
     "updated": "2026-06-29",
-    "version": "0.1.0",
+    "version": "0.5.4",
     "tags": ["docs", "tooling", "design-system"],
-    "lifecycle": { "stage": "review", "note": "First end-to-end render of the kit.", "promoteTo": "durable" },
+    "lifecycle": { "stage": "durable", "note": "Overview of the public Dossier surface after the process workflow closeout.", "promoteTo": "durable" },
     "changelog": [
-      { "version": "0.1.0", "date": "2026-06-26", "summary": "Initial generator + catalog", "changes": ["Schema", "Generator", "Catalog", "Selected features"] }
+      { "version": "0.5.4", "date": "2026-06-29", "summary": "Process dossiers, live editing, gallery examples, and public QA docs", "changes": ["Process blocks", "MCP packets", "CodeMirror live editor", "Release and incident workflows"] },
+      { "version": "0.1.0", "date": "2026-06-26", "summary": "Initial generator and catalog", "changes": ["Schema", "Generator", "Catalog", "Selected features"] }
     ]
   },
   "blocks": [
@@ -23,11 +24,11 @@
       "eyebrow": "Documentation kit",
       "title": "One JSON file in, a beautiful agent-readable page out",
       "lede": "Dossier renders a single document model into a self-contained, themed, interactive HTML artifact. The page you see is a projection of the embedded **[[dossier-model]]** data island, so agents read one block while humans get the rendered view.",
-      "pills": ["Self-contained", "Light + dark", "Markdown + JSON export", "Embeddable", "Zero-dep"],
+      "pills": ["Self-contained", "Light + dark", "Markdown + JSON export", "Embeddable", "Agent-readable"],
       "sideCards": [
-        { "label": "Status", "value": "Review", "note": "First full render of the catalog." },
+        { "label": "Status", "value": "Ready", "note": "Process workflows, gallery examples, and QA docs are in place." },
         { "label": "Render model", "value": "Hybrid", "note": "Static HTML + JSON island + minimal JS." },
-        { "label": "Footprint", "value": "Zero deps", "note": "Runs anywhere Node 18+ does." }
+        { "label": "Static artifact", "value": "Offline", "note": "Generated HTML has no external network dependency." }
       ]
     },
     {
@@ -49,13 +50,13 @@
     },
     {
       "type": "section",
-      "title": "How a Brief is produced",
+      "title": "How a Dossier is produced",
       "subtitle": "The agent writes JSON; the generator owns all design and interactivity.",
       "blocks": [
         {
           "type": "flow",
           "steps": [
-            { "title": "Author", "body": "An agent emits a `brief.json` conforming to the schema." },
+            { "title": "Author", "body": "An agent emits a `*.dossier.json` model conforming to the schema." },
             { "title": "Validate", "body": "The generator lints the model and assigns stable block ids." },
             { "title": "Render", "body": "JSON becomes HTML + the embedded data island + Markdown." },
             { "title": "Use", "body": "Read, review, export, embed, or round-trip back to an agent." }
@@ -98,7 +99,7 @@
             {
               "label": "Authoring",
               "blocks": [
-                { "type": "code", "lang": "bash", "filename": "build a brief", "code": "node bin/dossier.mjs build examples/sample.dossier.json\n# -> writes dossier-overview.html + .md" }
+                { "type": "code", "lang": "bash", "filename": "build a dossier", "code": "node bin/dossier.mjs build examples/sample.dossier.json\n# -> writes dossier-overview.html + .md" }
               ]
             },
             {
@@ -132,7 +133,7 @@
         {
           "type": "references",
           "items": [
-            { "label": "Deep-dive reference", "signal": "Static reader pattern", "use": "Baseline for the read-only Brief layout." },
+            { "label": "Deep-dive reference", "signal": "Static reader pattern", "use": "Baseline for the read-only Dossier layout." },
             { "label": "Review board reference", "signal": "Interactive decision surface", "use": "Basis for the review-board block." }
           ]
         }
@@ -140,32 +141,32 @@
     },
     {
       "type": "action-items",
-      "title": "Next implementation steps",
+      "title": "Implementation closeout",
       "items": [
-        { "title": "Bug bash process dossier workflows.", "owner": "agent", "status": "todo" },
-        { "title": "Polish release artifacts.", "owner": "agent", "status": "todo" },
-        { "title": "Dogfood MCP process packets in another agent.", "owner": "agent", "status": "todo" }
+        { "title": "Bug bash process dossier workflows.", "owner": "agent", "status": "done" },
+        { "title": "Polish release artifacts, README, examples, and manual QA guide.", "owner": "agent", "status": "done" },
+        { "title": "Dogfood MCP process packets through example workflows.", "owner": "agent", "status": "done" }
       ]
     },
     {
       "type": "assumptions",
       "items": [
-        { "statement": "Briefs usually sit in the same folder, so relative [[slug]] links suffice.", "kind": "assumption", "status": "unverified" },
-        { "statement": "Should the catalog generator (#26) come back later as an index Brief?", "kind": "open-question", "status": "unverified" }
+        { "statement": "Dossiers can sit in the same folder, so relative [[slug]] links suffice for local catalogs.", "kind": "assumption", "status": "verified" },
+        { "statement": "Catalog generation is available through `dossier catalog` and `dossier publish`.", "kind": "decision", "status": "verified" }
       ]
     },
     {
       "type": "glossary",
       "terms": [
         { "term": "dossier-model", "definition": "The embedded JSON data island that is the source of truth for the rendered page." },
-        { "term": "agent digest", "definition": "A compact, token-efficient text summary of the Brief for downstream agents." }
+        { "term": "agent digest", "definition": "A compact, token-efficient text summary of the Dossier for downstream agents." }
       ]
     },
     {
       "type": "diagram",
       "title": "Pipeline",
       "format": "dot",
-      "spec": "digraph { rankdir=LR; bgcolor=\"transparent\"; node [shape=box style=rounded fontname=\"Inter\" fontsize=12 color=\"#c81e4a\" fontcolor=\"#1a1822\"]; edge [color=\"#8b8698\"]; \"brief.json\" -> \"generator\"; \"generator\" -> \"brief.html\"; \"generator\" -> \"brief.md\"; \"brief.html\" -> \"#dossier-model island\"; }"
+      "spec": "digraph { rankdir=LR; bgcolor=\"transparent\"; node [shape=box style=rounded fontname=\"Inter\" fontsize=12 color=\"#c81e4a\" fontcolor=\"#1a1822\"]; edge [color=\"#8b8698\"]; \"dossier.json\" -> \"generator\"; \"generator\" -> \"dossier.html\"; \"generator\" -> \"dossier.md\"; \"dossier.html\" -> \"#dossier-model island\"; }"
     },
     {
       "type": "review-board",

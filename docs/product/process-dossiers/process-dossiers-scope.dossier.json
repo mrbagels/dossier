@@ -237,7 +237,7 @@
         },
         {
           "type": "action-items",
-          "title": "Immediate next commits",
+          "title": "Completed milestone commits",
           "items": [
             { "title": "Commit M0 product scope packet.", "owner": "Codex", "status": "done" },
             { "title": "Commit M1 process kinds, starters, README and skill positioning.", "owner": "Codex", "status": "done" },
@@ -297,11 +297,11 @@
         },
         {
           "type": "assumptions",
-          "title": "Open decisions",
+          "title": "Settled direction",
           "items": [
             { "statement": "Use CodeMirror 6 as the default live editor enhancer in `dossier serve`, while static artifacts keep the textarea fallback.", "kind": "decision", "status": "verified" },
             { "statement": "Reserve Monaco for a future hosted Studio or Lumen integration where bundle size and worker setup are acceptable.", "kind": "decision", "status": "verified" },
-            { "statement": "A tiny first-party unified diff renderer may be enough for M3, with a library adopted only if inline comments and complex hunk mapping require it.", "kind": "assumption", "status": "unverified" },
+            { "statement": "The first-party unified diff parser and renderer is enough for the current patch and diff review surface.", "kind": "decision", "status": "verified" },
             { "statement": "Dossier should remain useful without Lumen, but become more powerful when Lumen or another host consumes the same MCP/process contracts.", "kind": "assumption", "status": "verified" }
           ]
         }

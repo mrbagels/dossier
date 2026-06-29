@@ -208,7 +208,7 @@ Commit boundaries should map to user-visible product increments and keep rollbac
 - **M7** (done), Integration-loop dossiers: producer/consumer packet templates, cycle control, upstream response, integration report, and closeout examples.
 - **M8** (done), Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, release readiness, and incident closeout blocks.
 
-### Immediate next commits
+### Completed milestone commits
 
 - [x] Commit M0 product scope packet. (@Codex)
 - [x] Commit M1 process kinds, starters, README and skill positioning. (@Codex)
@@ -253,11 +253,11 @@ Going all in still needs crisp boundaries.
 | OSS license leakage from farming AGPL/GPL projects. | medium | high | Record license posture per source. Copy permissive code only; use AGPL/GPL as pattern or sidecar only unless deliberately accepted. |
 | Too many block types before one loop is excellent. | medium | medium | Build implementation dossier first end to end, then generalize to integration loops and release/incident kinds. |
 
-### Open decisions
+### Settled direction
 
 - (decision/verified) Use CodeMirror 6 as the default live editor enhancer in `dossier serve`, while static artifacts keep the textarea fallback.
 - (decision/verified) Reserve Monaco for a future hosted Studio or Lumen integration where bundle size and worker setup are acceptable.
-- (assumption/unverified) A tiny first-party unified diff renderer may be enough for M3, with a library adopted only if inline comments and complex hunk mapping require it.
+- (decision/verified) The first-party unified diff parser and renderer is enough for the current patch and diff review surface.
 - (assumption/verified) Dossier should remain useful without Lumen, but become more powerful when Lumen or another host consumes the same MCP/process contracts.
 
 
