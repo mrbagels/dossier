@@ -17,6 +17,9 @@ export function setCtx(ctx: any) {
 const md = (t?: string) => ({ __html: inlineMd(t ?? "", CTX) });
 const raw = (h?: string) => ({ __html: h ?? "" });
 const PROCESS_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "split", "retry", "block"];
+const REVIEW_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "block"];
+const detailRows = (rows: Array<[string, any]>): [string, string][] =>
+  rows.filter(([, v]) => v !== undefined && v !== null && String(v).trim()).map(([k, v]) => [k, String(v)]);
 
 const CopyIcon = (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -236,13 +239,22 @@ const DiffViewInner: React.FC<{ b: B; nested?: boolean }> = ({ b, nested = false
       <div className="ds-diff-body">
         {files.length > 0 ? files.map((file: any, i: number) => {
           const label = diffFileLabel(file);
+          const fileKey = `${b.id}:${label}`;
           return (
-            <details className="ds-diff-file" id={`${b.id}-${slugify(label)}`} open key={i}>
+            <details className="ds-diff-file" id={`${b.id}-${slugify(label)}`} data-diff-file={fileKey} open key={i}>
               <summary><span className="ds-diff-path">{label}</span><span className="ds-diff-stat">+{file.additions} -{file.deletions}</span></summary>
+              <div className="ds-diff-review">
+                <label><span>File verdict</span><select data-diff-file-verdict={fileKey}>{REVIEW_VERDICTS.map((v) => <option value={v} key={v}>{v}</option>)}</select></label>
+                <label><span>File comment</span><textarea data-diff-file-comment={fileKey} placeholder="File-level review note" /></label>
+              </div>
               {file.meta.length > 0 && <div className="ds-diff-meta-lines">{file.meta.map((line: string, j: number) => <code key={j}>{line}</code>)}</div>}
               {file.hunks.map((hk: any, h: number) => (
-                <div className="ds-hunk" key={h}>
-                  <div className="ds-hunk-head">{hk.header}</div>
+                <div className="ds-hunk" data-diff-hunk={`${fileKey}:h${h + 1}`} key={h}>
+                  <div className="ds-hunk-head">
+                    <span>{hk.header}</span>
+                    <label><span>Hunk verdict</span><select data-diff-hunk-verdict={`${fileKey}:h${h + 1}`}>{REVIEW_VERDICTS.map((v) => <option value={v} key={v}>{v}</option>)}</select></label>
+                  </div>
+                  <textarea className="ds-diff-comment" data-diff-hunk-comment={`${fileKey}:h${h + 1}`} placeholder="Hunk comment or requested change" />
                   <pre className="ds-diff-lines"><code>{hk.lines.map((line: any, j: number) => (
                       <span className={`ds-diff-line ${line.type}`} key={j}>
                         <span className="ds-diff-num">{line.oldNumber}</span>
@@ -256,6 +268,10 @@ const DiffViewInner: React.FC<{ b: B; nested?: boolean }> = ({ b, nested = false
             </details>
           );
         }) : <pre className="ds-diff-empty"><code>{b.diff || ""}</code></pre>}
+      </div>
+      <div className="ds-codeedit-actions">
+        <button className="ds-btn ds-btn-line" type="button" data-export-diff-review>Export diff review JSON</button>
+        <button className="ds-btn ds-btn-line" type="button" data-import-diff-review>Import</button>
       </div>
     </section>
   );
@@ -271,26 +287,36 @@ const PatchSet: React.FC<{ b: B }> = ({ b }) => (
         if (p.operation) chips.push(p.operation);
         if (p.status) chips.push(p.status);
         if (p.risk) chips.push(`Risk · ${p.risk}`);
+        const patchId = p.id || slugify(p.title || "patch");
+        const reviewVerdict = REVIEW_VERDICTS.includes((p as any).review || "") ? (p as any).review : "undecided";
         const rows: [string, string][] = [];
         if (p.files?.length) rows.push(["Files", p.files.join(", ")]);
         if (p.workItems?.length) rows.push(["Work items", p.workItems.join(", ")]);
         if (p.verification?.length) rows.push(["Verification", p.verification.join(", ")]);
         Object.entries(p.details || {}).forEach(([k, v]) => rows.push([k, v]));
         return (
-          <article className="ds-patch" data-patch={p.id} key={p.id || i}>
+          <article className="ds-patch" data-patch={patchId} key={patchId || i}>
             <div className="ds-patch-head">
               <div><h4>{p.title || p.id || "Patch"}</h4>{p.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(p.summary)} />}</div>
               {chips.length > 0 && <div className="ds-chips">{chips.map((x, j) => <span className="ds-chip" key={j}>{x}</span>)}</div>}
+            </div>
+            <div className="ds-patch-review">
+              <label><span>Patch verdict</span><select data-patch-verdict={patchId} defaultValue={reviewVerdict}>{REVIEW_VERDICTS.map((v) => <option value={v} key={v}>{v}</option>)}</select></label>
+              <label><span>Review notes</span><textarea data-patch-notes={patchId} placeholder="Apply, revise, skip, or follow-up notes" defaultValue={(p as any).notes || ""} /></label>
             </div>
             {rows.length > 0 && (
               <dl className="ds-detailgrid">
                 {rows.map(([k, v], j) => <div className="ds-detail" key={j}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>)}
               </dl>
             )}
-            {p.diff && <DiffViewInner b={{ type: "diff-view", id: `${p.id || slugify(p.title || "patch")}-diff`, title: "Diff", diff: p.diff }} nested />}
+            {p.diff && <DiffViewInner b={{ type: "diff-view", id: `${patchId}-diff`, title: "Diff", diff: p.diff }} nested />}
           </article>
         );
       })}
+    </div>
+    <div className="ds-codeedit-actions">
+      <button className="ds-btn ds-btn-line" type="button" data-export-patch-review>Export patch review JSON</button>
+      <button className="ds-btn ds-btn-line" type="button" data-import-patch-review>Import</button>
     </div>
   </Wrap>
 );
@@ -558,7 +584,7 @@ const ProcessItem: React.FC<{ item: ProcessItemModel }> = ({ item }) => {
               )}
             </div>
           )}
-          <label className="ds-notes"><span>Notes</span><textarea data-process-notes={item.id} placeholder="Verdict notes, constraints, follow-up instructions" /></label>
+          <label className="ds-notes"><span>Notes</span><textarea data-process-notes={item.id} placeholder="Verdict notes, constraints, follow-up instructions" defaultValue={(item as any).notes || ""} /></label>
         </div>
       </div>
     </article>
@@ -580,6 +606,167 @@ const ProcessBoard: React.FC<{ b: B }> = ({ b }) => (
       {(b.items || []).map((item: ProcessItemModel, i: number) => <ProcessItem item={item} key={item.id || i} />)}
     </div>
   </section>
+);
+
+const SimpleProcessList: React.FC<{ items?: any[]; cls: string }> = ({ items = [], cls }) => (
+  <div className="ds-process-list">
+    {items.map((it: any, i: number) => {
+      const chips: string[] = [];
+      ["status", "severity", "kind", "trust", "owner", "producer", "consumer"].forEach((k) => { if (it[k]) chips.push(`${k} · ${it[k]}`); });
+      const title = it.title || it.label || it.id || "Item";
+      const body = it.body || it.summary || it.response || it.rationale || it.notes || "";
+      const rows: [string, string][] = [];
+      ["source", "created", "command", "expected", "actual", "decision", "recommendation", "request", "nextStep"].forEach((k) => {
+        if (it[k]) rows.push([k.replace(/[A-Z]/g, (m: string) => " " + m.toLowerCase()), it[k]]);
+      });
+      if (it.files?.length) rows.push(["files", it.files.join(", ")]);
+      if (it.artifacts?.length) rows.push(["artifacts", it.artifacts.join(", ")]);
+      if (it.links?.length) rows.push(["links", it.links.join(", ")]);
+      return (
+        <article className={`ds-process-card ${cls}`} key={it.id || i}>
+          <div className="ds-process-card-head">
+            <div><h4>{title}</h4>{body && <p className="ds-muted" dangerouslySetInnerHTML={md(body)} />}</div>
+            {chips.length > 0 && <div className="ds-chips">{chips.map((x, j) => <span className="ds-chip" key={j}>{x}</span>)}</div>}
+          </div>
+          {rows.length > 0 && (
+            <dl className="ds-detailgrid">
+              {rows.map(([k, v], j) => <div className="ds-detail" key={j}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>)}
+            </dl>
+          )}
+        </article>
+      );
+    })}
+  </div>
+);
+
+const VerificationRun: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="verification-run" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    {b.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(b.summary)} />}
+    <SimpleProcessList items={(b.runs || []).map((r: any) => ({ ...r, body: r.notes || r.summary, kind: r.status }))} cls="ds-vrun" />
+  </Wrap>
+);
+
+const EvidenceLog: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="evidence-log" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <SimpleProcessList items={b.items || []} cls="ds-evidence" />
+  </Wrap>
+);
+
+const VerdictGate: React.FC<{ b: B }> = ({ b }) => {
+  const id = b.gateId || b.id || slugify(b.title || "verdict-gate");
+  const options = b.options || PROCESS_VERDICTS;
+  return (
+    <Wrap type="verdict-gate" id={b.id}>
+      <Heading id={b.id} text={b.title} />
+      {b.prompt && <p className="ds-muted" dangerouslySetInnerHTML={md(b.prompt)} />}
+      <div className="ds-gate" data-gate={id}>
+        <label className="ds-process-verdict-wrap"><span>Verdict</span><select className="ds-process-verdict" data-verdict-gate={id} data-verdict-title={b.title || id} defaultValue={b.verdict || "undecided"}>{options.map((v: string) => <option value={v} key={v}>{v}</option>)}</select></label>
+        <label className="ds-notes"><span>Notes</span><textarea data-verdict-notes={id} placeholder="Decision rationale, constraints, follow-up" /></label>
+        <div className="ds-codeedit-actions"><button className="ds-btn ds-btn-line" type="button" data-export-verdicts>Export verdicts JSON</button><button className="ds-btn ds-btn-line" type="button" data-import-verdicts>Import</button></div>
+      </div>
+    </Wrap>
+  );
+};
+
+const ProcessReceipt: React.FC<{ b: B }> = ({ b }) => {
+  const rows = detailRows([
+    ["outcome", b.outcome],
+    ["owner", b.owner],
+    ["date", b.date],
+    ["model", b.model],
+    ["changed files", b.changedFiles?.join(", ")],
+    ["commands", b.commands?.join(", ")],
+    ["risks", b.risks?.join(", ")],
+    ["follow ups", b.followUps?.join(", ")],
+  ]);
+  return (
+    <Wrap type="process-receipt" id={b.id}>
+      <aside className="ds-receipt ds-process-receipt">
+        <div className="ds-receipt-head">{b.title || "Process receipt"}</div>
+        {b.summary && <p dangerouslySetInnerHTML={md(b.summary)} />}
+        {rows.length > 0 && <dl className="ds-detailgrid">{rows.map(([k, v], i) => <div className="ds-detail" key={i}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>)}</dl>}
+      </aside>
+    </Wrap>
+  );
+};
+
+const FindingList: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="finding-list" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <SimpleProcessList items={b.findings || []} cls="ds-finding" />
+  </Wrap>
+);
+
+const CommentThread: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="comment-thread" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <div className="ds-process-list">
+      {(b.threads || []).map((t: any, i: number) => (
+        <article className="ds-process-card" key={t.id || i}>
+          <div className="ds-process-card-head"><div><h4>{t.subject || t.id || "Thread"}</h4>{t.status && <p className="ds-muted">{t.status}</p>}</div></div>
+          <ul className="ds-comments">{(t.comments || []).map((c: any, j: number) => <li key={j}><strong>{c.author || "comment"}</strong>{c.created && <span className="ds-muted"> {c.created}</span>}<p dangerouslySetInnerHTML={md(c.body || "")} /></li>)}</ul>
+        </article>
+      ))}
+    </div>
+  </Wrap>
+);
+
+const CycleBoard: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="cycle-board" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <SimpleProcessList items={b.cycles || []} cls="ds-cycle" />
+  </Wrap>
+);
+
+const IntegrationReport: React.FC<{ b: B }> = ({ b }) => {
+  const rows = detailRows([["producer", b.producer], ["consumer", b.consumer], ["status", b.status], ["version", b.version], ["next step", b.nextStep]]);
+  return (
+    <Wrap type="integration-report" id={b.id}>
+      <Heading id={b.id} text={b.title} />
+      {b.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(b.summary)} />}
+      {rows.length > 0 && <dl className="ds-detailgrid">{rows.map(([k, v], i) => <div className="ds-detail" key={i}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>)}</dl>}
+      <SimpleProcessList items={b.items || []} cls="ds-integration" />
+    </Wrap>
+  );
+};
+
+const UpstreamResponse: React.FC<{ b: B }> = ({ b }) => {
+  const rows = detailRows([["upstream", b.upstream], ["status", b.status], ["url", b.url], ["request", b.request], ["response", b.response], ["next step", b.nextStep]]);
+  return (
+    <Wrap type="upstream-response" id={b.id}>
+      <Heading id={b.id} text={b.title} />
+      {rows.length > 0 && <dl className="ds-detailgrid">{rows.map(([k, v], i) => <div className="ds-detail" key={i}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>)}</dl>}
+    </Wrap>
+  );
+};
+
+const ReleaseChecklist: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="release-checklist" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <ul className="ds-actions ds-release-list">
+      {(b.gates || []).map((g: any, i: number) => {
+        const id = g.id || slugify(g.title || "gate");
+        const checked = g.status === "done" || g.status === "passed";
+        return (
+          <li className="ds-action ds-release-gate" data-release-row={id} key={id || i}>
+            <label><input type="checkbox" data-release-gate={id} data-release-title={g.title || id} data-release-required={g.required ? "1" : "0"} defaultChecked={checked} /><span className="ds-action-title" dangerouslySetInnerHTML={md(g.title || id)} /></label>
+            <span className="ds-action-meta">{g.required && <span className="ds-chip">required</span>}<span className={`ds-status s-${slugify(g.status || "todo")}`}>{g.status || "todo"}</span></span>
+            <textarea data-release-notes={id} placeholder="Evidence, approver, blocker" defaultValue={g.evidence || ""} />
+          </li>
+        );
+      })}
+    </ul>
+    <div className="ds-codeedit-actions"><button className="ds-btn ds-btn-line" type="button" data-export-release>Export release JSON</button><button className="ds-btn ds-btn-line" type="button" data-import-release>Import</button></div>
+  </Wrap>
+);
+
+const DecisionLog: React.FC<{ b: B }> = ({ b }) => (
+  <Wrap type="decision-log" id={b.id}>
+    <Heading id={b.id} text={b.title} />
+    <SimpleProcessList items={b.decisions || []} cls="ds-decision" />
+  </Wrap>
 );
 
 const Prose: React.FC<{ b: B }> = ({ b }) => (
@@ -690,6 +877,17 @@ export const Block: React.FC<{ b: B }> = ({ b }) => {
     case "diagram": return <Diagram b={b} />;
     case "review-board": return <ReviewBoard b={b} />;
     case "process-board": return <ProcessBoard b={b} />;
+    case "verification-run": return <VerificationRun b={b} />;
+    case "evidence-log": return <EvidenceLog b={b} />;
+    case "verdict-gate": return <VerdictGate b={b} />;
+    case "process-receipt": return <ProcessReceipt b={b} />;
+    case "finding-list": return <FindingList b={b} />;
+    case "comment-thread": return <CommentThread b={b} />;
+    case "cycle-board": return <CycleBoard b={b} />;
+    case "integration-report": return <IntegrationReport b={b} />;
+    case "upstream-response": return <UpstreamResponse b={b} />;
+    case "release-checklist": return <ReleaseChecklist b={b} />;
+    case "decision-log": return <DecisionLog b={b} />;
     case "figure": return <Figure b={b} />;
     case "math": return <Math b={b} />;
     case "footnotes": return <Footnotes b={b} />;

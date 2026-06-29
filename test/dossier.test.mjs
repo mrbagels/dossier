@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
@@ -519,6 +519,20 @@ test("catalog indexes a folder and finds cross-links", async () => {
   assert.equal(docs.length, 2);
   assert.ok(docs.find((x) => x.slug === "a").links.includes("b"), "cross-link found");
   assert.ok(model.blocks.some((b) => b.type === "table"), "catalog has a document table");
+});
+
+test("publish builds a static dossier site with catalog index", async () => {
+  const { publishDir } = await import("../src/publish.mjs");
+  const d = mkdtempSync(join(tmpdir(), "dossier-publish-"));
+  const out = join(d, "public");
+  writeFileSync(join(d, "a.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "A", slug: "a" }, blocks: [{ type: "prose", markdown: "see [[b]]" }] }, null, 2));
+  writeFileSync(join(d, "b.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "B", slug: "b" }, blocks: [{ type: "callout", body: "B" }] }, null, 2));
+  const result = await publishDir(d, { out, title: "Published" });
+  assert.equal(result.docs.length, 2);
+  assert.ok(existsSync(join(out, "a.html")), "published document html");
+  assert.ok(existsSync(join(out, "a.md")), "published document markdown");
+  assert.ok(existsSync(join(out, "index.html")), "published catalog html");
+  assert.ok(existsSync(join(out, "index.dossier.json")), "published catalog source");
 });
 
 test("diff detects added and changed blocks", () => {

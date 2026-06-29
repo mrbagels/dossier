@@ -5,6 +5,7 @@ import { validateModel } from "./validate.mjs";
 import { THEMES } from "./themes.mjs";
 
 export { generate, validateModel };
+export { publishDir } from "./publish.mjs";
 // Plugin authoring surface.
 export { registerBlock, esc, inlineMd, slugify, chartSvg, knownBlockTypes, parseUnifiedDiff } from "./generate.mjs";
 

@@ -59,6 +59,7 @@ HTML stays in sync with the JSON (round-trip).
 
 Other commands: `dossier validate <file>` (check without rendering), `dossier serve <file>
 --open` (live-reload preview while iterating), `dossier diff <old> <new>` (what changed),
+`dossier publish <dir> --out <dir>` (build a static folder with a catalog index),
 `dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
 and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
 `dossier_render`, `dossier_validate`, `dossier_read_decisions`, `dossier_read_process`,

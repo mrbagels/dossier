@@ -53,6 +53,7 @@ const USAGE = [
   "  dossier validate <file.dossier.json> ... check a model without rendering",
   "  dossier diff <old.json> <new.json>      structural diff between two versions",
   "  dossier catalog <dir>                    index a folder of dossiers (+ link graph)",
+  "  dossier publish <dir> [--out <dir>]      build a static dossier site with catalog index",
   "  dossier export <file> --format docx|md|pdf  export to Word, Markdown, or PDF",
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
@@ -140,6 +141,16 @@ if (cmd === "build" && args.length) {
     writeFileSync(outPath, JSON.stringify(model, null, 2) + "\n");
     const r = await generateFile(outPath, { theme: flags.theme });
     console.log(`✓ ${r.htmlPath}  (${docs.length} documents)`);
+  } catch (e) {
+    console.error("✗ " + e.message);
+    process.exitCode = 1;
+  }
+} else if (cmd === "publish" && args.length) {
+  const { publishDir } = await import("../src/publish.mjs");
+  try {
+    const r = await publishDir(args[0], { out: flags.out, title: flags.title, baseUrl: flags["base-url"], theme: flags.theme });
+    console.log(`✓ published ${r.docs.length} dossier${r.docs.length === 1 ? "" : "s"} to ${r.outDir}`);
+    console.log(`  index: ${r.index.htmlPath}`);
   } catch (e) {
     console.error("✗ " + e.message);
     process.exitCode = 1;
