@@ -437,8 +437,8 @@ git clone https://github.com/mrbagels/dossier.git
 cd dossier
 npm install
 npm test
-node bin/dossier.mjs build examples/sample.dossier.json
-node bin/dossier.mjs build examples/showcase.dossier.json
+node bin/dossier.mjs validate examples/*.dossier.json
+node bin/dossier.mjs build examples/*.dossier.json
 
 cd react
 npm install
@@ -454,7 +454,7 @@ Project map:
 | `schema/` | Document schema and packet schemas. |
 | `mcp/` | MCP server. |
 | `skill/` | Agent skill and block references. |
-| `examples/` | Sample and showcase models. |
+| `examples/` | Gallery models for overview, showcase, product launch, research, implementation, release, and incident workflows. |
 | `docs/product/` | Durable product scope and QA docs. |
 | `.github/workflows/` | CI and Pages demo deployment. |
 
@@ -462,8 +462,8 @@ Before opening a PR or cutting a release:
 
 ```bash
 npm test
-node bin/dossier.mjs validate examples/sample.dossier.json
-node bin/dossier.mjs validate examples/showcase.dossier.json
+node bin/dossier.mjs validate examples/*.dossier.json
+node bin/dossier.mjs build examples/*.dossier.json
 cd react && npx tsc --noEmit
 ```
 

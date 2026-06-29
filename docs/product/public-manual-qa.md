@@ -8,7 +8,7 @@ This checklist covers the `0.5.x` functionality closeout:
 
 | Area | Must verify |
 |---|---|
-| Core rendering | Sample and showcase build to self-contained HTML and Markdown. |
+| Core rendering | Every gallery example builds to self-contained HTML and Markdown. |
 | Reader UX | TOC, search, command palette, theme toggle, copy controls, anchors, collapsed sections. |
 | Presentation | Default theme, theme pack flags, `meta.theme` overrides, and `console-slate` skin. |
 | Process workflows | `process-board`, `code-editor`, `patch-set`, `diff-view`, `verification-run`, `release-checklist`, `process-receipt`. |
@@ -29,11 +29,8 @@ node --check src/generate.mjs
 node --check src/export.mjs
 node --check src/serve.mjs
 node --check mcp/server.mjs
-node bin/dossier.mjs validate examples/sample.dossier.json
-node bin/dossier.mjs validate examples/showcase.dossier.json
-node bin/dossier.mjs validate docs/product/process-dossiers/process-dossiers-scope.dossier.json
-node bin/dossier.mjs build examples/sample.dossier.json
-node bin/dossier.mjs build examples/showcase.dossier.json
+node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json
+node bin/dossier.mjs build examples/*.dossier.json
 node bin/dossier.mjs build examples/showcase.dossier.json --embed
 node bin/dossier.mjs build examples/sample.dossier.json --theme forest --skin console-slate
 node bin/dossier.mjs publish examples --out /tmp/dossier-public-qa --theme ocean --skin console-slate --embed
