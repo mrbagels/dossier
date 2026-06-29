@@ -111,7 +111,7 @@ The Pages build also emits a hosted gallery at `examples.html`, with every examp
 | Area | What is included |
 |---|---|
 | Self-contained output | One HTML file, one Markdown export, embedded JSON model, no view-time network. |
-| Reader UX | Sticky TOC, search, command palette, scroll progress, dark mode, section collapse, copy buttons, heading anchors. |
+| Reader UX | Sticky TOC, search, command palette, scroll progress, dark mode, section collapse, copy buttons, heading anchors, row anchors. |
 | Agent usability | Embedded `#dossier-model`, agent digest, versioned packets, MCP read/write tools, starter templates. |
 | Human control | Review boards, process verdicts, release gates, patch verdicts, diff file and hunk comments. |
 | Editing | In-place text editing, `code-editor` blocks, edit packet export/import, `dossier serve` save-back. |
@@ -161,7 +161,7 @@ Build-time enrichments are baked into the HTML:
 | Shiki code highlighting | Build time | None |
 | Graphviz DOT diagrams | Build time | None |
 | KaTeX math | Build time | None |
-| SVG charts | Build time | None |
+| SVG charts with axes, gridlines, and value labels | Build time | None |
 | Figures | Build time, local images inlined | None |
 | Mermaid diagrams | Optional Playwright path | Browser only for build |
 | PDF export | Optional Playwright path | Browser only for export |
@@ -281,12 +281,12 @@ The saved model is validated before writing. Invalid saves return a 400 and do n
 
 | Group | Blocks |
 |---|---|
-| Structure | `hero`, `section`, `two-col`, `tabs`, `prose` |
-| At a glance | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
+| Structure | `hero`, `section`, `two-col`, `tabs`, `prose` with paragraphs, bullets, and numbered lists |
+| At a glance | `summary-cards`, `stat-strip` with deltas, `flow`, `timeline`, `callout` |
 | Reference | `table`, `code`, `code-editor`, `patch-set`, `diff-view`, `diagram`, `references`, `faq`, `glossary` |
-| Media and data | `figure`, `math`, `chart`, `footnotes` |
+| Media and data | `figure`, `math`, `chart` with static labels, `footnotes` |
 | Decisions | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `verdict-gate`, `decision-log` |
-| Process | `process-board`, `verification-run`, `evidence-log`, `process-receipt`, `finding-list`, `comment-thread`, `cycle-board`, `integration-report`, `upstream-response`, `release-checklist` |
+| Process | `process-board` with row anchors, `verification-run`, `evidence-log`, `process-receipt`, `finding-list`, `comment-thread`, `cycle-board`, `integration-report`, `upstream-response`, `release-checklist` |
 | Trust | `trust-report`, `receipt` |
 
 Every block has a copy-paste example in [`skill/references/blocks.md`](skill/references/blocks.md).

@@ -1,8 +1,9 @@
 # Dossier, block catalog
 
 Every block is an object in `blocks[]` with a `type`. Text fields accept inline
-markdown (`**bold**`, `` `code` ``, `[label](url)`, `[[slug]]`, `[[Term]]`). `id` is
-optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
+markdown (`**bold**`, `` `code` ``, `[label](url)`, `[[slug]]`, `[[Term]]`). `prose`,
+review bodies, and process bodies also render simple `-` bullet lists and numbered
+lists as real lists. `id` is optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 Process packet collections require stable kebab-case ids on their nested items:
 `candidates`, `items`, `patches`, `runs`, `findings`, `threads`, `cycles`, `gates`,
 `decisions`, `sources`, and `claims`.
@@ -17,7 +18,8 @@ Process packet collections require stable kebab-case ids on their nested items:
 
 ## prose, rich text
 ```json
-{ "type": "prose", "heading": "Optional H2", "markdown": "Paragraph one.\n\nParagraph two with **bold**." }
+{ "type": "prose", "heading": "Optional H2",
+  "markdown": "Paragraph one.\n\n- Bullet with **bold**\n- Bullet with `code`\n\n1. First step\n2. Second step" }
 ```
 
 ## section, titled container (nests blocks)
@@ -41,8 +43,11 @@ Process packet collections require stable kebab-case ids on their nested items:
 
 ## stat-strip, KPI figures
 ```json
-{ "type": "stat-strip", "stats": [ { "value": "42", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
+{ "type": "stat-strip", "stats": [
+  { "value": "42", "label": "Block types", "delta": { "value": "+5", "label": "this release", "tone": "up" } },
+  { "value": "0", "label": "Runtime deps", "delta": "view-time" } ] }
 ```
+`delta` is optional. It can be a string or `{ "value": "...", "label": "...", "tone": "up|down|positive|negative|good|bad|warn|neutral" }`.
 
 ## flow, numbered steps
 ```json
@@ -195,7 +200,8 @@ Reference a note inline with `[^src]`. Place the `footnotes` block near the end.
 { "type": "chart", "title": "Quarterly", "chartType": "bar",
   "data": [ { "label": "Q1", "value": 12 }, { "label": "Q2", "value": 18 } ] }
 ```
-`chartType`: `bar | line | area`. Bars/lines use the accent color and adapt to the theme.
+`chartType`: `bar | line | area`. Charts render static SVG with axes, gridlines,
+point/bar value labels, and theme-aware color.
 
 ## receipt, provenance panel (trust for agent-authored docs)
 ```json
@@ -210,7 +216,9 @@ Pair with footnote citations (`[^id]`) for grounded, auditable documents.
 Each candidate is an expandable row: collapsed shows title/summary/chips/status/select;
 expanded shows the full reference (`body` markdown and/or nested `blocks`) + a notes
 field. Reader filters, searches, ticks decisions, writes notes, exports a decisions JSON
-(and can re-import). Load as much reference detail per candidate as you want.
+(and can re-import). Rows also render stable `ITEM-###` scan anchors plus
+`data-candidate` ids, so humans can link to a row and agents can target the same
+nested item id. Load as much reference detail per candidate as you want.
 ```json
 { "type": "review-board", "title": "Features, triage and decide",
   "candidates": [
@@ -229,7 +237,9 @@ Each item is an expandable work row with owner, priority, status, files, verific
 risks, evidence, full reference detail, a verdict dropdown, and notes. Reader verdicts
 persist locally and export as a process JSON packet:
 `{ "schema": "dossier.process/v1", "slug": "...", "process": { "id": { "verdict": "approve", "notes": "...", "title": "..." } } }`.
-Agents should read that packet with `dossier_read_process`.
+Rows render stable `ITEM-###` scan anchors plus `data-process-item` ids. Use stable
+kebab-case ids because verdict, note, and process packets key off those ids. Agents
+should read that packet with `dossier_read_process`.
 ```json
 { "type": "process-board", "title": "Implementation work",
   "items": [

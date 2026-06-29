@@ -70,6 +70,10 @@ Verify:
 - Copy buttons copy block text.
 - Export menu can copy Markdown, digest, and JSON.
 - Source modal opens and closes.
+- Prose blocks render paragraphs, bullet lists, and numbered lists with inline Markdown intact.
+- Stat strips show optional delta lines without resizing or clipping cards.
+- Charts show axes, gridlines, labels, and values in light and dark themes.
+- Review and process rows expose stable `ITEM-###` anchors and target highlighting.
 - Mobile width around 390px has no overlapping text or controls.
 - Tables, math, tabs, code, diffs, and workflow textareas do not show nested scrollbar chrome at desktop or mobile widths.
 - Print preview hides editor controls, TOC, palette, and transient UI.

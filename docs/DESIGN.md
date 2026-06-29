@@ -21,7 +21,7 @@ linkable and embeddable (iframe today, `*.embed.html` variant for inline use).
 | Decision | Choice |
 | --- | --- |
 | Hosting / scope | Standalone, global, cross-project. Own repo `~/Developer/products/dossier`. |
-| Open source | Build open-source-shaped (zero-dep, all original code, MIT-ready) but stay `UNLICENSED`/private for now. Publishing later = add LICENSE + flip repo. |
+| Open source | MIT-licensed, package-shaped, and ready for public consumption once npm auth and manual QA are complete. |
 | Host integration | A host app or monorepo can vendor or import this as a package. The core stays decoupled from any host. |
 | Render model | Hybrid: build-time generator emits self-contained HTML + embedded JSON island + minimal inlined JS for interactivity. |
 | Generator stack | Zero-dependency Node, single-file-style ESM modules. Runs via `node` / `npx`. |
@@ -34,10 +34,9 @@ linkable and embeddable (iframe today, `*.embed.html` variant for inline use).
 Data backbone (embedded JSON island, stable `data-id`/`data-block` typing, canonical
 front-matter, `dossierVersion`/schema header) · pipeline (schema, generator,
 validation+lint, presets, the `dossier` skill) · render baseline (hybrid render,
-light/dark theming + per-project overrides, Markdown + JSON export) · the full static
-component catalog (hero, summary cards, sections, two-col, flow, timeline, tables,
-callouts, code, stat strip, tabs, FAQ, references, plus **static** decision-matrix and
-risk-register display blocks).
+light/dark theming + per-project overrides, Markdown + JSON export) · the full
+42-block catalog, including process, trust, review, release, media, and export-oriented
+blocks.
 
 ## Selected optional features
 
@@ -46,11 +45,11 @@ In: 1 TOC/scroll-spy · 2 reading progress · 3 in-page search · 4 command pale
 10 cross-artifact links · 14 assumptions register · 15 changelog/version diff ·
 16 annotation/review mode · 17 approve/reject verdicts · 18 interactive action items ·
 21 import-JSON round-trip · 22 lifecycle banner · 23 diagrams to SVG ·
-24 syntax highlighting · 25 glossary tooltips.
+24 syntax highlighting · 25 glossary tooltips · process packets · trust reports ·
+patch/diff/release packets · static publish/catalog output · DOCX/PDF exports.
 
-Out: 6 density/font controls · 9 print/PDF refinement · 11 citation system ·
-12 confidence/freshness · 13 generation receipt · 19 interactive decision matrix ·
-20 interactive risk register · 26 catalog/index generator. (19/20 ship as static
+Out: 6 density/font controls · 9 deep print/PDF refinement · 11 full citation system ·
+19 interactive decision matrix · 20 interactive risk register. (19/20 ship as static
 display blocks only.)
 
 ## Embeddability & hosting
@@ -87,15 +86,16 @@ view-time network). These run only at generate time:
 
 - `shiki`, dual-theme (light/dark) highlighting via CSS variables, zero client JS.
 - `@hpcc-js/wasm-graphviz`, `diagram` blocks with `format: "dot"` → inline SVG, browserless.
+- `katex`, math blocks to MathML.
+- `@resvg/resvg-js`, image conversion for DOCX export.
 
 The "zero-dependency" promise now means **zero runtime dependencies in the artifact**,
 not a dependency-free toolchain.
 
 ## React port (`react/`)
 
-Typed TSX components (`Block` dispatcher over all 21 types) rendered via
+Typed TSX components (`Block` dispatcher over built-in block types) rendered via
 `react-dom/server` `renderToStaticMarkup`, **reusing the core `CSS`, `RUNTIME`, and
 enrichment** (`enrich`/`assignIds`/`buildToc`/`toMarkdown`/`agentDigest`/`inlineMd`) as
-the single source of truth. Produces the same self-contained artifact; `tsc --noEmit`
-clean. The shell template is currently duplicated in `react/src/render.tsx`, a future
-cleanup is to extract a shared `renderShell()` from the core so both paths share it.
+the single source of truth. The React renderer shares the core shell through
+`renderShell()` and stays checked with `tsc --noEmit`.
