@@ -30,7 +30,7 @@
       "title": "One JSON file becomes this",
       "lede": "Everything below, navigation, search, theme, code, diagrams, charts, math, and an interactive review board, lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.",
       "pills": [
-        "41 block types",
+        "42 block types",
         "Self-contained",
         "Agent-readable",
         "Light + dark"
@@ -60,7 +60,7 @@
       "type": "stat-strip",
       "stats": [
         {
-          "value": "41",
+          "value": "42",
           "label": "Block types"
         },
         {
@@ -280,7 +280,7 @@
             },
             {
               "label": "Q4",
-              "value": 41
+              "value": 42
             }
           ]
         },
@@ -543,6 +543,48 @@
           ]
         },
         {
+          "type": "trust-report",
+          "title": "Trust report",
+          "summary": "A provenance layer ties claims to source ids and verification evidence for agent readback.",
+          "sources": [
+            {
+              "id": "npm-test",
+              "label": "npm test",
+              "kind": "command",
+              "trust": "high",
+              "summary": "Local test command recorded in the verification run."
+            },
+            {
+              "id": "manual-qa",
+              "label": "Public manual QA guide",
+              "kind": "doc",
+              "url": "../docs/product/public-manual-qa.md",
+              "trust": "medium",
+              "summary": "Manual browser, live serve, MCP, export, and release gate checklist."
+            }
+          ],
+          "claims": [
+            {
+              "id": "tests-pass",
+              "claim": "Automated tests pass for the process block family.",
+              "status": "verified",
+              "confidence": "high",
+              "sources": ["npm-test"],
+              "evidence": ["test-suite"],
+              "notes": "Agents can read this with `dossier_read_trust`."
+            },
+            {
+              "id": "manual-qa-ready",
+              "claim": "The feature set is ready for public manual QA.",
+              "status": "partial",
+              "confidence": "medium",
+              "sources": ["manual-qa"],
+              "evidence": ["release-checklist"],
+              "notes": "Manual QA still needs a human browser pass before broad announcement."
+            }
+          ]
+        },
+        {
           "type": "verdict-gate",
           "title": "Apply gate",
           "gateId": "apply-process-patch",
@@ -595,7 +637,7 @@
           "producer": "dossier",
           "consumer": "lumen",
           "status": "accepted",
-          "version": "0.5.2",
+          "version": "0.5.3",
           "nextStep": "Dogfood against a live dependency change.",
           "items": [
             {
@@ -628,8 +670,9 @@
             {
               "id": "docs",
               "title": "Docs regenerated",
-              "status": "todo",
-              "required": true
+              "status": "passed",
+              "required": true,
+              "evidence": "README and public manual QA guide refreshed."
             }
           ]
         },
@@ -648,16 +691,17 @@
         {
           "type": "process-receipt",
           "title": "Process receipt",
-          "outcome": "functionality closeout ready for bug bash",
+          "outcome": "functionality closeout ready for public manual QA",
           "owner": "Codex",
           "date": "2026-06-29",
           "changedFiles": [
             "src/generate.mjs",
             "src/runtime/runtime.mjs",
+            "schema/packets/trust.schema.json",
             "mcp/server.mjs"
           ],
           "commands": ["npm test"],
-          "followUps": ["Run the bug bash pass before release."]
+          "followUps": ["Run the public manual QA guide before broad announcement."]
         }
       ]
     },

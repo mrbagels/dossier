@@ -267,6 +267,24 @@ async function block(b, out, ctx) {
       }
       break;
     }
+    case "trust-report":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      if (b.summary) out.push(P(b.summary));
+      if (b.sources && b.sources.length) {
+        out.push(H("Sources", HeadingLevel.HEADING_3));
+        addTable(out, ["Source", "Kind", "Trust", "License", "Summary"], (b.sources || []).map((s) => [s.label || s.id || "", s.kind || "", s.trust || "", s.license || "", s.summary || s.url || ""]));
+      }
+      if (b.claims && b.claims.length) {
+        out.push(H("Claims", HeadingLevel.HEADING_3));
+        for (const c of b.claims || []) {
+          out.push(H(plain(c.claim || c.title || c.id || "Claim"), HeadingLevel.HEADING_4));
+          ["status", "confidence", "owner", "updated"].forEach((k) => { if (c[k]) out.push(P(k + ": " + plain(c[k]))); });
+          if (c.sources && c.sources.length) out.push(P("Sources: " + c.sources.map(plain).join(", ")));
+          if (c.evidence && c.evidence.length) out.push(P("Evidence: " + c.evidence.map(plain).join(", ")));
+          if (c.notes) out.push(P(c.notes));
+        }
+      }
+      break;
     case "verdict-gate":
       if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
       if (b.prompt) out.push(P(b.prompt));

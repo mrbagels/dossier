@@ -20,6 +20,11 @@ const PROCESS_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "sp
 const REVIEW_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "block"];
 const detailRows = (rows: Array<[string, any]>): [string, string][] =>
   rows.filter(([, v]) => v !== undefined && v !== null && String(v).trim()).map(([k, v]) => [k, String(v)]);
+const asArray = (v: any) => (Array.isArray(v) ? v : v ? [v] : []);
+const safeUrl = (u?: string) => {
+  const s = String(u || "").trim();
+  return /^(javascript|data|vbscript):/i.test(s.replace(/[\s\x00-\x1f]+/g, "")) ? "#" : s;
+};
 
 const CopyIcon = (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -182,6 +187,8 @@ const Code: React.FC<{ b: B }> = ({ b }) => (
 
 const CodeEditor: React.FC<{ b: B }> = ({ b }) => {
   const id = b.id || slugify(b.title || b.filename || b.targetPath || "code-editor");
+  const code = String(b.code || "");
+  const rows = globalThis.Math.min(28, globalThis.Math.max(10, code.split(/\r?\n/).length + 1));
   const meta: string[] = [];
   if (b.lang) meta.push(b.lang);
   if (b.targetPath) meta.push(b.targetPath);
@@ -203,7 +210,8 @@ const CodeEditor: React.FC<{ b: B }> = ({ b }) => {
           data-editor-target={b.targetPath || ""}
           spellCheck={false}
           readOnly={!!b.readonly}
-          defaultValue={b.code || ""}
+          rows={rows}
+          defaultValue={code}
         />
         <div className="ds-codeedit-actions">
           <span className="ds-codeedit-state" data-editor-state={id}>clean</span>
@@ -654,6 +662,71 @@ const EvidenceLog: React.FC<{ b: B }> = ({ b }) => (
   </Wrap>
 );
 
+const TrustReport: React.FC<{ b: B }> = ({ b }) => {
+  const sources = asArray(b.sources);
+  const claims = asArray(b.claims);
+  const sourceMap = new Map<string, any>(sources.filter((s: any) => s?.id).map((s: any) => [s.id, s]));
+  return (
+    <Wrap type="trust-report" id={b.id}>
+      <Heading id={b.id} text={b.title} />
+      {b.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(b.summary)} />}
+      {sources.length > 0 && (
+        <div className="ds-trust-sources">
+          <h4>Sources</h4>
+          <div className="ds-tablewrap">
+            <table>
+              <thead><tr><th>Source</th><th>Kind</th><th>Trust</th><th>License</th><th>Summary</th></tr></thead>
+              <tbody>
+                {sources.map((s: any, i: number) => {
+                  const id = s.id || slugify(s.label || s.url || "source");
+                  return (
+                    <tr id={`${b.id}-${id}`} data-trust-source={id} key={id || i}>
+                      <td>{s.url ? <a href={safeUrl(s.url)}>{s.label || s.url}</a> : (s.label || id)}</td>
+                      <td dangerouslySetInnerHTML={md(s.kind || "")} />
+                      <td dangerouslySetInnerHTML={md(s.trust || "")} />
+                      <td dangerouslySetInnerHTML={md(s.license || "")} />
+                      <td dangerouslySetInnerHTML={md(s.summary || "")} />
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      <div className="ds-process-list ds-trust-claims">
+        {claims.map((c: any, i: number) => {
+          const id = c.id || slugify(c.claim || c.title || "claim");
+          const chips = [
+            c.status && `status · ${c.status}`,
+            c.confidence && `confidence · ${c.confidence}`,
+            c.owner && `owner · ${c.owner}`,
+          ].filter(Boolean) as string[];
+          const rows = detailRows([["notes", c.notes], ["updated", c.updated]]);
+          return (
+            <article className={`ds-process-card ds-trust-claim status-${slugify(c.status || "unverified")}`} data-trust-claim={id} key={id || i}>
+              <div className="ds-process-card-head">
+                <div><h4>{c.claim || c.title || id}</h4>{c.summary && <p className="ds-muted" dangerouslySetInnerHTML={md(c.summary)} />}</div>
+                {chips.length > 0 && <div className="ds-chips">{chips.map((x, j) => <span className="ds-chip" key={j}>{x}</span>)}</div>}
+              </div>
+              {rows.length > 0 && <dl className="ds-detailgrid">{rows.map(([k, v], j) => <div className="ds-detail" key={j}><dt>{k}</dt><dd dangerouslySetInnerHTML={md(v)} /></div>)}</dl>}
+              {(asArray(c.sources).length > 0 || asArray(c.evidence).length > 0) && (
+                <div className="ds-trust-refs">
+                  {asArray(c.sources).map((sid: string) => {
+                    const src = sourceMap.get(sid);
+                    return src ? <a className="ds-chip ds-trust-link" href={`#${b.id}-${src.id}`} key={sid}>{src.label || src.id}</a> : <span className="ds-chip ds-trust-missing" key={sid}>missing · {sid}</span>;
+                  })}
+                  {asArray(c.evidence).map((e: string) => <span className="ds-chip" key={e}>{e}</span>)}
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </Wrap>
+  );
+};
+
 const VerdictGate: React.FC<{ b: B }> = ({ b }) => {
   const id = b.gateId || b.id || slugify(b.title || "verdict-gate");
   const options = b.options || PROCESS_VERDICTS;
@@ -879,6 +952,7 @@ export const Block: React.FC<{ b: B }> = ({ b }) => {
     case "process-board": return <ProcessBoard b={b} />;
     case "verification-run": return <VerificationRun b={b} />;
     case "evidence-log": return <EvidenceLog b={b} />;
+    case "trust-report": return <TrustReport b={b} />;
     case "verdict-gate": return <VerdictGate b={b} />;
     case "process-receipt": return <ProcessReceipt b={b} />;
     case "finding-list": return <FindingList b={b} />;

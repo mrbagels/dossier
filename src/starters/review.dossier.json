@@ -62,6 +62,17 @@
       ]
     },
     {
+      "type": "trust-report",
+      "title": "Review trust report",
+      "summary": "Tie review findings to source and evidence ids before asking an agent to act.",
+      "sources": [
+        { "id": "finding-evidence", "label": "Finding evidence", "kind": "source", "trust": "pending", "summary": "Replace with file, command, screenshot, or issue evidence." }
+      ],
+      "claims": [
+        { "id": "finding-is-actionable", "claim": "The accepted finding is actionable.", "status": "unverified", "confidence": "unknown", "sources": ["finding-evidence"], "evidence": ["finding-one"], "notes": "Update when the finding has enough evidence to implement." }
+      ]
+    },
+    {
       "type": "action-items",
       "title": "Accepted fixes",
       "items": [

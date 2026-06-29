@@ -154,7 +154,7 @@ test("patch-set and diff-view render parsed unified diffs", async () => {
 
 test("packet schemas are published for agent handoff contracts", () => {
   const packetDir = join(root, "schema", "packets");
-  const names = ["process", "edits", "verdicts", "release", "patch-review", "diff-review", "closeout"];
+  const names = ["process", "edits", "verdicts", "release", "patch-review", "diff-review", "trust", "closeout"];
   for (const name of names) {
     const schema = JSON.parse(readFileSync(join(packetDir, `${name}.schema.json`), "utf8"));
     assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema", name);
@@ -207,6 +207,17 @@ test("process closeout blocks render and export agent-readable packet hooks", as
         title: "Evidence",
         items: [
           { id: "log-one", title: "Build log", kind: "command", source: "local", trust: "high", body: "Build completed." },
+        ],
+      },
+      {
+        type: "trust-report",
+        title: "Trust report",
+        summary: "Claims are tied to source and evidence ids.",
+        sources: [
+          { id: "npm-test", label: "npm test", kind: "command", trust: "high", summary: "Local test command." },
+        ],
+        claims: [
+          { id: "tests-pass", claim: "The test suite passes.", status: "verified", confidence: "high", sources: ["npm-test"], evidence: ["test-suite"] },
         ],
       },
       { type: "verdict-gate", title: "Ship gate", prompt: "Ready to ship?", gateId: "ship", verdict: "approve" },
@@ -272,11 +283,14 @@ test("process closeout blocks render and export agent-readable packet hooks", as
   const { html, md } = await generate(structuredClone(model), {});
   assert.ok(html.includes('data-block="verification-run"'), "renders verification-run");
   assert.ok(html.includes('data-block="release-checklist"'), "renders release-checklist");
+  assert.ok(html.includes('data-block="trust-report"'), "renders trust-report");
+  assert.ok(html.includes('data-trust-claim="tests-pass"'), "renders trust claim hook");
   assert.ok(html.includes('data-verdict-gate="ship"'), "renders verdict gate hook");
   assert.ok(html.includes("dossier.verdicts/v1"), "runtime can export verdict packets");
   assert.ok(html.includes("dossier.release/v1"), "runtime can export release packets");
   assert.ok(html.includes("Integration report"), "new titled blocks are present");
   assert.ok(md.includes("## Verification"), "exports verification markdown");
+  assert.ok(md.includes("## Trust report"), "exports trust markdown");
   assert.ok(md.includes("- [x] Tests pass"), "exports release checklist markdown");
 });
 
@@ -327,6 +341,21 @@ test("mcp helpers normalize packets and validate writes before touching disk", a
   );
   model = JSON.parse(readFileSync(file, "utf8"));
   assert.equal(model.blocks.length, 1, "invalid write was not persisted");
+
+  await handleTool("dossier_record_claim", {
+    path: file,
+    title: "Trust",
+    sources: [{ id: "npm-test", label: "npm test", kind: "command", trust: "high" }],
+    claim: { id: "tests-pass", claim: "Tests pass.", status: "verified", confidence: "high", sources: ["npm-test"] },
+  });
+  model = JSON.parse(readFileSync(file, "utf8"));
+  assert.equal(model.blocks[1].type, "trust-report");
+  const trust = await handleTool("dossier_read_trust", { path: file });
+  const trustBody = JSON.parse(trust.content[0].text);
+  assert.equal(trustBody.totals.claims, 1);
+  assert.equal(trustBody.reports[0].byStatus.verified, 1);
+  const trustSchema = await handleTool("dossier_get_packet_schema", { name: "trust" });
+  assert.ok(trustSchema.content[0].text.includes("dossier.trust/v1"));
 });
 
 test("mcp apply and closeout tools update models with packet state", async () => {

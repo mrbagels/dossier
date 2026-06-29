@@ -42,6 +42,17 @@
       ]
     },
     {
+      "type": "trust-report",
+      "title": "Release trust report",
+      "summary": "Track which release-readiness claims are grounded before publishing.",
+      "sources": [
+        { "id": "release-build", "label": "Release build", "kind": "command", "trust": "pending", "summary": "Replace with the final release verification run." }
+      ],
+      "claims": [
+        { "id": "release-ready", "claim": "The release is ready to publish.", "status": "unverified", "confidence": "unknown", "sources": ["release-build"], "evidence": ["required-checks"], "notes": "Update after gates and approvals complete." }
+      ]
+    },
+    {
       "type": "risk-register",
       "title": "Release risks",
       "risks": [

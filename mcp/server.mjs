@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { generate, validateModel } from "../src/index.mjs";
+import { generate, validateModel, slugify } from "../src/index.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = dirname(here);
@@ -102,6 +102,11 @@ const TOOLS = [
     inputSchema: { type: "object", properties: { review: { type: "object" }, path: { type: "string" } } },
   },
   {
+    name: "dossier_read_trust",
+    description: "Read trust-report blocks from a model or a dossier.trust/v1 packet, returning source and claim provenance for agent handoff.",
+    inputSchema: { type: "object", properties: { model: { type: "object" }, trust: { type: "object" }, path: { type: "string" } } },
+  },
+  {
     name: "dossier_resume_context",
     description: "Summarize a dossier model into agent-resumable context: block counts, process items, editors, patches, release gates, and receipts.",
     inputSchema: { type: "object", properties: { model: { type: "object" }, path: { type: "string" } } },
@@ -151,6 +156,22 @@ const TOOLS = [
     },
   },
   {
+    name: "dossier_record_claim",
+    description: "Create or append a trust-report claim and optional source records. Provide `path` to update a .dossier.json file, otherwise the block is returned.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        model: { type: "object" },
+        title: { type: "string" },
+        summary: { type: "string" },
+        claim: { type: "object", description: "{ id, claim, title, status, confidence, sources, evidence, notes }." },
+        sources: { type: "array", items: { type: "object" }, description: "Optional source records: { id, label, kind, url, trust, license, summary }." },
+      },
+      required: ["claim"],
+    },
+  },
+  {
     name: "dossier_attach_patchset",
     description: "Create or append a patch-set block. Provide `path` to update a .dossier.json file, otherwise the block is returned.",
     inputSchema: {
@@ -176,7 +197,7 @@ const TOOLS = [
   },
   {
     name: "dossier_get_packet_schema",
-    description: "Return a packet JSON Schema by name: process, edits, verdicts, release, patch-review, diff-review, closeout.",
+    description: "Return a packet JSON Schema by name: process, edits, verdicts, release, patch-review, diff-review, trust, closeout.",
     inputSchema: { type: "object", properties: { name: { type: "string" } }, required: ["name"] },
   },
   {
@@ -242,6 +263,19 @@ function appendOrCreateBlock(model, type, title, collectionKey, item) {
   return block;
 }
 
+function appendOrCreateTrustReport(model, title, summary) {
+  model.blocks = Array.isArray(model.blocks) ? model.blocks : [];
+  let block = model.blocks.find((b) => b && b.type === "trust-report" && (!title || b.title === title));
+  if (!block) {
+    block = { type: "trust-report", title: title || "Trust report", summary: summary || "", sources: [], claims: [] };
+    model.blocks.push(block);
+  }
+  block.sources = Array.isArray(block.sources) ? block.sources : [];
+  block.claims = Array.isArray(block.claims) ? block.claims : [];
+  if (summary && !block.summary) block.summary = summary;
+  return block;
+}
+
 function walkBlocks(blocks, fn) {
   (blocks || []).forEach((b) => {
     if (!b || typeof b !== "object") return;
@@ -275,6 +309,7 @@ function summarizeModel(model) {
   const patches = [];
   const releaseGates = [];
   const receipts = [];
+  const trustReports = [];
   walkBlocks(model.blocks, (b) => {
     counts[b.type] = (counts[b.type] || 0) + 1;
     if (b.type === "code-editor") editors.push({ id: blockId(b), title: b.title || "", targetPath: b.targetPath || "", filename: b.filename || "" });
@@ -282,6 +317,7 @@ function summarizeModel(model) {
     if (b.type === "patch-set") (b.patches || []).forEach((p) => patches.push({ id: p.id, title: p.title, status: p.status || "", review: p.review || "" }));
     if (b.type === "release-checklist") (b.gates || []).forEach((g) => releaseGates.push({ id: g.id, title: g.title, status: g.status || "", required: !!g.required }));
     if (b.type === "process-receipt" || b.type === "receipt") receipts.push({ id: b.id || "", title: b.title || b.type, outcome: b.outcome || "" });
+    if (b.type === "trust-report") trustReports.push({ id: b.id || "", title: b.title || "Trust report", sources: (b.sources || []).length, claims: (b.claims || []).length });
   });
   return {
     title: model.meta && model.meta.title,
@@ -293,6 +329,74 @@ function summarizeModel(model) {
     patches,
     releaseGates,
     receipts,
+    trustReports,
+  };
+}
+
+function trustReportsFromModel(model) {
+  const reports = [];
+  walkBlocks(model.blocks, (b) => {
+    if (b.type !== "trust-report") return;
+    reports.push({
+      id: b.id || "",
+      title: b.title || "Trust report",
+      summary: b.summary || "",
+      sources: Array.isArray(b.sources) ? b.sources : [],
+      claims: Array.isArray(b.claims) ? b.claims : [],
+    });
+  });
+  return reports;
+}
+
+function normalizeTrustPacket(packet) {
+  if (!packet || typeof packet !== "object") return [];
+  if (Array.isArray(packet.reports)) return packet.reports;
+  return [{
+    id: packet.id || "",
+    title: packet.title || "Trust report",
+    summary: packet.summary || "",
+    sources: Array.isArray(packet.sources) ? packet.sources : [],
+    claims: Array.isArray(packet.claims) ? packet.claims : [],
+  }];
+}
+
+function summarizeTrustReports(reports, slug) {
+  const normalized = (reports || []).map((report) => {
+    const sources = Array.isArray(report.sources) ? report.sources : [];
+    const claims = Array.isArray(report.claims) ? report.claims : [];
+    const sourceIds = new Set(sources.map((s) => s && s.id).filter(Boolean));
+    const missingSources = [];
+    const byStatus = {};
+    const byConfidence = {};
+    for (const claim of claims) {
+      const status = claim.status || "unverified";
+      const confidence = claim.confidence || "unknown";
+      byStatus[status] = (byStatus[status] || 0) + 1;
+      byConfidence[confidence] = (byConfidence[confidence] || 0) + 1;
+      for (const sid of claim.sources || []) if (!sourceIds.has(sid)) missingSources.push({ claim: claim.id || "", source: sid });
+    }
+    return {
+      id: report.id || "",
+      title: report.title || "Trust report",
+      summary: report.summary || "",
+      sources,
+      claims,
+      totals: { sources: sources.length, claims: claims.length },
+      byStatus,
+      byConfidence,
+      missingSources,
+    };
+  });
+  return {
+    schema: "dossier.trust/v1",
+    slug,
+    reports: normalized,
+    totals: {
+      reports: normalized.length,
+      sources: normalized.reduce((sum, r) => sum + r.totals.sources, 0),
+      claims: normalized.reduce((sum, r) => sum + r.totals.claims, 0),
+      missingSources: normalized.reduce((sum, r) => sum + r.missingSources.length, 0),
+    },
   };
 }
 
@@ -457,6 +561,16 @@ async function handle(name, args) {
     return text({ schema: packet.schema || "dossier.diff-review/v1", slug: packet.slug, files: summarize(files), hunks: summarize(hunks), totals: { files: Object.keys(files).length, hunks: Object.keys(hunks).length } });
   }
 
+  if (name === "dossier_read_trust") {
+    if (args.model) {
+      return text(summarizeTrustReports(trustReportsFromModel(args.model), args.model.meta && args.model.meta.slug));
+    }
+    const packet = args.trust || (args.path ? JSON.parse(readFileSync(args.path, "utf8")) : null);
+    if (!packet) return fail("provide `model`, `trust`, or `path`");
+    if (packet.blocks) return text(summarizeTrustReports(trustReportsFromModel(packet), packet.meta && packet.meta.slug));
+    return text(summarizeTrustReports(normalizeTrustPacket(packet), packet.slug));
+  }
+
   if (name === "dossier_resume_context") {
     const { model } = loadModel(args);
     if (!model) return fail("provide `model` or `path`");
@@ -549,6 +663,36 @@ async function handle(name, args) {
     return text({ ok: true, path, block });
   }
 
+  if (name === "dossier_record_claim") {
+    const stamp = Date.now();
+    const sources = (Array.isArray(args.sources) ? args.sources : [])
+      .filter((s) => s && typeof s === "object")
+      .map((s, index) => ({ ...s, id: s.id || slugify(s.label || s.url || "source") + "-" + stamp + "-" + index }));
+    const claim = {
+      id: args.claim.id || slugify(args.claim.claim || args.claim.title || "claim") + "-" + stamp,
+      status: "unverified",
+      confidence: "unknown",
+      ...args.claim,
+    };
+    const sourceIds = sources.map((s) => s && s.id).filter(Boolean);
+    if (!claim.sources && sourceIds.length) claim.sources = sourceIds;
+    const blockPayload = { type: "trust-report", title: args.title || "Trust report", summary: args.summary || "", sources, claims: [claim] };
+    const { model, path } = loadModel(args);
+    if (!model) return text(blockPayload);
+    const block = appendOrCreateTrustReport(model, args.title || "Trust report", args.summary || "");
+    for (const source of sources) {
+      const existing = block.sources.find((s) => s && s.id === source.id);
+      if (existing) Object.assign(existing, source);
+      else block.sources.push(source);
+    }
+    const existingClaim = block.claims.find((c) => c && c.id === claim.id);
+    if (existingClaim) Object.assign(existingClaim, claim);
+    else block.claims.push(claim);
+    assertValidModel(model);
+    writeModel(path, model);
+    return text({ ok: true, path, block });
+  }
+
   if (name === "dossier_attach_patchset") {
     const patchSet = args.patchSet.type === "patch-set" ? args.patchSet : { type: "patch-set", title: args.title || "Patch set", patches: args.patchSet.patches || [] };
     const { model, path } = loadModel(args);
@@ -592,7 +736,7 @@ async function handle(name, args) {
   }
 
   if (name === "dossier_get_packet_schema") {
-    const allowed = new Set(["process", "edits", "verdicts", "release", "patch-review", "diff-review", "closeout"]);
+    const allowed = new Set(["process", "edits", "verdicts", "release", "patch-review", "diff-review", "trust", "closeout"]);
     const schemaName = String(args.name || "").replace(/\.schema\.json$/, "");
     if (!allowed.has(schemaName)) return fail("unknown packet schema: " + args.name);
     return text(readFileSync(join(root, `schema/packets/${schemaName}.schema.json`), "utf8"));
@@ -609,7 +753,7 @@ async function handle(name, args) {
 export const handleTool = handle;
 
 export function createServer() {
-  const server = new Server({ name: "dossier", version: "0.2.0" }, { capabilities: { tools: {} } });
+  const server = new Server({ name: "dossier", version: "0.5.3" }, { capabilities: { tools: {} } });
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
     try {

@@ -95,12 +95,12 @@ Agents can render, validate, read verdict packets, record run evidence, attach p
 | Kind | Purpose | Core blocks |
 | --- | --- | --- |
 | `plan` | Strategy, option selection, feature planning. | `review-board`, `decision-matrix`, `assumptions`, `action-items` |
-| `implementation` | Actual code edit loop. | `context-map`, `process-board`, `patch-set`, `diff-view`, `verification-run`, `process-receipt` |
-| `review` | Code review, design review, security review. | `review-board`, `finding-list`, `diff-view`, `comment-thread`, `verdict-gate` |
-| `debug` | Bug reproduction, hypotheses, traces, fixes. | `evidence-log`, `hypothesis-board`, `patch-set`, `verification-run` |
+| `implementation` | Actual code edit loop. | `process-board`, `code-editor`, `patch-set`, `diff-view`, `verification-run`, `trust-report`, `process-receipt` |
+| `review` | Code review, design review, security review. | `review-board`, `finding-list`, `diff-view`, `comment-thread`, `verdict-gate`, `trust-report` |
+| `debug` | Bug reproduction, hypotheses, traces, fixes. | `evidence-log`, `process-board`, `patch-set`, `verification-run`, `trust-report` |
 | `integration-loop` | Producer/consumer dependency dogfooding. | `cycle-board`, `integration-report`, `upstream-response`, `process-receipt` |
-| `release` | Release prep, checks, approvals, changelog. | `release-checklist`, `risk-register`, `verification-run`, `process-receipt` |
-| `incident` | Timeline, impact, mitigation, follow-ups. | `timeline`, `evidence-log`, `decision-log`, `verification-run`, `process-receipt` |
+| `release` | Release prep, checks, approvals, changelog. | `release-checklist`, `risk-register`, `verification-run`, `trust-report`, `process-receipt` |
+| `incident` | Timeline, impact, mitigation, follow-ups. | `timeline`, `evidence-log`, `decision-log`, `verification-run`, `trust-report`, `process-receipt` |
 
 
 ## New Block Families
@@ -115,6 +115,7 @@ These are the product primitives to add beyond the current planning catalog.
 | `code-editor` | Embeddable editor block for snippets, config, prompts, JSON, markdown, and small patches. Static artifacts use a textarea fallback; hosts can enhance with CodeMirror. | Edited text, language, dirty state, optional target path. |
 | `verification-run` | Commands, expected results, actual results, logs, artifacts, and rerun guidance. | Pass/fail/blocked state, command receipt refs, selected rerun requests. |
 | `evidence-log` | Append-only observations: screenshots, logs, links, command outputs, API responses, source refs. | Evidence ids, trust level, source, created time, linked work items. |
+| `trust-report` | Source-backed claims with status, confidence, source ids, and evidence ids. | Versioned `dossier.trust/v1` claim/source packet for MCP readback. |
 | `verdict-gate` | A focused approval surface for apply/revise/skip/defer/split/retry decisions. | Structured verdict packet for agents and MCP tools. |
 | `process-receipt` | Closeout/provenance summary covering model, tools, commands, files, tests, risks, and failures. | Receipt packet plus digest text. |
 | `finding-list` | Review findings with severity, affected files, recommendations, and evidence. | Finding ids, severity, files, recommendation state. |
@@ -231,6 +232,7 @@ Keep the existing document model, but add process contracts that can round-trip 
 | `PatchSet` | One proposed or applied edit set. | Can store inline unified diff, file summaries, external artifact refs, or both. |
 | `VerificationRun` | Commands and evidence. | Expected versus actual result, logs, artifacts, pass/fail/blocked, rerun request. |
 | `Verdict` | Human decision over item, file, hunk, patch, or run. | Values: approve, revise, skip, defer, split, retry, block. |
+| `TrustClaim` | Auditable assertion tied to source ids and evidence ids. | Carries status, confidence, notes, and missing-source checks for agents. |
 | `Receipt` | Durable trace of generated, applied, verified, or rejected work. | Keep provenance even when output is later copied into another tool. |
 | `SourceRef` | Pointer to files, docs, repos, issues, PRs, command outputs, browser captures, or source material. | This is how Dossier avoids bloating packets while preserving evidence links. |
 

@@ -2,250 +2,336 @@
 
 # Dossier
 
-### Stop asking your AI for a Markdown file. Have it build you a Dossier: a self-contained, interactive HTML document for planning, documenting, deciding, and doing *with* AI.
+### A self-contained, interactive HTML artifact for planning, deciding, editing, verifying, releasing, and handing work back to AI agents.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
-[![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#how-it-works)
-[![Output](https://img.shields.io/badge/output-single%20.html%20file-7048e8.svg)](#how-it-works)
-[![Version](https://img.shields.io/badge/version-0.5.2-7048e8.svg)](#)
-[![Live demo](https://img.shields.io/badge/live%20demo-%E2%86%97-7048e8.svg)](https://mrbagels.github.io/dossier/)
+[![Version](https://img.shields.io/badge/version-0.5.3-7048e8.svg)](#release-status)
+[![Output](https://img.shields.io/badge/output-single%20HTML%20file-7048e8.svg)](#how-dossier-works)
+[![Runtime](https://img.shields.io/badge/viewer%20runtime-zero%20external%20assets-c81e4a.svg)](#how-dossier-works)
+[![Agent Ready](https://img.shields.io/badge/agent%20ready-MCP%20%2B%20packets-0f7a52.svg)](#agent-workflows)
+[![Blocks](https://img.shields.io/badge/built--in%20blocks-42-9a5b00.svg)](#block-catalog)
+[![Live demo](https://img.shields.io/badge/live%20demo-open-7048e8.svg)](https://mrbagels.github.io/dossier/)
 
-<a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="840"></a>
+<a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="860"></a>
 
-**[See the live demo &rarr;](https://mrbagels.github.io/dossier/)** &nbsp;Every block type, in one self-contained file.
-
-</div>
-
-When you ask an AI to "write up a plan," "lay out the options," or "run this
-implementation through a real review loop," it usually dumps a wall of Markdown. Dossier
-replaces that. Your agent builds you **one self-contained, interactive HTML page** you can
-navigate, search, mark up, and hand back to the AI to act on.
-
-```
-  "write me a markdown file"   →   a flat .md you skim once and lose
-  "make me a dossier"          →   one interactive .html: navigable, markable, agent-readable
-```
-
-Built for the back and forth that real AI-assisted work needs:
-
-- **Your agent writes it.** Plans, specs, research, implementation packets, reviews, and
-  options, as a structured document instead of a text dump. You hand-write nothing.
-- **You work in it.** Navigate, search, expand the details that matter, tick the options you
-  want, leave notes, and edit text in place.
-- **You hand it back.** Export your decisions as JSON and the agent implements them. The
-  document carries its own structured data, so the AI reads it back exactly. No scraping, no
-  lossy copy-paste.
-
-One file. No server, no external assets, works offline. Open it, email it, or embed it.
-
-## Get started
-
-Let your **agent** drive it. Install the CLI and the skill once:
-
-```bash
-npm install -g github:mrbagels/dossier                 # one line, any platform (Node 18+)
-ln -s "$(pwd)/dossier/skill" ~/.claude/skills/dossier  # if cloned; see "Use it from an agent"
-```
-
-Then ask your assistant:
-
-> *"Make me a dossier planning the Q3 migration."*
-> *"Make me an implementation dossier for this refactor."*
-> *"Turn these five options into a review board I can triage."*
-
-It writes a `*.dossier.json`, runs `dossier build`, and you get `my-doc.html` (+ `.md`).
-
-Driving it yourself:
-
-```bash
-dossier init my-doc                # scaffold my-doc.dossier.json from a starter
-dossier build my-doc.dossier.json  # writes my-doc.html (+ .md)
-open my-doc.html                   # Linux: xdg-open, Windows: start
-```
-
-<div align="center">
-
----
-
-**Documentation**
-
-[How it works](#how-it-works) · [From an agent](#use-it-from-an-agent) ·
-[Authoring](#authoring) · [Block types](#block-types) · [Review / triage](#review--triage) ·
-[Process dossiers](#process-dossiers) · [React](#react) · [Plugins & CLI](#plugins--cli) ·
-[Embedding](#embedding) · [Development](#development)
-
----
+**[Open the live demo](https://mrbagels.github.io/dossier/)** | **[Read the process scope](docs/product/process-dossiers/process-dossiers-scope.md)** | **[View the block cheatsheet](skill/references/blocks.md)** | **[Manual QA guide](docs/product/public-manual-qa.md)**
 
 </div>
 
-## How it works
+## What It Is
 
-The page you open is a projection of one JSON model (which the agent writes). The full model
-is embedded back into the file as a `#dossier-model` island, which is what an agent reads.
-Everything else is inlined at build time, so the result needs nothing at view time:
+Dossier turns an AI response into a durable working artifact.
+
+Instead of asking an agent for a Markdown plan that gets lost in a thread, ask it for a Dossier. It creates one `*.dossier.json` model, builds a polished HTML file, embeds the source model back into that file, and gives humans and agents a shared control surface.
 
 ```
-my-doc.dossier.json ──► enrich ──► render ──► self-contained .html  (+ .md, + agent digest)
-                         │                     │
-                         │                     └─ <script id="dossier-model"> ← the source model
-                         ├─ Shiki: code → highlighted HTML (light/dark via CSS variables)
-                         └─ Graphviz WASM: DOT → inline SVG
+AI produces structured model
+        |
+        v
+*.dossier.json  ->  dossier build  ->  self-contained .html + .md
+        ^                                  |
+        |                                  v
+agent reads packets  <-  human decisions, edits, evidence, release gates
 ```
 
-- **Zero runtime dependencies in the output.** Shiki (highlighting), Graphviz-WASM
-  (diagrams), KaTeX (math), and React (the optional port) run at build time only. None ship
-  to the viewer.
-- **One design system.** Tokens, the inlined client runtime, and the HTML shell are shared by
-  both renderers (`renderShell()`).
-- **It round-trips.** Edit the JSON, rebuild, and the island always deserializes back to the
-  exact model. The human-and-agent loop stays lossless.
+Use it for planning, specs, research, code implementation packets, patch review, QA checklists, release gates, incident response, integration loops, and any process where humans and agents need to pass structured state back and forth.
 
-Each page includes a sticky table of contents with scroll-spy, in-page search, a command
-palette, light/dark theme, reading progress, per-block copy, heading anchors, collapsible
-sections, glossary tooltips, in-place text editing, and one-click export to Markdown, JSON,
-or agent digest. All inlined, all offline, responsive to mobile.
+## Why It Exists
 
-## Use it from an agent
+| Old flow | Dossier flow |
+|---|---|
+| AI writes a long Markdown dump. | AI builds an interactive artifact with a typed source model. |
+| Human comments in the chat. | Human decides inside the artifact with verdicts, notes, gates, and edits. |
+| Agent re-reads an ambiguous transcript. | Agent reads versioned packets through HTML export or MCP tools. |
+| Evidence is scattered across logs, PRs, and messages. | Evidence, claims, sources, commands, diffs, and receipts live together. |
 
-Dossier ships a [Claude Code](https://claude.com/claude-code) skill in [`skill/`](skill/), so
-an agent reaches for it whenever you ask for a plan, implementation packet, review,
-write-up, report, or options to decide on. Link it into your skills directory:
+The core idea: **a dossier is not just a document. It is a portable human-agent process packet.**
+
+## Quick Start
+
+Install from GitHub:
+
+```bash
+npm install -g github:mrbagels/dossier
+```
+
+Create and build a document:
+
+```bash
+dossier init my-plan --kind plan
+dossier build my-plan.dossier.json
+open my-plan.html
+```
+
+Or let an agent do it:
+
+```text
+Make me a Dossier for this refactor. Include work items, patch review, verification, risks, and a release gate.
+```
+
+The agent should write `my-refactor.dossier.json`, run `dossier build`, and give you `my-refactor.html` plus `my-refactor.md`.
+
+## Choose A Workflow
+
+| If you need... | Start with... | Main blocks |
+|---|---|---|
+| Strategy, options, tradeoffs | `dossier init roadmap --kind plan` | `review-board`, `decision-matrix`, `assumptions`, `action-items` |
+| Actual code editing loop | `--kind implementation` | `process-board`, `code-editor`, `patch-set`, `diff-view`, `verification-run`, `process-receipt` |
+| Review or bug bash | `--kind review` | `finding-list`, `diff-view`, `comment-thread`, `verdict-gate`, `trust-report` |
+| Debugging | `--kind debug` | `evidence-log`, `patch-set`, `verification-run`, `decision-log` |
+| Dependency dogfood | `--kind integration-loop` | `cycle-board`, `integration-report`, `upstream-response`, `process-receipt` |
+| Release readiness | `--kind release` | `release-checklist`, `risk-register`, `verification-run`, `trust-report`, `process-receipt` |
+| Incident response | `--kind incident` | `timeline`, `evidence-log`, `decision-log`, `verification-run`, `process-receipt` |
+| A folder of docs | `dossier publish docs --out site` | catalog, cross-links, static site output |
+
+## Example Gallery
+
+The repo ships focused examples so people can see Dossier as more than a plan document. Build them all with:
+
+```bash
+node bin/dossier.mjs build examples/*.dossier.json
+npm run site
+```
+
+| Example | Source | What it showcases | Use it when |
+|---|---|---|---|
+| [Block showcase](examples/showcase.html) | [`examples/showcase.dossier.json`](examples/showcase.dossier.json) | All 42 blocks, reader controls, export packets, process blocks, trust reports. | You want to inspect the full product surface. |
+| [System overview](examples/dossier-overview.html) | [`examples/sample.dossier.json`](examples/sample.dossier.json) | Compact overview, hero, stats, flow, tables, and core export behavior. | You want the smallest useful starting point. |
+| [Product launch](examples/product-launch.html) | [`examples/product-launch.dossier.json`](examples/product-launch.dossier.json) | Product microsite, hero media, FAQ, launch claims, and polished public copy. | You need a product page, feature brief, or launch note. |
+| [Research brief](examples/research-brief.html) | [`examples/research-brief.dossier.json`](examples/research-brief.dossier.json) | Decision matrix, assumptions, references, and source-backed trust ledger. | You need research synthesis or competitive analysis. |
+| [Engineering release](examples/engineering-release.html) | [`examples/engineering-release.dossier.json`](examples/engineering-release.dossier.json) | Release checklist, verification receipts, trust claims, and closeout. | You need public QA or release readiness. |
+| [Incident response](examples/incident-response.html) | [`examples/incident-response.dossier.json`](examples/incident-response.dossier.json) | Timeline, evidence log, decision log, risk register, remediation board. | You need an incident or post-incident packet. |
+| [Implementation packet](examples/implementation-packet.html) | [`examples/implementation-packet.dossier.json`](examples/implementation-packet.dossier.json) | Process board, editable code, patch set, diff review, and verification plan. | You need agentic code editing with human approval. |
+
+The Pages build also emits a hosted gallery at `examples.html`, with every example cross-linked as a static Dossier site.
+
+## Feature Map
+
+| Area | What is included |
+|---|---|
+| Self-contained output | One HTML file, one Markdown export, embedded JSON model, no view-time network. |
+| Reader UX | Sticky TOC, search, command palette, scroll progress, dark mode, section collapse, copy buttons, heading anchors. |
+| Agent usability | Embedded `#dossier-model`, agent digest, versioned packets, MCP read/write tools, starter templates. |
+| Human control | Review boards, process verdicts, release gates, patch verdicts, diff file and hunk comments. |
+| Editing | In-place text editing, `code-editor` blocks, edit packet export/import, `dossier serve` save-back. |
+| Live authoring | Local dev server, reload, live model editor, patch import, JSON validation before write. |
+| Code review | Unified diff parser, file summaries, hunk rendering, patch sets, review packets. |
+| Evidence | Verification runs, evidence logs, process receipts, generation receipts, trust reports. |
+| Trust | Structured source records, per-claim status and confidence, source/evidence links, MCP trust readback. |
+| Publishing | `catalog` and `publish` commands for static dossier sites. |
+| Export | HTML, Markdown, DOCX, PDF through Playwright, plus React SSR/components. |
+| Extensibility | Plugin renderer registry for Node and React block components. |
+
+## How Dossier Works
+
+Dossier has one source of truth: the JSON model.
+
+```json
+{
+  "dossierVersion": "1.0",
+  "kind": "implementation",
+  "meta": {
+    "title": "Session refactor",
+    "slug": "session-refactor",
+    "status": "review"
+  },
+  "blocks": [
+    { "type": "hero", "title": "Session refactor", "lede": "A bounded implementation packet." },
+    { "type": "process-board", "title": "Work", "items": [] },
+    { "type": "verification-run", "title": "Verification", "runs": [] },
+    {
+      "type": "trust-report",
+      "title": "Trust report",
+      "sources": [
+        { "id": "verification", "label": "Verification", "kind": "command", "trust": "pending" }
+      ],
+      "claims": [
+        { "id": "ready", "claim": "Ready for review.", "status": "unverified", "confidence": "unknown", "sources": ["verification"] }
+      ]
+    }
+  ]
+}
+```
+
+Build-time enrichments are baked into the HTML:
+
+| Enrichment | Where it runs | Viewer requirement |
+|---|---|---|
+| Shiki code highlighting | Build time | None |
+| Graphviz DOT diagrams | Build time | None |
+| KaTeX math | Build time | None |
+| SVG charts | Build time | None |
+| Figures | Build time, local images inlined | None |
+| Mermaid diagrams | Optional Playwright path | Browser only for build |
+| PDF export | Optional Playwright path | Browser only for export |
+
+The generated HTML includes:
+
+- `#dossier-model`: the embedded JSON source model.
+- `#dossier-markdown`: the Markdown export.
+- `#dossier-digest`: a compact agent-readable digest.
+- Inlined CSS and runtime JavaScript.
+- No external assets or remote scripts.
+
+## Agent Workflows
+
+Dossier is designed to be driven by agents, not only read by humans.
+
+### Claude Code Skill
+
+This repo ships a skill in [`skill/`](skill/). Link it into your skill directory:
 
 ```bash
 ln -s "$(pwd)/skill" ~/.claude/skills/dossier
 ```
 
-It bundles a [block cheatsheet](skill/references/blocks.md) and a
-[starter template](skill/references/starter.dossier.json), and tells the agent to author a
-`*.dossier.json` and run `dossier build`. After that, "make me a dossier" is all you need.
+Then ask:
 
-### Any agent, via MCP
-
-`dossier mcp` runs a [Model Context Protocol](https://modelcontextprotocol.io) server over
-stdio, so any MCP-capable agent can drive Dossier, including the full human-and-agent loop.
-Tools: `dossier_render`, `dossier_validate`, `dossier_read_decisions` (read back the options a
-human selected on a review board), `dossier_read_process` (read process-board verdicts and
-notes), `dossier_read_edits` (read code-editor edit packets), `dossier_read_verdicts`,
-`dossier_read_release`, `dossier_read_patch_review`, `dossier_read_diff_review`,
-`dossier_resume_context`, `dossier_apply_edits`, `dossier_apply_process`,
-`dossier_apply_patch_review`, `dossier_record_run`, `dossier_attach_patchset`,
-`dossier_closeout_digest`, `dossier_closeout_model`, `dossier_get_schema`,
-`dossier_get_packet_schema`, and `dossier_get_starter`.
-
-```jsonc
-// e.g. an MCP client config
-{ "mcpServers": { "dossier": { "command": "dossier", "args": ["mcp"] } } }
+```text
+Make me an implementation dossier for this change. Include source context, work items, proposed patch sets, diff review, test evidence, a trust report, and release gates.
 ```
 
-## Authoring
+The skill points the agent at:
 
-You normally let the agent write this, but the model is small. A dossier is
-`{ dossierVersion, kind, meta, blocks[] }`:
+- [`skill/SKILL.md`](skill/SKILL.md), the agent instructions.
+- [`skill/references/blocks.md`](skill/references/blocks.md), copy-paste examples for every block.
+- [`schema/dossier.schema.json`](schema/dossier.schema.json), the full contract.
+
+### MCP Server
+
+Run:
+
+```bash
+dossier mcp
+```
+
+Example MCP client config:
 
 ```json
 {
-  "dossierVersion": "1.0",
-  "kind": "dossier",
-  "meta": { "title": "My title", "slug": "my-doc", "status": "review", "updated": "2026-06-26" },
-  "blocks": [
-    { "type": "hero", "eyebrow": "Kicker", "title": "Headline", "lede": "One-sentence summary." },
-    { "type": "section", "title": "Details", "blocks": [
-      { "type": "callout", "tone": "tip", "title": "Note.", "body": "Sections nest other blocks." }
-    ] }
-  ]
+  "mcpServers": {
+    "dossier": {
+      "command": "dossier",
+      "args": ["mcp"]
+    }
+  }
 }
 ```
 
-- **`kind`**: `reader | plan | review-board | dossier | adr | runbook | research |
-  comparison | implementation | review | debug | integration-loop | release | incident`.
-  Selects defaults and starter shape.
-- **`meta`**: `title` (required), `slug`, `eyebrow`, `lede`, `crumbs`, `status`, `owner`,
-  `updated`, `version`, `tags`, `baseUrl` (for hosted cross-links), `theme` (token overrides),
-  `lifecycle`, `changelog`.
-- **`blocks`**: ordered. `section`, `two-col`, and `tabs` nest other blocks. Text fields take
-  inline markdown: `**bold**`, `` `code` ``, `[label](url)`, `[[slug]]` cross-document links,
-  and `[[Term]]` glossary tooltips.
+Core MCP tools:
 
-Full contract: [`schema/dossier.schema.json`](schema/dossier.schema.json).
+| Tool family | Tools |
+|---|---|
+| Render and validate | `dossier_render`, `dossier_validate`, `dossier_get_schema`, `dossier_get_starter` |
+| Read human state | `dossier_read_decisions`, `dossier_read_process`, `dossier_read_edits`, `dossier_read_verdicts`, `dossier_read_release` |
+| Review packets | `dossier_read_patch_review`, `dossier_read_diff_review` |
+| Trust and provenance | `dossier_read_trust`, `dossier_record_claim` |
+| Update models | `dossier_apply_edits`, `dossier_apply_process`, `dossier_apply_patch_review`, `dossier_record_run`, `dossier_attach_patchset` |
+| Closeout | `dossier_resume_context`, `dossier_closeout_digest`, `dossier_closeout_model` |
+| Packet schemas | `dossier_get_packet_schema` |
 
-## Block types
+Packet contracts live in [`schema/packets/`](schema/packets/):
 
-41 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
-example in [`skill/references/blocks.md`](skill/references/blocks.md):
+`process`, `edits`, `verdicts`, `release`, `patch-review`, `diff-review`, `trust`, and `closeout`.
+
+## Process Dossiers
+
+Planning is one process. Dossier now covers the rest of the AI-assisted work loop.
+
+### Implementation Loop
+
+1. Agent writes a context-rich implementation dossier.
+2. Human reviews `process-board` items and `patch-set` proposals.
+3. Human leaves notes, approves patches, or requests revision.
+4. Agent reads packets through MCP or exported JSON.
+5. Agent edits the real codebase in the host environment.
+6. Verification runs, evidence, trust claims, release gates, and closeout receipts are appended.
+
+### Release And Incident Flow
+
+| Release | Incident |
+|---|---|
+| `release-checklist` tracks required gates. | `timeline` tracks events and mitigation. |
+| `verification-run` records test and build evidence. | `evidence-log` records observations and links. |
+| `trust-report` records which claims are grounded. | `decision-log` records operational decisions. |
+| `process-receipt` closes out the release. | `process-receipt` closes out remediation. |
+
+## Live Editing
+
+Static artifacts work anywhere. For authoring, run:
+
+```bash
+dossier serve my-doc.dossier.json --open
+```
+
+`dossier serve` adds development-only live tools:
+
+- Live reload when the source model changes.
+- Save-back for `code-editor` blocks.
+- Line numbers, search, JSON formatting, tab indentation, copy, and Cmd/Ctrl-S in editor blocks.
+- A live model editor that can validate and save the full JSON model.
+- Patch import that appends a validated `patch-set` block.
+
+The saved model is validated before writing. Invalid saves return a 400 and do not touch disk.
+
+## Block Catalog
+
+42 built-in block types, plus plugins:
 
 | Group | Blocks |
 |---|---|
-| **Structure** | `hero`, `section`, `two-col`, `tabs`, `prose` |
-| **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
-| **Reference** | `table`, `code` (Shiki), `code-editor`, `patch-set`, `diff-view`, `diagram` (DOT or Mermaid to SVG), `references`, `faq`, `glossary` |
-| **Media & data** | `figure` (inlined), `math` (KaTeX to MathML), `chart` (bar/line/area SVG), `footnotes` |
-| **Decisions, process & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `process-board`, `verification-run`, `evidence-log`, `verdict-gate`, `process-receipt`, `finding-list`, `comment-thread`, `cycle-board`, `integration-report`, `upstream-response`, `release-checklist`, `decision-log`, `receipt` |
+| Structure | `hero`, `section`, `two-col`, `tabs`, `prose` |
+| At a glance | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
+| Reference | `table`, `code`, `code-editor`, `patch-set`, `diff-view`, `diagram`, `references`, `faq`, `glossary` |
+| Media and data | `figure`, `math`, `chart`, `footnotes` |
+| Decisions | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `verdict-gate`, `decision-log` |
+| Process | `process-board`, `verification-run`, `evidence-log`, `process-receipt`, `finding-list`, `comment-thread`, `cycle-board`, `integration-report`, `upstream-response`, `release-checklist` |
+| Trust | `trust-report`, `receipt` |
 
-## Review / triage
+Every block has a copy-paste example in [`skill/references/blocks.md`](skill/references/blocks.md).
 
-Deciding *with* AI happens here. Use one `review-board` block for "here are the options,
-let's decide." Each candidate is an expandable row: collapsed it's scannable (title, summary,
-chips, status, a checkbox); expanded it shows the full reference the agent loaded (`body`
-markdown and/or nested `blocks`) plus a notes field.
+## CLI Reference
 
-You filter, search, tick what to do, and write notes, then export a decisions JSON (re-import
-to resume). The agent reads the reference plus your decisions and implements them. The human
-to agent loop, in one file.
-
-## Process dossiers
-
-Planning is one process. Dossier now also scaffolds process-oriented starters for the actual
-work loop:
-
-| Starter | Use it for |
+| Command | What it does |
 |---|---|
-| `plan` | Strategy, options, tradeoffs, and selected direction. |
-| `implementation` | Code-editing context, work items, patch preview, verification, and handoff. |
-| `review` | Findings, severity, evidence, accepted fixes, and follow-up work. |
-| `debug` | Reproduction, hypotheses, fix candidates, and verification. |
-| `integration-loop` | Producer/consumer dependency dogfooding and packet exchange. |
-| `release` | Release readiness, checks, risks, approvals, and closeout. |
-| `incident` | Timeline, mitigation decisions, evidence, and follow-ups. |
-
-They use the existing block catalog plus `process-board` for work items, `code-editor` for
-bounded editable snippets, `patch-set` for proposed edit packets, `diff-view` for static
-unified diff review, `verification-run` for commands and outcomes, `evidence-log` for source
-material, `verdict-gate` for human approval, and closeout blocks for release, incident,
-review, and integration loops. `patch-set` and `diff-view` export review packets for patch,
-file, and hunk verdicts. In `dossier serve`, editor blocks get a live host adapter with line
-numbers, search, JSON formatting, save shortcuts, and save-back. The live model editor can
-validate and save the whole source model, and patch imports can append a `patch-set` block
-for the next agent turn.
+| `dossier init [name] --kind <kind>` | Scaffold from a starter. |
+| `dossier build <file> [--watch] [--plugin a,b]` | Validate and render to `<slug>.html` plus `<slug>.md`. |
+| `dossier serve <file> [--open] [--port]` | Build, serve, live reload, and enable save-back tools. |
+| `dossier validate <file>` | Validate a model without rendering. |
+| `dossier diff <old> <new>` | Structural diff between two dossier models. |
+| `dossier catalog <dir>` | Build an index model for a folder of dossiers. |
+| `dossier publish <dir> --out site` | Build every dossier plus an `index.html` catalog into a static site. |
+| `dossier export <file> --format docx\|md\|pdf` | Export to Word, Markdown, or PDF. |
+| `dossier mcp` | Run the MCP server over stdio. |
 
 ## React
 
-Dossier also ships as typed React/TSX components ([`react/`](react/),
-`@mrbagels/dossier-react`), for teams that render the same design from a React or Next app.
+Dossier also ships a typed React port in [`react/`](react/):
 
 ```ts
 import { renderDossier } from "@mrbagels/dossier-react";
-const { html, md } = await renderDossier(model);   // the same self-contained file
+
+const { html, md } = await renderDossier(model);
 ```
 
 ```tsx
-// or render blocks live inside an app (optional Motion entrance when hydrated)
 import { DossierDocument } from "@mrbagels/dossier-react";
+
 <DossierDocument model={model} animate />
 ```
 
-The `<Block>` dispatcher covers all 41 block types and reuses the core's CSS, runtime, and
-enrichment, so SSR output matches the Node generator. See [`react/README.md`](react/README.md).
+The React dispatcher covers the built-in blocks, reuses the core design system, and falls back to registered Node renderers for plugin blocks.
 
-## Plugins & CLI
+## Plugins
 
-Add custom block types without forking. A plugin registers a renderer:
+Register custom blocks without forking:
 
 ```bash
 dossier build my.dossier.json --plugin ./my-plugin.mjs
 ```
+
 ```js
-// my-plugin.mjs; the default export receives the authoring API
 export default function ({ registerBlock, esc }) {
   registerBlock("badge-row", (b) =>
     `<section class="ds-block" data-block="badge-row"><div class="ds-chips">` +
@@ -254,87 +340,111 @@ export default function ({ registerBlock, esc }) {
 }
 ```
 
-The same plugin can also `registerComponent(type, Component)` for the React port, so one
-plugin reaches full parity across both renderers (the Node renderer is the fallback
-otherwise). See [`examples/plugins/badge-row.plugin.mjs`](examples/plugins/badge-row.plugin.mjs).
+React plugins can call `registerComponent(type, Component)` for native component parity. See [`examples/plugins/badge-row.plugin.mjs`](examples/plugins/badge-row.plugin.mjs).
 
-The full CLI:
+## Publishing And Embedding
 
-| Command | What it does |
-|---|---|
-| `dossier init [name] --kind <kind>` | scaffold from a starter (`dossier`, `plan`, `implementation`, `review`, `debug`, `integration-loop`, `release`, `incident`, `adr`, `runbook`, `postmortem`, `review-board`) |
-| `dossier build <file> [--watch] [--plugin a,b]` | validate and render to `<slug>.html` (+ `.md`) |
-| `dossier serve <file> [--open] [--port]` | build and live-reload dev server |
-| `dossier validate <file>` | check a model without rendering |
-| `dossier diff <old> <new>` | structural diff between two versions |
-| `dossier catalog <dir>` | index a folder of dossiers, with a link graph |
-| `dossier publish <dir> --out site` | build every dossier in a folder plus a catalog index into a static site |
-| `dossier export <file> --format docx\|md\|pdf` | export to Word, Markdown, or PDF |
-| `dossier mcp` | run the MCP server (stdio) |
-
-### Optional: Mermaid and PDF
-
-DOT diagrams, syntax highlighting, math, charts, and Word export (with charts and diagrams
-embedded as images) all work out of the box. Two features render through a headless browser
-and are opt-in: Mermaid diagrams (`format: "mermaid"`) and `dossier export --format pdf`. To
-keep the install lightweight, Playwright and the mermaid library are **not bundled**. Add them
-when you want those features:
+Publish a dossier folder:
 
 ```bash
-npm i playwright mermaid && npx playwright install chromium
-# installed Dossier globally? use: npm i -g playwright mermaid && npx playwright install chromium
+dossier publish docs --out site
 ```
 
-Until then, Mermaid diagrams render as their source (the build prints how to enable it) and
-PDF export tells you what to install. Word export needs no browser.
-
-## Embedding
-
-Every page is a complete, style-isolated HTML document, so it embeds anywhere:
+Embed a generated artifact anywhere:
 
 ```html
 <iframe src="my-doc.html" style="width:100%;height:80vh;border:0"></iframe>
 ```
 
-Cross-link dossiers with `[[other-slug]]`: a relative file link when they sit together, or an
-absolute URL when you set `meta.baseUrl` for a hosted site. Dossier is a *companion* to your
-docs site, not a replacement.
+Cross-link dossiers with `[[other-slug]]`. Use relative links when files sit together, or set `meta.baseUrl` for hosted sites.
+
+## Optional Browser Features
+
+Most features need no browser automation. Two features use Playwright:
+
+```bash
+npm i playwright mermaid
+npx playwright install chromium
+```
+
+| Feature | Without Playwright | With Playwright |
+|---|---|---|
+| Mermaid diagrams | Render as source text with an install hint. | Render to static SVG at build time. |
+| PDF export | Prints an install hint. | Exports a print-styled PDF. |
+
+## Release Status
+
+Current patch train:
+
+| Version | Focus |
+|---|---|
+| `0.5.1` | Live editor adapter, model editor, patch import, review packets, expanded MCP write tools. |
+| `0.5.2` | Static publishing, catalog index, React parity for process blocks. |
+| `0.5.3` | Trust reports, provenance packet, MCP trust tools, README and public manual QA readiness. |
+
+Manual QA entrypoint: [`docs/product/public-manual-qa.md`](docs/product/public-manual-qa.md).
 
 ## Development
 
+```bash
+git clone https://github.com/mrbagels/dossier.git
+cd dossier
+npm install
+npm test
+node bin/dossier.mjs build examples/sample.dossier.json
+node bin/dossier.mjs build examples/showcase.dossier.json
+
+cd react
+npm install
+npx tsc --noEmit
 ```
-src/            zero-dependency Node generator (generate.mjs, theme, runtime, renderers)
-react/          typed React/TSX port (SSR + live components)
-schema/         dossier.schema.json, the document contract
-skill/          Claude Code skill (SKILL.md + references + starter)
-examples/       sample.dossier.json, showcase.dossier.json
-docs/DESIGN.md  the design system and decisions
-```
+
+Project map:
+
+| Path | Purpose |
+|---|---|
+| `src/` | Core Node generator, runtime, theme, validation, exports, serve mode. |
+| `react/` | Typed React renderer and components. |
+| `schema/` | Document schema and packet schemas. |
+| `mcp/` | MCP server. |
+| `skill/` | Agent skill and block references. |
+| `examples/` | Sample and showcase models. |
+| `docs/product/` | Durable product scope and QA docs. |
+| `.github/workflows/` | CI and Pages demo deployment. |
+
+Before opening a PR or cutting a release:
 
 ```bash
-git clone https://github.com/mrbagels/dossier.git && cd dossier
-npm install && npm link
-dossier build examples/sample.dossier.json && open examples/dossier-overview.html
-
-cd react && npm install
-npx tsx src/cli.tsx ../examples/sample.dossier.json && npx tsc --noEmit
+npm test
+node bin/dossier.mjs validate examples/sample.dossier.json
+node bin/dossier.mjs validate examples/showcase.dossier.json
+cd react && npx tsc --noEmit
 ```
 
 ## Requirements
 
-Node.js >= 18 to build. The generated pages need only a browser.
+Node.js 18 or newer to build. Generated pages need only a browser.
 
 ## Contributing
 
-Issues and PRs welcome. Keep the output self-contained (no view-time network) and keep one
-accent in the design.
+Issues and PRs are welcome. Keep generated output self-contained, keep agent-readable contracts explicit, and add tests for new blocks or packets.
 
-When you add a block type, update all of: the Node renderer (`src/generate.mjs`), the React
-component (`react/src/blocks.tsx`), the schema (`schema/dossier.schema.json`), the validator
-(`src/validate.mjs`), the cheatsheet (`skill/references/blocks.md`), the live demo
-(`examples/showcase.dossier.json`), and a test. CI and the
-[Pages demo](https://mrbagels.github.io/dossier/) redeploy automatically on push to `next`.
+When adding a block type, update:
+
+| Surface | File |
+|---|---|
+| Node render and Markdown | `src/generate.mjs` |
+| React render | `react/src/blocks.tsx` |
+| Types | `react/src/types.ts` |
+| Schema | `schema/dossier.schema.json` |
+| Validator | `src/validate.mjs` |
+| DOCX export, if applicable | `src/export.mjs` |
+| Agent docs | `skill/references/blocks.md` |
+| Showcase | `examples/showcase.dossier.json` |
+| Tests | `test/dossier.test.mjs` |
+
+CI runs tests on Node 18, 20, and 22. The Pages demo redeploys on pushes to `next`.
 
 ## License
 
-[MIT](LICENSE). Do whatever you want with it.
+[MIT](LICENSE).

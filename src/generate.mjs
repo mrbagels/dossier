@@ -233,6 +233,71 @@ function renderSimpleList(items, cls, ctx) {
     .join("");
 }
 
+const asArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+
+function renderTrustReport(b, ctx) {
+  const sources = asArray(b.sources);
+  const claims = asArray(b.claims);
+  const sourceMap = new Map(sources.filter((s) => s && s.id).map((s) => [s.id, s]));
+  const sourceRows = sources
+    .map((s) => {
+      const id = s.id || slugify(s.label || s.url || "source");
+      const label = s.url ? `<a href="${esc(safeUrl(s.url))}">${esc(s.label || s.url)}</a>` : esc(s.label || id);
+      const cells = [
+        `<td>${label}</td>`,
+        `<td>${inlineMd(s.kind || "", ctx)}</td>`,
+        `<td>${inlineMd(s.trust || "", ctx)}</td>`,
+        `<td>${inlineMd(s.license || "", ctx)}</td>`,
+        `<td>${inlineMd(s.summary || "", ctx)}</td>`,
+      ].join("");
+      return `<tr id="${esc(b.id)}-${esc(id)}" data-trust-source="${esc(id)}">${cells}</tr>`;
+    })
+    .join("");
+  const sourceTable = sourceRows
+    ? `<div class="ds-trust-sources"><h4>Sources</h4><div class="ds-tablewrap"><table><thead><tr><th>Source</th><th>Kind</th><th>Trust</th><th>License</th><th>Summary</th></tr></thead><tbody>${sourceRows}</tbody></table></div></div>`
+    : "";
+  const claimCards = claims
+    .map((c) => {
+      const id = c.id || slugify(c.claim || c.title || "claim");
+      const title = c.claim || c.title || id;
+      const chips = [];
+      if (c.status) chips.push(`<span class="ds-chip">status · ${esc(c.status)}</span>`);
+      if (c.confidence) chips.push(`<span class="ds-chip">confidence · ${esc(c.confidence)}</span>`);
+      if (c.owner) chips.push(`<span class="ds-chip">owner · ${esc(c.owner)}</span>`);
+      const sourceLinks = asArray(c.sources)
+        .map((sid) => {
+          const src = sourceMap.get(sid);
+          const label = src ? src.label || src.id : sid;
+          return src
+            ? `<a class="ds-chip ds-trust-link" href="#${esc(b.id)}-${esc(src.id)}">${esc(label)}</a>`
+            : `<span class="ds-chip ds-trust-missing">missing · ${esc(sid)}</span>`;
+        })
+        .join("");
+      const evidence = asArray(c.evidence).map((e) => `<span class="ds-chip">${esc(e)}</span>`).join("");
+      const rows = [
+        ["notes", c.notes],
+        ["updated", c.updated],
+      ];
+      return (
+        `<article class="ds-process-card ds-trust-claim status-${esc(slugify(c.status || "unverified"))}" data-trust-claim="${esc(id)}">` +
+        `<div class="ds-process-card-head"><div><h4>${esc(title)}</h4>${c.summary ? `<p class="ds-muted">${inlineMd(c.summary, ctx)}</p>` : ""}</div>` +
+        (chips.length ? `<div class="ds-chips">${chips.join("")}</div>` : "") +
+        `</div>${renderDetails(rows, ctx)}` +
+        (sourceLinks || evidence ? `<div class="ds-trust-refs">${sourceLinks}${evidence}</div>` : "") +
+        `</article>`
+      );
+    })
+    .join("");
+  return wrap(
+    "trust-report",
+    b.id,
+    (b.title ? `<h3 id="${esc(b.id)}">${esc(b.title)}</h3>` : "") +
+      (b.summary ? `<p class="ds-muted">${inlineMd(b.summary, ctx)}</p>` : "") +
+      sourceTable +
+      `<div class="ds-process-list ds-trust-claims">${claimCards}</div>`
+  );
+}
+
 // ---- block renderers -------------------------------------------------------
 
 const renderers = {
@@ -329,6 +394,8 @@ const renderers = {
   "code-editor"(b, ctx) {
     const id = b.id || slugify(b.title || b.filename || b.targetPath || "code-editor");
     const label = b.filename || b.targetPath || b.lang || "code";
+    const codeText = String(b.code || "");
+    const rows = Math.min(28, Math.max(10, codeText.split(/\r?\n/).length + 1));
     const meta = [];
     if (b.lang) meta.push(`<span>${esc(b.lang)}</span>`);
     if (b.targetPath) meta.push(`<span>${esc(b.targetPath)}</span>`);
@@ -340,6 +407,7 @@ const renderers = {
       `data-editor-target="${esc(b.targetPath || "")}"`,
       `data-editor-title="${esc(b.title || "")}"`,
       `spellcheck="false"`,
+      `rows="${rows}"`,
     ];
     if (b.readonly) attrs.push("readonly");
     return wrap(
@@ -349,7 +417,7 @@ const renderers = {
         (b.summary ? `<p class="ds-muted">${inlineMd(b.summary, ctx)}</p>` : "") +
         `<div class="ds-codeedit" data-editor-shell="${esc(id)}">` +
         `<div class="ds-codeedit-bar"><span class="ds-lang">${esc(label)}</span><div class="ds-codeedit-meta">${meta.join("")}</div></div>` +
-        `<textarea class="ds-codeedit-area" ${attrs.join(" ")}>${esc(b.code || "")}</textarea>` +
+        `<textarea class="ds-codeedit-area" ${attrs.join(" ")}>${esc(codeText)}</textarea>` +
         `<div class="ds-codeedit-actions"><span class="ds-codeedit-state" data-editor-state="${esc(id)}">clean</span>` +
         `<button class="ds-btn ds-btn-line" type="button" data-editor-reset="${esc(id)}">Reset</button>` +
         `<button class="ds-btn ds-btn-line" type="button" data-export-editors>Export edits JSON</button>` +
@@ -407,6 +475,9 @@ const renderers = {
   },
   "evidence-log"(b, ctx) {
     return wrap("evidence-log", b.id, (b.title ? `<h3 id="${esc(b.id)}">${esc(b.title)}</h3>` : "") + `<div class="ds-process-list">${renderSimpleList(b.items || [], "ds-process-card ds-evidence", ctx)}</div>`);
+  },
+  "trust-report"(b, ctx) {
+    return renderTrustReport(b, ctx);
   },
   "verdict-gate"(b, ctx) {
     const id = b.gateId || b.id || slugify(b.title || "verdict-gate");
@@ -831,6 +902,26 @@ function blockMd(b) {
       if (it.body) lines.push("", it.body);
       lines.push("");
     });
+  } else if (t === "trust-report") {
+    if (b.title) lines.push(`## ${b.title}`, "");
+    if (b.summary) lines.push(b.summary, "");
+    if (b.sources?.length) {
+      lines.push("### Sources", "");
+      (b.sources || []).forEach((s) => {
+        lines.push(`- **${s.id || s.label || "source"}:** ${s.label || s.url || ""}${s.trust ? ` (${s.trust})` : ""}`);
+        if (s.summary) lines.push(`  ${s.summary}`);
+      });
+      lines.push("");
+    }
+    if (b.claims?.length) {
+      lines.push("### Claims", "");
+      (b.claims || []).forEach((c) => {
+        lines.push(`- **${c.claim || c.title || c.id || "Claim"}**${c.status ? ` (${c.status})` : ""}${c.confidence ? `, confidence: ${c.confidence}` : ""}`);
+        if (c.sources?.length) lines.push(`  - Sources: ${c.sources.join(", ")}`);
+        if (c.evidence?.length) lines.push(`  - Evidence: ${c.evidence.join(", ")}`);
+        if (c.notes) lines.push(`  - Notes: ${c.notes}`);
+      });
+    }
   } else if (t === "verdict-gate") {
     if (b.title) lines.push(`## ${b.title}`, "");
     if (b.prompt) lines.push(b.prompt, "");
@@ -1002,6 +1093,7 @@ function buildToc(blocks) {
     "code-editor",
     "verification-run",
     "evidence-log",
+    "trust-report",
     "verdict-gate",
     "process-receipt",
     "finding-list",

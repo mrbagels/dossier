@@ -44,6 +44,17 @@
       ]
     },
     {
+      "type": "trust-report",
+      "title": "Debug trust report",
+      "summary": "Track which bug hypotheses and observations are grounded.",
+      "sources": [
+        { "id": "observation-one", "label": "Observation one", "kind": "log", "trust": "medium", "summary": "Replace with the primary evidence source." }
+      ],
+      "claims": [
+        { "id": "bug-reproduced", "claim": "The bug is reproducible.", "status": "unverified", "confidence": "unknown", "sources": ["observation-one"], "evidence": ["repro-run"], "notes": "Update after running the reproduction command." }
+      ]
+    },
+    {
       "type": "assumptions",
       "title": "Hypotheses",
       "items": [

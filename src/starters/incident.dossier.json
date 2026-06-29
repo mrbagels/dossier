@@ -48,6 +48,17 @@
       ]
     },
     {
+      "type": "trust-report",
+      "title": "Incident trust report",
+      "summary": "Track which incident claims are supported by evidence and verification.",
+      "sources": [
+        { "id": "alert-one", "label": "Alert or observation one", "kind": "alert", "trust": "high", "summary": "Replace with the primary alert, dashboard, or log." }
+      ],
+      "claims": [
+        { "id": "impact-understood", "claim": "The customer impact is understood.", "status": "unverified", "confidence": "unknown", "sources": ["alert-one"], "evidence": ["impact-check"], "notes": "Update after mitigation verification." }
+      ]
+    },
+    {
       "type": "decision-log",
       "title": "Decision log",
       "decisions": [

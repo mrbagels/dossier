@@ -366,6 +366,9 @@
           "$ref": "#/$defs/blocks/evidenceLog"
         },
         {
+          "$ref": "#/$defs/blocks/trustReport"
+        },
+        {
           "$ref": "#/$defs/blocks/verdictGate"
         },
         {
@@ -1653,6 +1656,53 @@
           "type": { "const": "evidence-log" },
           "title": { "type": "string" },
           "items": { "type": "array", "items": { "$ref": "#/$defs/processItemLite" } }
+        }
+      },
+      "trustReport": {
+        "description": "Structured provenance: source records and per-claim trust/confidence mapping for agent-authored work.",
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "claims"],
+        "properties": {
+          "type": { "const": "trust-report" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                "label": { "type": "string" },
+                "kind": { "type": "string" },
+                "url": { "type": "string" },
+                "trust": { "type": "string" },
+                "license": { "type": "string" },
+                "created": { "type": "string" },
+                "summary": { "type": "string" }
+              }
+            }
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                "claim": { "type": "string" },
+                "title": { "type": "string" },
+                "summary": { "type": "string" },
+                "status": { "type": "string" },
+                "confidence": { "type": "string" },
+                "owner": { "type": "string" },
+                "updated": { "type": "string" },
+                "sources": { "type": "array", "items": { "type": "string" } },
+                "evidence": { "type": "array", "items": { "type": "string" } },
+                "notes": { "type": "string" }
+              }
+            }
+          }
         }
       },
       "verdictGate": {

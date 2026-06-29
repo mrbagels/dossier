@@ -73,6 +73,17 @@
       ]
     },
     {
+      "type": "trust-report",
+      "title": "Integration trust report",
+      "summary": "Track which producer and consumer claims are grounded by cycle evidence.",
+      "sources": [
+        { "id": "consumer-report", "label": "Consumer integration report", "kind": "report", "trust": "pending", "summary": "Replace after consumer verification." }
+      ],
+      "claims": [
+        { "id": "consumer-tested-version", "claim": "The consumer tested the stated dependency version or source ref.", "status": "unverified", "confidence": "unknown", "sources": ["consumer-report"], "evidence": ["cycle-one"], "notes": "Update after the consumer run is complete." }
+      ]
+    },
+    {
       "type": "upstream-response",
       "title": "Producer upstream response",
       "upstream": "replace-with-producer",

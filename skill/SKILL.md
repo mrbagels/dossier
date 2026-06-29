@@ -64,12 +64,15 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
 `dossier_render`, `dossier_validate`, `dossier_read_decisions`, `dossier_read_process`,
 `dossier_read_edits`, `dossier_read_verdicts`, `dossier_read_release`,
-`dossier_read_patch_review`, `dossier_read_diff_review`, `dossier_resume_context`,
+`dossier_read_patch_review`, `dossier_read_diff_review`, `dossier_read_trust`,
+`dossier_resume_context`,
 `dossier_apply_edits`, `dossier_apply_process`, `dossier_apply_patch_review`,
-`dossier_record_run`, `dossier_attach_patchset`, `dossier_closeout_digest`,
-`dossier_closeout_model`, and `dossier_get_packet_schema`.
+`dossier_record_run`, `dossier_record_claim`, `dossier_attach_patchset`,
+`dossier_closeout_digest`, `dossier_closeout_model`, `dossier_get_schema`,
+`dossier_get_packet_schema`, and `dossier_get_starter`.
 Block types beyond the basics, `figure`,
-`math`, `chart`, `footnotes` (with inline `[^id]`), and `receipt` (provenance), are in
+`math`, `chart`, `footnotes` (with inline `[^id]`), `trust-report`, and `receipt`
+(provenance), are in
 `references/blocks.md`.
 
 ### React variant (optional)
@@ -98,7 +101,7 @@ Top-level shape:
   `owner`, `updated`, `version`, `tags[]`, `baseUrl` (for hosted cross-links),
   `theme` (per-project token overrides), `lifecycle` (banner), `changelog`.
 - **`blocks[]`**: ordered. `section`, `two-col`, and `tabs` nest other blocks. Lead with
-  a `hero`. See `references/blocks.md` for all 41 types.
+  a `hero`. See `references/blocks.md` for all 42 types.
 - **Inline markdown** in text fields: `**bold**`, `` `code` ``, `[label](url)`,
   `[[other-slug]]` (cross-artifact link), `[[Term]]` (glossary tooltip).
 - **Code**: `{ "type": "code", "lang": "ts", "code": "..." }`, highlighted at build
@@ -129,10 +132,11 @@ Use process starters when the user wants to steer the actual work, not only read
 These starters use `process-board` for work items, `code-editor` for bounded editable
 snippets, `patch-set` for proposed edit packets, `diff-view` for unified diff review,
 `verification-run` for commands and outcomes, `evidence-log` for source material,
-`verdict-gate` for approvals, and closeout blocks for release, incident, review, and
-integration loops. `dossier serve` can save editor changes back to the source model and
-import patches into a new `patch-set` block. MCP tools can read human state and append run
-or patch evidence without scraping the HTML.
+`trust-report` for source-backed claims, `verdict-gate` for approvals, and closeout blocks
+for release, incident, review, and integration loops. `dossier serve` can save editor
+changes back to the source model and import patches into a new `patch-set` block. MCP
+tools can read human state and append run, claim, or patch evidence without scraping the
+HTML.
 
 ## What the reader gets (built in)
 

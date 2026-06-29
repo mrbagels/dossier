@@ -31,7 +31,7 @@ export type BlockType =
   | "references" | "decision-matrix" | "risk-register" | "action-items"
   | "assumptions" | "glossary" | "diagram" | "review-board" | "process-board"
   | "code-editor" | "patch-set" | "diff-view" | "verification-run" | "evidence-log"
-  | "verdict-gate" | "process-receipt" | "finding-list" | "comment-thread"
+  | "trust-report" | "verdict-gate" | "process-receipt" | "finding-list" | "comment-thread"
   | "cycle-board" | "integration-report" | "upstream-response" | "release-checklist"
   | "decision-log" | "figure" | "math" | "chart" | "footnotes" | "receipt";
 

@@ -106,6 +106,17 @@
         { "title": "Run the narrow unit or typecheck command.", "owner": "agent", "status": "todo" },
         { "title": "Record changed files and residual risk.", "owner": "agent", "status": "todo" }
       ]
+    },
+    {
+      "type": "trust-report",
+      "title": "Implementation trust report",
+      "summary": "Track which implementation claims are backed by commands, files, or review evidence.",
+      "sources": [
+        { "id": "verification-command", "label": "Verification command", "kind": "command", "trust": "pending", "summary": "Replace after running the verification command." }
+      ],
+      "claims": [
+        { "id": "behavior-implemented", "claim": "The requested behavior is implemented.", "status": "unverified", "confidence": "unknown", "sources": ["verification-command"], "evidence": ["work-item-one"], "notes": "Update after edits and verification." }
+      ]
     }
   ]
 }

@@ -5,7 +5,7 @@ markdown (`**bold**`, `` `code` ``, `[label](url)`, `[[slug]]`, `[[Term]]`). `id
 optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 Process packet collections require stable kebab-case ids on their nested items:
 `candidates`, `items`, `patches`, `runs`, `findings`, `threads`, `cycles`, `gates`,
-and `decisions`.
+`decisions`, `sources`, and `claims`.
 
 ## hero, page opener (use one, first)
 ```json
@@ -41,7 +41,7 @@ and `decisions`.
 
 ## stat-strip, KPI figures
 ```json
-{ "type": "stat-strip", "stats": [ { "value": "41", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
+{ "type": "stat-strip", "stats": [ { "value": "42", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
 ```
 
 ## flow, numbered steps
@@ -263,6 +263,27 @@ run with `dossier_record_run`.
     { "id": "build-log", "title": "Build log", "kind": "command",
       "source": "local", "trust": "high", "body": "`npm test` passed." } ] }
 ```
+
+## trust-report, source-backed claims
+Use for provenance that an agent or reviewer must be able to audit. Sources describe the
+material used; claims link to source ids and evidence ids. Agents can read reports with
+`dossier_read_trust` and append or update claims with `dossier_record_claim`.
+```json
+{ "type": "trust-report", "title": "Trust report",
+  "summary": "Claims are tied to source and evidence ids.",
+  "sources": [
+    { "id": "npm-test", "label": "npm test", "kind": "command",
+      "trust": "high", "summary": "Local verification command." },
+    { "id": "release-notes", "label": "Release notes", "kind": "doc",
+      "url": "docs/release.md", "trust": "medium" } ],
+  "claims": [
+    { "id": "tests-pass", "claim": "The test suite passes.",
+      "status": "verified", "confidence": "high",
+      "sources": ["npm-test"], "evidence": ["test-suite"],
+      "notes": "Verified on the release branch." } ] }
+```
+`source.id` and `claim.id` must be kebab-case. Common claim statuses:
+`verified | partial | unverified | disputed | rejected`.
 
 ## verdict-gate, focused approval packet
 Renders one approval control plus notes. It exports
