@@ -62,7 +62,7 @@
         {
           "type": "prose",
           "heading": "Authoring long-form copy",
-          "markdown": "Prose blocks carry the connective narrative between heavier components. They accept inline markdown so you can emphasize a **decision**, reference a `config.flag`, or point at the [block catalog](https://example.com/blocks) without leaving the flow.\n\nUse them to set context before a table or chart, then summarize the takeaway after. A single prose block can hold several paragraphs, which keeps related thoughts together instead of fragmenting them across cards.\n\nThey also render lists cleanly:\n\n- **Scannable** beats dense: short lines win in a design lab.\n- Inline `code` stays legible against the body text color.\n- Links such as [the schema](https://example.com/schema) keep their accent treatment.\n\nClose with a plain paragraph so the reader returns to the baseline rhythm before the next block."
+          "markdown": "Prose blocks carry the connective narrative between heavier components. They accept inline markdown so you can emphasize a **decision**, reference a `config.flag`, or point at the [block catalog](https://example.com/blocks) without leaving the flow.\n\nUse them to set context before a table or chart, then summarize the takeaway after. A single prose block can hold several paragraphs, which keeps related thoughts together instead of fragmenting them across cards.\n\nThey keep inline formatting legible too: **bold** for emphasis, `inline code` against the body color, and links such as [the schema](https://example.com/schema) that keep their accent treatment.\n\nClose with a plain paragraph so the reader returns to the baseline rhythm before the next block."
         },
         {
           "type": "section",

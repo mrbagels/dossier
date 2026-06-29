@@ -18,11 +18,7 @@ Prose blocks carry the connective narrative between heavier components. They acc
 
 Use them to set context before a table or chart, then summarize the takeaway after. A single prose block can hold several paragraphs, which keeps related thoughts together instead of fragmenting them across cards.
 
-They also render lists cleanly:
-
-- **Scannable** beats dense: short lines win in a design lab.
-- Inline `code` stays legible against the body text color.
-- Links such as [the schema](https://example.com/schema) keep their accent treatment.
+They keep inline formatting legible too: **bold** for emphasis, `inline code` against the body color, and links such as [the schema](https://example.com/schema) that keep their accent treatment.
 
 Close with a plain paragraph so the reader returns to the baseline rhythm before the next block.
 
