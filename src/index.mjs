@@ -30,6 +30,7 @@ export {
   writeWorkspaceIndex,
   writeWorkspaceManifest,
 } from "./workspace.mjs";
+export { RELEASE_DIR, collectReleaseEvidence, writeReleaseEvidence } from "./release.mjs";
 export { THEMES } from "./themes.mjs";
 export { SKINS, resolveSkin, skinNames } from "./skins.mjs";
 // Plugin authoring surface.

@@ -13,11 +13,35 @@ import {
   writeWorkspaceIndex,
   writeWorkspaceManifest,
 } from "../src/workspace.mjs";
+import { writeReleaseEvidence } from "../src/release.mjs";
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
 // pull out --flags; rest are positional
-const VALUE_FLAGS = new Set(["kind", "out", "plugin", "pack", "template", "port", "title", "base-url", "format", "theme", "skin", "name", "ref", "roots", "status", "tag", "owner", "needs", "text"]);
+const VALUE_FLAGS = new Set([
+  "kind",
+  "out",
+  "plugin",
+  "pack",
+  "template",
+  "port",
+  "title",
+  "base-url",
+  "format",
+  "theme",
+  "skin",
+  "name",
+  "ref",
+  "roots",
+  "status",
+  "tag",
+  "owner",
+  "needs",
+  "text",
+  "version",
+  "since",
+  "checks",
+]);
 const flags = {};
 const args = [];
 const rest = argv.slice(1);
@@ -73,6 +97,7 @@ const USAGE = [
   "  dossier workspace status [manifest|dir]  print agent-readable workspace status",
   "  dossier workspace query [manifest|dir]   filter workspace docs (--kind, --tag, --needs)",
   "  dossier workspace publish [manifest|dir] publish all workspace dossiers into a static site",
+  "  dossier release collect                  collect release evidence into a dossier",
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
@@ -251,6 +276,36 @@ if (cmd === "build" && args.length) {
       console.log(`  index: ${r.index.rendered.htmlPath}`);
     } else {
       console.log("Usage: dossier workspace init [dir] [--name <name>] [--roots <a,b>]\n       dossier workspace index [manifest|dir] [--out <file>]\n       dossier workspace status [manifest|dir] [--json]\n       dossier workspace query [manifest|dir] [--kind <kind>] [--tag <tag>] [--needs process|release|trust]\n       dossier workspace publish [manifest|dir] [--out <dir>]");
+      process.exit(sub ? 0 : 1);
+    }
+  } catch (e) {
+    console.error("✗ " + e.message);
+    process.exitCode = 1;
+  }
+} else if (cmd === "release") {
+  const sub = args[0];
+  try {
+    if (sub === "collect") {
+      const r = await writeReleaseEvidence({
+        version: flags.version,
+        since: flags.since,
+        out: flags.out,
+        checks: flags.checks,
+        theme: flags.theme,
+        skin: flags.skin,
+        embed: !!flags.embed,
+      });
+      if (flags.json) {
+        console.log(JSON.stringify({ summary: r.summary, outPath: r.outPath, htmlPath: r.htmlPath, mdPath: r.mdPath, embedPath: r.embedPath }, null, 2));
+      } else {
+        console.log(`✓ ${r.outPath}`);
+        console.log(`  html: ${r.htmlPath}`);
+        console.log(`  markdown: ${r.mdPath}`);
+        if (r.embedPath) console.log(`  embed: ${r.embedPath}`);
+        console.log(`  commits: ${r.summary.commits}, files: ${r.summary.changedFiles}, checks: ${r.summary.checks}`);
+      }
+    } else {
+      console.log("Usage: dossier release collect [--version <version>] [--since <ref>] [--out <file>] [--checks <cmd,cmd>] [--json]");
       process.exit(sub ? 0 : 1);
     }
   } catch (e) {

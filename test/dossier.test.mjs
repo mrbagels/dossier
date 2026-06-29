@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -7,6 +8,7 @@ import { tmpdir } from "node:os";
 import { esc, generate, generateFile, inlineMd, parseUnifiedDiff, registerBlock, slugify, validateModel } from "../src/index.mjs";
 import { diffModels } from "../src/diff.mjs";
 import { addPack, listPacks, loadTrustedPackPlugins, resolveTemplateRef, trustPack } from "../src/packs.mjs";
+import { collectReleaseEvidence, writeReleaseEvidence } from "../src/release.mjs";
 import { WORKSPACE_MANIFEST, buildWorkspaceIndex, createWorkspaceManifest, publishWorkspace, queryWorkspace, scanWorkspace, writeWorkspaceIndex, writeWorkspaceManifest } from "../src/workspace.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -776,6 +778,51 @@ test("workspace scans dossiers, builds an agent status index, queries, and publi
   assert.equal(published.rendered.length, 2);
   assert.ok(existsSync(join(d, "public", "implementation-plan.html")), "publishes workspace document");
   assert.ok(existsSync(join(d, "public", "workspace-index.html")), "publishes workspace index");
+});
+
+test("release evidence collects git range, gates, trust claims, and rendered artifacts", async () => {
+  const d = mkdtempSync(join(tmpdir(), "dossier-release-"));
+  const git = (...args) => {
+    const result = spawnSync("git", args, { cwd: d, encoding: "utf8" });
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+  };
+  writeFileSync(join(d, "package.json"), JSON.stringify({ name: "release-fixture", version: "0.2.0" }, null, 2));
+  git("init");
+  git("config", "user.email", "agent@example.com");
+  git("config", "user.name", "Agent");
+  git("add", "package.json");
+  git("commit", "-m", "Initial release");
+  git("tag", "v0.1.0");
+  writeFileSync(join(d, "feature.txt"), "ship it\n");
+  git("add", "feature.txt");
+  git("commit", "-m", "Add release feature");
+
+  const evidence = collectReleaseEvidence({
+    cwd: d,
+    version: "0.2.0",
+    since: "v0.1.0",
+    checks: "npm test,npm pack --dry-run --json",
+    generatedAt: "2026-01-04T00:00:00.000Z",
+  });
+  assert.equal(evidence.summary.version, "0.2.0");
+  assert.equal(evidence.summary.since, "v0.1.0");
+  assert.equal(evidence.summary.commits, 1);
+  assert.ok(evidence.changedFiles.includes("feature.txt"));
+  assert.deepEqual(validateModel(evidence.model).errors, []);
+  assert.ok(evidence.model.blocks.some((block) => block.type === "release-checklist"));
+  assert.ok(evidence.model.blocks.some((block) => block.type === "trust-report"));
+
+  const written = await writeReleaseEvidence({
+    cwd: d,
+    version: "0.2.0",
+    since: "v0.1.0",
+    checks: "npm test,npm pack --dry-run --json",
+    generatedAt: "2026-01-04T00:00:00.000Z",
+    out: "docs/releases/0.2.0.dossier.json",
+  });
+  assert.ok(existsSync(join(d, written.outPath)), "writes release dossier JSON");
+  assert.ok(existsSync(join(d, written.htmlPath)), "renders release evidence HTML");
+  assert.ok(existsSync(join(d, written.mdPath)), "renders release evidence Markdown");
 });
 
 test("diff detects added and changed blocks", () => {
