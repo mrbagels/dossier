@@ -543,6 +543,7 @@ Current patch train:
 
 | Version | Focus |
 |---|---|
+| `0.6.1` | Workspace invalid-dossier diagnostics, stricter workspace publish behavior, no-tag release evidence changed files, CLI subcommand exit hardening. |
 | `0.6.0` | Repo-backed packs, trusted plugin loading, pack templates, multi-dossier workspaces, workspace publish/query/status, release evidence automation, example engineering pack. |
 | `0.5.5` | Live CodeMirror editor adapter for `dossier serve`, CodeMirror module serving, docs roadmap closeout, refreshed overview and release examples. |
 | `0.5.4` | Chrome-stripped embed output, presentation flag parity, React render hardening, refreshed gallery docs. |
