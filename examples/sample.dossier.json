@@ -10,11 +10,12 @@
     "owner": "Kyle",
     "project": "Dossier",
     "updated": "2026-06-29",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "tags": ["docs", "tooling", "design-system"],
     "lifecycle": { "stage": "durable", "note": "Overview of the public Dossier surface after the process workflow closeout.", "promoteTo": "durable" },
     "changelog": [
-      { "version": "0.5.4", "date": "2026-06-29", "summary": "Process dossiers, live editing, gallery examples, and public QA docs", "changes": ["Process blocks", "MCP packets", "CodeMirror live editor", "Release and incident workflows"] },
+      { "version": "0.5.5", "date": "2026-06-29", "summary": "Live CodeMirror editor adapter and process roadmap closeout", "changes": ["CodeMirror live editor", "Local CodeMirror module serving", "Roadmap closeout docs", "Updated overview and release examples"] },
+      { "version": "0.5.4", "date": "2026-06-29", "summary": "Process dossiers, gallery examples, and public QA docs", "changes": ["Process blocks", "MCP packets", "Release and incident workflows"] },
       { "version": "0.1.0", "date": "2026-06-26", "summary": "Initial generator and catalog", "changes": ["Schema", "Generator", "Catalog", "Selected features"] }
     ]
   },

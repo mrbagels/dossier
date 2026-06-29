@@ -1,5 +1,5 @@
 ---
-title: "Release Readiness: 0.5.4"
+title: "Release Readiness: 0.5.5"
 slug: "engineering-release"
 status: "review"
 updated: "2026-06-29"
@@ -13,6 +13,7 @@ Use this shape when a team needs public QA readiness, release notes, command rec
 - [x] Automated tests pass (required), npm test
 - [x] React renderer typecheck passes (required), cd react && npx tsc --noEmit
 - [x] README and examples regenerated (required), node bin/dossier.mjs build examples/*.dossier.json
+- [x] Live CodeMirror editor smoke passes (required), Playwright smoke edited a CodeMirror-backed code-editor and saved back to source JSON
 - [ ] Manual browser pass complete (required), Run docs/product/public-manual-qa.md
 - [ ] npm publish credential available, npm whoami if publishing to registry
 
@@ -35,6 +36,15 @@ node bin/dossier.mjs build examples/*.dossier.json
 
 - **Expected:** Every example emits HTML and Markdown.
 - **Actual:** Generated showcase, overview, and focused example pages.
+
+### Live editor smoke (passed)
+
+```sh
+dossier serve examples/implementation-packet.dossier.json
+```
+
+- **Expected:** CodeMirror mounts, edits sync, and save-back writes the source model.
+- **Actual:** Playwright verified desktop and mobile CodeMirror mounting, textarea sync, and save-back.
 
 
 ### Release assets
@@ -68,5 +78,5 @@ node bin/dossier.mjs build examples/*.dossier.json
 - **outcome:** Ready for public manual QA
 - **owner:** Release captain
 - **date:** 2026-06-29
-- **Commands:** npm test, node bin/dossier.mjs build examples/*.dossier.json
+- **Commands:** npm test, node bin/dossier.mjs build examples/*.dossier.json, dossier serve CodeMirror smoke
 - **Follow-ups:** Run public manual QA guide., Confirm Pages deployment after push.
