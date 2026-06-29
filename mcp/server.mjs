@@ -1,5 +1,5 @@
-// Dossier MCP server, lets any MCP-capable agent author, validate, render, and read
-// decisions from dossiers. Run via `dossier mcp` (stdio transport).
+// Dossier MCP server, lets any MCP-capable agent author, validate, render, read,
+// and update process packets. Run via `dossier mcp` (stdio transport).
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
@@ -82,6 +82,49 @@ const TOOLS = [
     },
   },
   {
+    name: "dossier_read_verdicts",
+    description: "Read a verdict packet exported from verdict-gate blocks ({ schema: 'dossier.verdicts/v1', verdicts: { id: { verdict, notes } } }).",
+    inputSchema: { type: "object", properties: { verdicts: { type: "object" }, path: { type: "string" } } },
+  },
+  {
+    name: "dossier_read_release",
+    description: "Read a release packet exported from release-checklist blocks ({ schema: 'dossier.release/v1', release: { id: { done, notes } } }).",
+    inputSchema: { type: "object", properties: { release: { type: "object" }, path: { type: "string" } } },
+  },
+  {
+    name: "dossier_record_run",
+    description: "Create or append a verification-run block for command/test evidence. Provide `path` to update a .dossier.json file, otherwise the block is returned.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        model: { type: "object" },
+        title: { type: "string" },
+        run: { type: "object", description: "{ id, title, command, status, expected, actual, duration, artifacts, notes }" },
+      },
+      required: ["run"],
+    },
+  },
+  {
+    name: "dossier_attach_patchset",
+    description: "Create or append a patch-set block. Provide `path` to update a .dossier.json file, otherwise the block is returned.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        model: { type: "object" },
+        title: { type: "string" },
+        patchSet: { type: "object", description: "A full patch-set block or { patches: [...] }." },
+      },
+      required: ["patchSet"],
+    },
+  },
+  {
+    name: "dossier_closeout_digest",
+    description: "Summarize decisions, process verdicts, edits, release gates, runs, and receipts into a closeout digest for handoff.",
+    inputSchema: { type: "object", properties: { packets: { type: "object" }, model: { type: "object" }, path: { type: "string" } } },
+  },
+  {
     name: "dossier_get_schema",
     description: "Return the Dossier JSON Schema so you can author a valid model.",
     inputSchema: { type: "object", properties: {} },
@@ -95,6 +138,34 @@ const TOOLS = [
 
 const text = (obj) => ({ content: [{ type: "text", text: typeof obj === "string" ? obj : JSON.stringify(obj, null, 2) }] });
 const fail = (msg) => ({ content: [{ type: "text", text: msg }], isError: true });
+
+function readPacket(args, keys) {
+  for (const key of keys) if (args[key]) return args[key];
+  if (args.path) return JSON.parse(readFileSync(args.path, "utf8"));
+  return null;
+}
+
+function loadModel(args) {
+  if (args.model) return { model: args.model, path: null };
+  if (args.path) return { model: JSON.parse(readFileSync(args.path, "utf8")), path: args.path };
+  return { model: null, path: null };
+}
+
+function writeModel(path, model) {
+  if (path) writeFileSync(path, JSON.stringify(model, null, 2) + "\n");
+}
+
+function appendOrCreateBlock(model, type, title, collectionKey, item) {
+  model.blocks = Array.isArray(model.blocks) ? model.blocks : [];
+  let block = model.blocks.find((b) => b && b.type === type && (!title || b.title === title));
+  if (!block) {
+    block = { type, title: title || type, [collectionKey]: [] };
+    model.blocks.push(block);
+  }
+  block[collectionKey] = Array.isArray(block[collectionKey]) ? block[collectionKey] : [];
+  block[collectionKey].push(item);
+  return block;
+}
 
 async function handle(name, args) {
   if (name === "dossier_validate") {
@@ -119,8 +190,7 @@ async function handle(name, args) {
   }
 
   if (name === "dossier_read_decisions") {
-    let packet = args.decisions;
-    if (!packet && args.path) packet = JSON.parse(readFileSync(args.path, "utf8"));
+    let packet = readPacket(args, ["decisions"]);
     if (!packet) return fail("provide `decisions` or `path`");
     const map = packet.decisions || packet;
     const selected = [];
@@ -133,8 +203,7 @@ async function handle(name, args) {
   }
 
   if (name === "dossier_read_process") {
-    let packet = args.process;
-    if (!packet && args.path) packet = JSON.parse(readFileSync(args.path, "utf8"));
+    let packet = readPacket(args, ["process"]);
     if (!packet) return fail("provide `process` or `path`");
     const map = packet.process || packet.items || packet;
     const byVerdict = {};
@@ -153,8 +222,7 @@ async function handle(name, args) {
   }
 
   if (name === "dossier_read_edits") {
-    let packet = args.edits;
-    if (!packet && args.path) packet = JSON.parse(readFileSync(args.path, "utf8"));
+    let packet = readPacket(args, ["edits"]);
     if (!packet) return fail("provide `edits` or `path`");
     const map = packet.edits || packet.items || packet;
     const edits = [];
@@ -167,6 +235,7 @@ async function handle(name, args) {
         lang: entry.lang || "",
         filename: entry.filename || "",
         targetPath: entry.targetPath || "",
+        title: entry.title || "",
         dirty: !!entry.dirty,
       };
       edits.push(row);
@@ -175,6 +244,63 @@ async function handle(name, args) {
       byTargetPath[key].push(row);
     }
     return text({ schema: packet.schema || "dossier.edits/v1", slug: packet.slug, edits, byTargetPath, totals: { edits: edits.length, dirty: edits.filter((x) => x.dirty).length } });
+  }
+
+  if (name === "dossier_read_verdicts") {
+    const packet = readPacket(args, ["verdicts"]);
+    if (!packet) return fail("provide `verdicts` or `path`");
+    const map = packet.verdicts || packet.items || packet;
+    const byVerdict = {};
+    for (const [id, entry] of Object.entries(map)) {
+      if (!entry || typeof entry !== "object") continue;
+      const verdict = entry.verdict || "undecided";
+      byVerdict[verdict] = byVerdict[verdict] || [];
+      byVerdict[verdict].push({ id, verdict, notes: entry.notes || "" });
+    }
+    return text({ schema: packet.schema || "dossier.verdicts/v1", slug: packet.slug, byVerdict, totals: Object.fromEntries(Object.entries(byVerdict).map(([k, v]) => [k, v.length])) });
+  }
+
+  if (name === "dossier_read_release") {
+    const packet = readPacket(args, ["release"]);
+    if (!packet) return fail("provide `release` or `path`");
+    const map = packet.release || packet.gates || packet;
+    const gates = Object.entries(map).map(([id, entry]) => ({ id, done: !!(entry && entry.done), notes: (entry && entry.notes) || "" }));
+    return text({ schema: packet.schema || "dossier.release/v1", slug: packet.slug, gates, totals: { gates: gates.length, done: gates.filter((g) => g.done).length } });
+  }
+
+  if (name === "dossier_record_run") {
+    const run = { id: args.run.id || "run-" + Date.now(), title: args.run.title || args.run.command || "Verification run", ...args.run };
+    const { model, path } = loadModel(args);
+    if (!model) return text({ type: "verification-run", title: args.title || "Verification runs", runs: [run] });
+    const block = appendOrCreateBlock(model, "verification-run", args.title || "Verification runs", "runs", run);
+    writeModel(path, model);
+    return text({ ok: true, path, block });
+  }
+
+  if (name === "dossier_attach_patchset") {
+    const patchSet = args.patchSet.type === "patch-set" ? args.patchSet : { type: "patch-set", title: args.title || "Patch set", patches: args.patchSet.patches || [] };
+    const { model, path } = loadModel(args);
+    if (!model) return text(patchSet);
+    model.blocks = Array.isArray(model.blocks) ? model.blocks : [];
+    model.blocks.push(patchSet);
+    writeModel(path, model);
+    return text({ ok: true, path, block: patchSet });
+  }
+
+  if (name === "dossier_closeout_digest") {
+    const model = args.model || (args.path ? JSON.parse(readFileSync(args.path, "utf8")) : null);
+    const packets = args.packets || {};
+    const digest = {
+      title: model && model.meta && model.meta.title,
+      slug: (model && model.meta && model.meta.slug) || packets.slug,
+      decisions: packets.decisions ? Object.keys(packets.decisions.decisions || packets.decisions).length : 0,
+      processItems: packets.process ? Object.keys(packets.process.process || packets.process).length : 0,
+      edits: packets.edits ? Object.keys(packets.edits.edits || packets.edits).length : 0,
+      verdicts: packets.verdicts ? Object.keys(packets.verdicts.verdicts || packets.verdicts).length : 0,
+      releaseGates: packets.release ? Object.keys(packets.release.release || packets.release).length : 0,
+      summary: "Closeout packet ready for handoff. Review non-approved verdicts, dirty edits, failed runs, and unresolved release gates before marking durable.",
+    };
+    return text(digest);
   }
 
   if (name === "dossier_get_schema") {

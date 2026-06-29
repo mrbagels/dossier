@@ -48,6 +48,8 @@ code{font-family:var(--ds-mono);font-size:.86em;background:var(--ds-bg-2);border
 
 .ds-progress{position:fixed;inset:0 0 auto 0;height:2px;z-index:60}
 .ds-progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--ds-accent),var(--ds-accent-2))}
+.ds-skip{position:fixed;left:14px;top:10px;z-index:100;transform:translateY(-140%);background:var(--ds-ink);color:var(--ds-bg);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:650;box-shadow:0 10px 30px rgba(20,16,40,.18)}
+.ds-skip:focus{transform:none;text-decoration:none}
 
 .ds-shell{width:min(var(--ds-frame),calc(100% - 48px));margin:0 auto;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 
@@ -234,6 +236,21 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-codeedit-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;padding:10px 12px;border-top:1px solid var(--ds-line);background:var(--ds-bg-2)}
 .ds-codeedit-state{margin-right:auto;color:var(--ds-ink-3);font-size:12px;font-weight:680;letter-spacing:.04em;text-transform:uppercase}
 .ds-codeedit.dirty .ds-codeedit-state{color:var(--ds-accent)}
+
+/* process block family */
+.ds-process-list{display:grid;gap:10px;margin-top:14px}
+.ds-process-card{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);padding:14px 16px}
+.ds-process-card-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.ds-process-card h4{margin:0 0 4px;font-size:15.5px}
+.ds-gate{border:1px solid var(--ds-line-2);border-radius:12px;background:var(--ds-bg);padding:14px 16px;margin-top:12px}
+.ds-comments{margin:10px 0 0;padding-left:20px;color:var(--ds-ink-2)}
+.ds-comments li+li{margin-top:8px}
+.ds-comments p{margin:4px 0 0}
+.ds-release-list{display:grid;gap:10px}
+.ds-release-gate{display:grid;gap:8px}
+.ds-release-gate textarea{min-height:58px}
+.ds-finding .ds-chip{border-color:rgba(214,48,49,.26)}
+.ds-vrun .ds-chip{border-color:rgba(18,161,104,.26)}
 
 /* patch and diff blocks */
 .ds-patchlist{display:grid;gap:12px;margin-top:14px}
@@ -489,7 +506,7 @@ tbody tr:hover td{color:var(--ds-ink)}
 @media print{
   :root{--ds-bg:#fff;--ds-bg-2:#fff;--ds-ink:#111;--ds-ink-2:#333;--ds-ink-3:#666;--ds-line:#ddd;--ds-line-2:#ccc}
   html{font-size:11pt}
-  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy,.ds-codeedit-actions,.ds-diff-files{display:none!important}
+  .ds-topbar,.ds-toc,.ds-totop,.ds-palette,.ds-modal,.ds-toast,.ds-studio,.ds-progress,.ds-skip,.ds-copy,.ds-review-bar,.ds-ritem-check,.ds-notes,.ds-toggle,.ds-code-copy,.ds-codeedit-actions,.ds-diff-files,.ds-process-verdict-wrap,.ds-release-gate textarea{display:none!important}
   .ds-layout{display:block}
   .ds-content{max-width:none}
   .ds-shell{width:100%}

@@ -245,6 +245,41 @@
         }
       }
     },
+    "processItemLite": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "title": { "type": "string" },
+        "label": { "type": "string" },
+        "summary": { "type": "string" },
+        "body": { "type": "string" },
+        "status": { "type": "string" },
+        "severity": { "type": "string" },
+        "kind": { "type": "string" },
+        "trust": { "type": "string" },
+        "owner": { "type": "string" },
+        "producer": { "type": "string" },
+        "consumer": { "type": "string" },
+        "source": { "type": "string" },
+        "created": { "type": "string" },
+        "url": { "type": "string" },
+        "command": { "type": "string" },
+        "expected": { "type": "string" },
+        "actual": { "type": "string" },
+        "decision": { "type": "string" },
+        "rationale": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "request": { "type": "string" },
+        "response": { "type": "string" },
+        "nextStep": { "type": "string" },
+        "required": { "type": "boolean" },
+        "evidence": { "type": "string" },
+        "files": { "type": "array", "items": { "type": "string" } },
+        "artifacts": { "type": "array", "items": { "type": "string" } },
+        "links": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "block": {
       "description": "A content block. Discriminated by `type`.",
       "oneOf": [
@@ -322,6 +357,39 @@
         },
         {
           "$ref": "#/$defs/blocks/processBoard"
+        },
+        {
+          "$ref": "#/$defs/blocks/verificationRun"
+        },
+        {
+          "$ref": "#/$defs/blocks/evidenceLog"
+        },
+        {
+          "$ref": "#/$defs/blocks/verdictGate"
+        },
+        {
+          "$ref": "#/$defs/blocks/processReceipt"
+        },
+        {
+          "$ref": "#/$defs/blocks/findingList"
+        },
+        {
+          "$ref": "#/$defs/blocks/commentThread"
+        },
+        {
+          "$ref": "#/$defs/blocks/cycleBoard"
+        },
+        {
+          "$ref": "#/$defs/blocks/integrationReport"
+        },
+        {
+          "$ref": "#/$defs/blocks/upstreamResponse"
+        },
+        {
+          "$ref": "#/$defs/blocks/releaseChecklist"
+        },
+        {
+          "$ref": "#/$defs/blocks/decisionLog"
         },
         {
           "$ref": "#/$defs/blocks/figure"
@@ -1529,6 +1597,171 @@
               }
             }
           }
+        }
+      },
+      "verificationRun": {
+        "description": "Command or check receipts with expected and actual results.",
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "runs"],
+        "properties": {
+          "type": { "const": "verification-run" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "runs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "title"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                "title": { "type": "string" },
+                "command": { "type": "string" },
+                "status": { "type": "string" },
+                "expected": { "type": "string" },
+                "actual": { "type": "string" },
+                "duration": { "type": "string" },
+                "artifacts": { "type": "array", "items": { "type": "string" } },
+                "notes": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "evidenceLog": {
+        "description": "Append-oriented evidence records: logs, screenshots, traces, links, source refs, or observations.",
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "items"],
+        "properties": {
+          "type": { "const": "evidence-log" },
+          "title": { "type": "string" },
+          "items": { "type": "array", "items": { "$ref": "#/$defs/processItemLite" } }
+        }
+      },
+      "verdictGate": {
+        "description": "Focused human approval gate with verdict and notes export.",
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "prompt"],
+        "properties": {
+          "type": { "const": "verdict-gate" },
+          "title": { "type": "string" },
+          "gateId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "prompt": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "verdict": { "type": "string" }
+        }
+      },
+      "processReceipt": {
+        "description": "Closeout receipt for process work, verification, release, incident, or integration loops.",
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "process-receipt" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "outcome": { "type": "string" },
+          "owner": { "type": "string" },
+          "date": { "type": "string" },
+          "model": { "type": "string" },
+          "changedFiles": { "type": "array", "items": { "type": "string" } },
+          "commands": { "type": "array", "items": { "type": "string" } },
+          "risks": { "type": "array", "items": { "type": "string" } },
+          "followUps": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "findingList": {
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "findings"],
+        "properties": {
+          "type": { "const": "finding-list" },
+          "title": { "type": "string" },
+          "findings": { "type": "array", "items": { "$ref": "#/$defs/processItemLite" } }
+        }
+      },
+      "commentThread": {
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "threads"],
+        "properties": {
+          "type": { "const": "comment-thread" },
+          "title": { "type": "string" },
+          "threads": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                "subject": { "type": "string" },
+                "status": { "type": "string" },
+                "comments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "author": { "type": "string" },
+                      "created": { "type": "string" },
+                      "body": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "cycleBoard": {
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "cycles"],
+        "properties": {
+          "type": { "const": "cycle-board" },
+          "title": { "type": "string" },
+          "cycles": { "type": "array", "items": { "$ref": "#/$defs/processItemLite" } }
+        }
+      },
+      "integrationReport": {
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "integration-report" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "producer": { "type": "string" },
+          "consumer": { "type": "string" },
+          "status": { "type": "string" },
+          "version": { "type": "string" },
+          "nextStep": { "type": "string" },
+          "items": { "type": "array", "items": { "$ref": "#/$defs/processItemLite" } }
+        }
+      },
+      "upstreamResponse": {
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "upstream-response" },
+          "title": { "type": "string" },
+          "upstream": { "type": "string" },
+          "status": { "type": "string" },
+          "url": { "type": "string" },
+          "request": { "type": "string" },
+          "response": { "type": "string" },
+          "nextStep": { "type": "string" }
+        }
+      },
+      "releaseChecklist": {
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "gates"],
+        "properties": {
+          "type": { "const": "release-checklist" },
+          "title": { "type": "string" },
+          "gates": { "type": "array", "items": { "$ref": "#/$defs/processItemLite" } }
+        }
+      },
+      "decisionLog": {
+        "allOf": [{ "$ref": "#/$defs/blockBase" }],
+        "required": ["type", "decisions"],
+        "properties": {
+          "type": { "const": "decision-log" },
+          "title": { "type": "string" },
+          "decisions": { "type": "array", "items": { "$ref": "#/$defs/processItemLite" } }
         }
       },
       "figure": {

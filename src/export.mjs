@@ -243,6 +243,62 @@ async function block(b, out, ctx) {
         Object.entries(it.details || {}).forEach(([k, v]) => out.push(P(k + ": " + plain(v))));
       }
       break;
+    case "verification-run":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      if (b.summary) out.push(P(b.summary));
+      for (const r of b.runs || []) {
+        out.push(H(plain(r.title || r.id || "Run") + (r.status ? " (" + r.status + ")" : ""), HeadingLevel.HEADING_3));
+        if (r.command) out.push(P("Command: " + r.command));
+        if (r.expected) out.push(P("Expected: " + r.expected));
+        if (r.actual) out.push(P("Actual: " + r.actual));
+        if (r.notes) out.push(P(r.notes));
+      }
+      break;
+    case "evidence-log":
+    case "finding-list":
+    case "cycle-board":
+    case "decision-log": {
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      const items = b.items || b.findings || b.cycles || b.decisions || [];
+      for (const it of items) {
+        out.push(H(plain(it.title || it.decision || it.id || "Item"), HeadingLevel.HEADING_3));
+        if (it.body || it.summary || it.rationale) out.push(P(it.body || it.summary || it.rationale));
+        ["status", "severity", "owner", "source", "recommendation"].forEach((k) => { if (it[k]) out.push(P(k + ": " + plain(it[k]))); });
+      }
+      break;
+    }
+    case "verdict-gate":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      if (b.prompt) out.push(P(b.prompt));
+      if (b.verdict) out.push(P("Verdict: " + b.verdict));
+      break;
+    case "process-receipt":
+      out.push(H(b.title || "Process receipt", HeadingLevel.HEADING_2));
+      if (b.summary) out.push(P(b.summary));
+      ["outcome", "owner", "date", "model"].forEach((k) => { if (b[k]) out.push(P(k + ": " + plain(b[k]))); });
+      if (b.commands && b.commands.length) out.push(P("Commands: " + b.commands.map(plain).join(", ")));
+      if (b.followUps && b.followUps.length) out.push(P("Follow-ups: " + b.followUps.map(plain).join(", ")));
+      break;
+    case "comment-thread":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      for (const t of b.threads || []) {
+        out.push(H(t.subject || t.id || "Thread", HeadingLevel.HEADING_3));
+        for (const c of t.comments || []) out.push(P((c.author || "comment") + ": " + (c.body || "")));
+      }
+      break;
+    case "integration-report":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      if (b.summary) out.push(P(b.summary));
+      ["producer", "consumer", "status", "version", "nextStep"].forEach((k) => { if (b[k]) out.push(P(k + ": " + plain(b[k]))); });
+      break;
+    case "upstream-response":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      ["upstream", "status", "url", "request", "response", "nextStep"].forEach((k) => { if (b[k]) out.push(P(k + ": " + plain(b[k]))); });
+      break;
+    case "release-checklist":
+      if (b.title) out.push(H(b.title, HeadingLevel.HEADING_2));
+      for (const g of b.gates || []) out.push(new Paragraph({ text: (g.status === "done" || g.status === "passed" ? "[x] " : "[ ] ") + plain(g.title || g.id || "Gate") + (g.required ? " (required)" : ""), bullet: { level: 0 } }));
+      break;
     case "footnotes":
       out.push(H(b.title || "Notes", HeadingLevel.HEADING_3));
       (b.items || []).forEach((it, i) => out.push(P((i + 1) + ". " + plain(it.text))));

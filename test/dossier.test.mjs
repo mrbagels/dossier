@@ -154,6 +154,97 @@ test("code-editor renders editable text hooks and edit packet export", async () 
   assert.ok(md.includes("```json"), "exports editor content to Markdown");
 });
 
+test("process closeout blocks render and export agent-readable packet hooks", async () => {
+  const model = {
+    dossierVersion: "1.0",
+    kind: "release",
+    meta: { title: "Closeout", slug: "closeout" },
+    blocks: [
+      {
+        type: "verification-run",
+        title: "Verification",
+        runs: [
+          { id: "test-suite", title: "Test suite", command: "npm test", status: "passed", expected: "green", actual: "green" },
+        ],
+      },
+      {
+        type: "evidence-log",
+        title: "Evidence",
+        items: [
+          { id: "log-one", title: "Build log", kind: "command", source: "local", trust: "high", body: "Build completed." },
+        ],
+      },
+      { type: "verdict-gate", title: "Ship gate", prompt: "Ready to ship?", gateId: "ship", verdict: "approve" },
+      {
+        type: "process-receipt",
+        title: "Receipt",
+        outcome: "shipped",
+        owner: "agent",
+        changedFiles: ["src/index.mjs"],
+        commands: ["npm test"],
+      },
+      {
+        type: "finding-list",
+        title: "Findings",
+        findings: [
+          { id: "finding-one", title: "Null handling", severity: "medium", body: "Guard the boundary.", files: ["src/index.mjs"] },
+        ],
+      },
+      {
+        type: "comment-thread",
+        title: "Threads",
+        threads: [
+          { id: "thread-one", subject: "Review note", comments: [{ author: "Kyle", body: "Prefer the direct path." }] },
+        ],
+      },
+      {
+        type: "cycle-board",
+        title: "Cycles",
+        cycles: [
+          { id: "cycle-one", title: "Consumer dogfood", status: "done", summary: "Consumer passed." },
+        ],
+      },
+      {
+        type: "integration-report",
+        title: "Integration report",
+        producer: "dossier",
+        consumer: "lumen",
+        status: "accepted",
+        items: [{ id: "api", title: "API contract", summary: "No breaking change." }],
+      },
+      {
+        type: "upstream-response",
+        title: "Upstream",
+        upstream: "library",
+        status: "opened",
+        request: "Accept patch",
+        response: "Pending",
+      },
+      {
+        type: "release-checklist",
+        title: "Release gates",
+        gates: [{ id: "tests", title: "Tests pass", status: "passed", required: true, evidence: "npm test" }],
+      },
+      {
+        type: "decision-log",
+        title: "Decisions",
+        decisions: [{ id: "ship", decision: "Ship", owner: "Kyle", rationale: "All gates passed." }],
+      },
+    ],
+  };
+  const result = validateModel(model);
+  assert.deepEqual(result.errors, []);
+  const { html, md } = await generate(structuredClone(model), {});
+  assert.ok(html.includes('data-block="verification-run"'), "renders verification-run");
+  assert.ok(html.includes('data-block="release-checklist"'), "renders release-checklist");
+  assert.ok(html.includes('data-verdict-gate="ship"'), "renders verdict gate hook");
+  assert.ok(html.includes("dossier.verdicts/v1"), "runtime can export verdict packets");
+  assert.ok(html.includes("dossier.release/v1"), "runtime can export release packets");
+  assert.ok(html.includes("Integration report"), "new titled blocks are present");
+  assert.ok(md.includes("## Verification"), "exports verification markdown");
+  assert.ok(md.includes("- [x] Tests pass"), "exports release checklist markdown");
+});
+
 test("plugins: a registered block validates and renders", async () => {
   const { registerBlock } = await import("../src/index.mjs");
   registerBlock("badge-test", (b) => `<section class="ds-block" data-block="badge-test">${b.label || ""}</section>`);
