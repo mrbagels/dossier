@@ -600,6 +600,19 @@ test("packs register templates and only load trusted render plugins", async () =
   assert.ok(html.includes("&lt;ready&gt;"));
 });
 
+test("cli unknown subcommands exit nonzero", () => {
+  const cli = join(root, "bin", "dossier.mjs");
+  for (const args of [
+    ["workspace", "nope"],
+    ["release", "nope"],
+    ["pack", "nope"],
+  ]) {
+    const result = spawnSync(process.execPath, [cli, ...args], { cwd: root, encoding: "utf8" });
+    assert.notEqual(result.status, 0, args.join(" "));
+    assert.match(result.stdout + result.stderr, /Usage:/, args.join(" "));
+  }
+});
+
 test("example pack templates validate", () => {
   const packDir = join(examplesDir, "packs", "engineering");
   const manifest = readPackManifest(packDir);

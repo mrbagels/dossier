@@ -383,7 +383,7 @@ if (cmd === "build" && args.length) {
       }
     } else {
       console.log("Usage: dossier pack add <repo-or-path> [--name <name>] [--ref <ref>]\n       dossier pack trust <name>\n       dossier pack untrust <name>\n       dossier pack list [--json]");
-      process.exit(sub ? 0 : 1);
+      process.exit(1);
     }
   } catch (e) {
     console.error("✗ " + e.message);
