@@ -447,6 +447,7 @@ export function buildWorkspaceIndex(input, opts = {}) {
       updated: opts.updated || new Date().toISOString(),
       tags: ["workspace", "agent-status"],
       ...(opts.baseUrl ? { baseUrl: opts.baseUrl } : {}),
+      ...(opts.skin ? { skin: opts.skin } : {}),
     },
     blocks,
   };

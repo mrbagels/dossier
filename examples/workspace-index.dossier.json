@@ -10,7 +10,8 @@
     "tags": [
       "workspace",
       "agent-status"
-    ]
+    ],
+    "skin": "console-slate"
   },
   "blocks": [
     {
