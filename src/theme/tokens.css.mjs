@@ -258,6 +258,10 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-patch-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
 .ds-patch h4{margin:0 0 4px;font-size:15.5px}
 .ds-patch .ds-detailgrid{margin-top:12px}
+.ds-patch-review,.ds-diff-review{display:grid;gap:9px;margin-top:12px}
+.ds-patch-review label,.ds-diff-review label,.ds-hunk-head label{display:grid;gap:4px;color:var(--ds-ink-3);font-size:12px;font-weight:650}
+.ds-patch-review select,.ds-diff-review select,.ds-hunk-head select{border:1px solid var(--ds-line-2);border-radius:7px;background:var(--ds-bg);color:var(--ds-ink);padding:5px 7px;font:12px var(--ds-font)}
+.ds-patch-review textarea,.ds-diff-review textarea,.ds-diff-comment{width:100%;min-height:54px;border:1px solid var(--ds-line-2);border-radius:8px;background:var(--ds-bg);color:var(--ds-ink);padding:8px 9px;font:13px/1.45 var(--ds-font);resize:vertical}
 .ds-diffview{margin-top:15px}
 .ds-diffview.nested{border-top:1px solid var(--ds-line);padding-top:14px}
 .ds-diff-summary{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;color:var(--ds-ink-2);font-size:12.5px;font-weight:650;font-variant-numeric:tabular-nums}
@@ -274,7 +278,9 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-diff-stat{font-size:12px;color:var(--ds-ink-3);font-variant-numeric:tabular-nums}
 .ds-diff-meta-lines{display:grid;gap:2px;padding:9px 14px;border-top:1px solid var(--ds-line);font-family:var(--ds-mono);font-size:12px;color:var(--ds-ink-3);background:var(--ds-bg)}
 .ds-hunk{border-top:1px solid var(--ds-line)}
-.ds-hunk-head{padding:7px 14px;background:var(--ds-accent-tint);color:var(--ds-accent);font-family:var(--ds-mono);font-size:12px;font-weight:650}
+.ds-hunk-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:7px 14px;background:var(--ds-accent-tint);color:var(--ds-accent);font-family:var(--ds-mono);font-size:12px;font-weight:650}
+.ds-hunk-head label{min-width:138px;color:var(--ds-ink-2);font-family:var(--ds-font)}
+.ds-diff-comment{border-radius:0;border-left:0;border-right:0;border-top:0}
 .ds-diff-lines{margin:0;overflow:auto;background:var(--ds-bg);font-family:var(--ds-mono);font-size:12.5px;line-height:1.5}
 .ds-diff-line{display:grid;grid-template-columns:46px 46px 22px minmax(360px,1fr)}
 .ds-diff-line span{padding:0 7px}

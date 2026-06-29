@@ -595,7 +595,7 @@
           "producer": "dossier",
           "consumer": "lumen",
           "status": "accepted",
-          "version": "0.5.0",
+          "version": "0.5.1",
           "nextStep": "Dogfood against a live dependency change.",
           "items": [
             {

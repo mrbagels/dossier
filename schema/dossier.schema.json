@@ -893,6 +893,9 @@
                 "summary": {
                   "type": "string"
                 },
+                "notes": {
+                  "type": "string"
+                },
                 "operation": {
                   "type": "string",
                   "enum": [
@@ -913,6 +916,17 @@
                     "skipped"
                   ],
                   "default": "proposed"
+                },
+                "review": {
+                  "type": "string",
+                  "enum": [
+                    "undecided",
+                    "approve",
+                    "revise",
+                    "skip",
+                    "defer",
+                    "block"
+                  ]
                 },
                 "risk": {
                   "type": "string",
@@ -1508,6 +1522,9 @@
                   "type": "string"
                 },
                 "summary": {
+                  "type": "string"
+                },
+                "notes": {
                   "type": "string"
                 },
                 "category": {

@@ -8,7 +8,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
 [![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-c81e4a.svg)](#how-it-works)
 [![Output](https://img.shields.io/badge/output-single%20.html%20file-7048e8.svg)](#how-it-works)
-[![Version](https://img.shields.io/badge/version-0.5.0-7048e8.svg)](#)
+[![Version](https://img.shields.io/badge/version-0.5.1-7048e8.svg)](#)
 [![Live demo](https://img.shields.io/badge/live%20demo-%E2%86%97-7048e8.svg)](https://mrbagels.github.io/dossier/)
 
 <a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="840"></a>
@@ -127,8 +127,11 @@ stdio, so any MCP-capable agent can drive Dossier, including the full human-and-
 Tools: `dossier_render`, `dossier_validate`, `dossier_read_decisions` (read back the options a
 human selected on a review board), `dossier_read_process` (read process-board verdicts and
 notes), `dossier_read_edits` (read code-editor edit packets), `dossier_read_verdicts`,
-`dossier_read_release`, `dossier_record_run`, `dossier_attach_patchset`,
-`dossier_closeout_digest`, `dossier_get_schema`, and `dossier_get_starter`.
+`dossier_read_release`, `dossier_read_patch_review`, `dossier_read_diff_review`,
+`dossier_resume_context`, `dossier_apply_edits`, `dossier_apply_process`,
+`dossier_apply_patch_review`, `dossier_record_run`, `dossier_attach_patchset`,
+`dossier_closeout_digest`, `dossier_closeout_model`, `dossier_get_schema`,
+`dossier_get_packet_schema`, and `dossier_get_starter`.
 
 ```jsonc
 // e.g. an MCP client config
@@ -209,8 +212,11 @@ They use the existing block catalog plus `process-board` for work items, `code-e
 bounded editable snippets, `patch-set` for proposed edit packets, `diff-view` for static
 unified diff review, `verification-run` for commands and outcomes, `evidence-log` for source
 material, `verdict-gate` for human approval, and closeout blocks for release, incident,
-review, and integration loops. In `dossier serve`, editor blocks can save changes back to the
-source model and patch imports can append a `patch-set` block for the next agent turn.
+review, and integration loops. `patch-set` and `diff-view` export review packets for patch,
+file, and hunk verdicts. In `dossier serve`, editor blocks get a live host adapter with line
+numbers, search, JSON formatting, save shortcuts, and save-back. The live model editor can
+validate and save the whole source model, and patch imports can append a `patch-set` block
+for the next agent turn.
 
 ## React
 

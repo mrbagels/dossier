@@ -92,6 +92,51 @@ const TOOLS = [
     inputSchema: { type: "object", properties: { release: { type: "object" }, path: { type: "string" } } },
   },
   {
+    name: "dossier_read_patch_review",
+    description: "Read a patch review packet exported from patch-set blocks ({ schema: 'dossier.patch-review/v1', patches: { id: { verdict, notes } } }).",
+    inputSchema: { type: "object", properties: { patches: { type: "object" }, path: { type: "string" } } },
+  },
+  {
+    name: "dossier_read_diff_review",
+    description: "Read a diff review packet exported from diff-view blocks ({ schema: 'dossier.diff-review/v1', files, hunks }).",
+    inputSchema: { type: "object", properties: { review: { type: "object" }, path: { type: "string" } } },
+  },
+  {
+    name: "dossier_resume_context",
+    description: "Summarize a dossier model into agent-resumable context: block counts, process items, editors, patches, release gates, and receipts.",
+    inputSchema: { type: "object", properties: { model: { type: "object" }, path: { type: "string" } } },
+  },
+  {
+    name: "dossier_apply_edits",
+    description: "Apply a dossier.edits/v1 packet to matching code-editor blocks by id, targetPath, filename, or title. Provide path to persist.",
+    inputSchema: { type: "object", properties: { path: { type: "string" }, model: { type: "object" }, edits: { type: "object" } }, required: ["edits"] },
+  },
+  {
+    name: "dossier_apply_process",
+    description: "Apply a dossier.process/v1 packet to process-board items, updating verdict and notes. Provide path to persist.",
+    inputSchema: { type: "object", properties: { path: { type: "string" }, model: { type: "object" }, process: { type: "object" } }, required: ["process"] },
+  },
+  {
+    name: "dossier_apply_patch_review",
+    description: "Apply a dossier.patch-review/v1 packet to patch-set patches, updating review and status. Provide path to persist.",
+    inputSchema: { type: "object", properties: { path: { type: "string" }, model: { type: "object" }, patches: { type: "object" } }, required: ["patches"] },
+  },
+  {
+    name: "dossier_closeout_model",
+    description: "Append a process-receipt block from packets and summary fields. Provide path to persist, otherwise returns the updated model.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        model: { type: "object" },
+        packets: { type: "object" },
+        title: { type: "string" },
+        summary: { type: "string" },
+        outcome: { type: "string" },
+      },
+    },
+  },
+  {
     name: "dossier_record_run",
     description: "Create or append a verification-run block for command/test evidence. Provide `path` to update a .dossier.json file, otherwise the block is returned.",
     inputSchema: {
@@ -128,6 +173,11 @@ const TOOLS = [
     name: "dossier_get_schema",
     description: "Return the Dossier JSON Schema so you can author a valid model.",
     inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "dossier_get_packet_schema",
+    description: "Return a packet JSON Schema by name: process, edits, verdicts, release, patch-review, diff-review, closeout.",
+    inputSchema: { type: "object", properties: { name: { type: "string" } }, required: ["name"] },
   },
   {
     name: "dossier_get_starter",
@@ -190,6 +240,82 @@ function appendOrCreateBlock(model, type, title, collectionKey, item) {
   block[collectionKey] = Array.isArray(block[collectionKey]) ? block[collectionKey] : [];
   block[collectionKey].push(item);
   return block;
+}
+
+function walkBlocks(blocks, fn) {
+  (blocks || []).forEach((b) => {
+    if (!b || typeof b !== "object") return;
+    fn(b);
+    if (b.blocks) walkBlocks(b.blocks, fn);
+    if (b.left) walkBlocks(b.left, fn);
+    if (b.right) walkBlocks(b.right, fn);
+    if (b.tabs) b.tabs.forEach((t) => walkBlocks(t && t.blocks, fn));
+    if (b.candidates) b.candidates.forEach((c) => walkBlocks(c && c.blocks, fn));
+    if (b.items) b.items.forEach((it) => walkBlocks(it && it.blocks, fn));
+  });
+}
+
+function blockId(modelBlock) {
+  return modelBlock.id || modelBlock.targetPath || modelBlock.filename || modelBlock.title || "";
+}
+
+function updateAndWrite(args, updater) {
+  const { model, path } = loadModel(args);
+  if (!model) throw new Error("provide `model` or `path`");
+  const result = updater(model);
+  assertValidModel(model);
+  writeModel(path, model);
+  return { model, path, result };
+}
+
+function summarizeModel(model) {
+  const counts = {};
+  const editors = [];
+  const processItems = [];
+  const patches = [];
+  const releaseGates = [];
+  const receipts = [];
+  walkBlocks(model.blocks, (b) => {
+    counts[b.type] = (counts[b.type] || 0) + 1;
+    if (b.type === "code-editor") editors.push({ id: blockId(b), title: b.title || "", targetPath: b.targetPath || "", filename: b.filename || "" });
+    if (b.type === "process-board") (b.items || []).forEach((it) => processItems.push({ id: it.id, title: it.title, verdict: it.verdict || "undecided", status: it.status || "" }));
+    if (b.type === "patch-set") (b.patches || []).forEach((p) => patches.push({ id: p.id, title: p.title, status: p.status || "", review: p.review || "" }));
+    if (b.type === "release-checklist") (b.gates || []).forEach((g) => releaseGates.push({ id: g.id, title: g.title, status: g.status || "", required: !!g.required }));
+    if (b.type === "process-receipt" || b.type === "receipt") receipts.push({ id: b.id || "", title: b.title || b.type, outcome: b.outcome || "" });
+  });
+  return {
+    title: model.meta && model.meta.title,
+    slug: model.meta && model.meta.slug,
+    kind: model.kind || "dossier",
+    counts,
+    editors,
+    processItems,
+    patches,
+    releaseGates,
+    receipts,
+  };
+}
+
+function closeoutFromPackets(model, packets = {}, args = {}) {
+  const edits = packetMap(packets.edits || {}, ["edits", "items"]);
+  const process = packetMap(packets.process || {}, ["process", "items"]);
+  const release = packetMap(packets.release || {}, ["release", "gates"]);
+  const changedFiles = [...new Set(Object.values(edits).map((e) => e && (e.targetPath || e.filename)).filter(Boolean))];
+  const blocked = Object.entries(process).filter(([, e]) => e && ["block", "revise", "retry"].includes(e.verdict)).map(([id]) => id);
+  const openGates = Object.entries(release).filter(([, e]) => e && e.required && !e.done).map(([id]) => id);
+  return {
+    type: "process-receipt",
+    title: args.title || "Process closeout",
+    summary: args.summary || "Closeout generated from Dossier process packets.",
+    outcome: args.outcome || (blocked.length || openGates.length ? "needs-follow-up" : "ready"),
+    owner: args.owner || "agent",
+    date: new Date().toISOString(),
+    model: model.meta && model.meta.slug,
+    changedFiles,
+    commands: Object.values(packets.runs || {}).map((r) => r && r.command).filter(Boolean),
+    risks: [...blocked.map((id) => `Blocked or revision-needed process item: ${id}`), ...openGates.map((id) => `Required release gate still open: ${id}`)],
+    followUps: [...blocked, ...openGates],
+  };
 }
 
 async function handle(name, args) {
@@ -299,6 +425,120 @@ async function handle(name, args) {
     return text({ schema: packet.schema || "dossier.release/v1", slug: packet.slug, gates, totals: { gates: gates.length, done: gates.filter((g) => g.done).length } });
   }
 
+  if (name === "dossier_read_patch_review") {
+    const packet = readPacket(args, ["patches"]);
+    if (!packet) return fail("provide `patches` or `path`");
+    const map = packetMap(packet, ["patches", "items"]);
+    const byVerdict = {};
+    for (const [id, entry] of Object.entries(map)) {
+      if (!entry || typeof entry !== "object") continue;
+      const verdict = entry.verdict || "undecided";
+      byVerdict[verdict] = byVerdict[verdict] || [];
+      byVerdict[verdict].push({ id, verdict, notes: entry.notes || "", title: entry.title || "" });
+    }
+    return text({ schema: packet.schema || "dossier.patch-review/v1", slug: packet.slug, byVerdict, totals: Object.fromEntries(Object.entries(byVerdict).map(([k, v]) => [k, v.length])) });
+  }
+
+  if (name === "dossier_read_diff_review") {
+    const packet = readPacket(args, ["review"]);
+    if (!packet) return fail("provide `review` or `path`");
+    const files = packetMap(packet, ["files"]);
+    const hunks = packetMap(packet, ["hunks"]);
+    const summarize = (map) => {
+      const byVerdict = {};
+      for (const [id, entry] of Object.entries(map)) {
+        if (!entry || typeof entry !== "object") continue;
+        const verdict = entry.verdict || "undecided";
+        byVerdict[verdict] = byVerdict[verdict] || [];
+        byVerdict[verdict].push({ id, verdict, comment: entry.comment || "" });
+      }
+      return byVerdict;
+    };
+    return text({ schema: packet.schema || "dossier.diff-review/v1", slug: packet.slug, files: summarize(files), hunks: summarize(hunks), totals: { files: Object.keys(files).length, hunks: Object.keys(hunks).length } });
+  }
+
+  if (name === "dossier_resume_context") {
+    const { model } = loadModel(args);
+    if (!model) return fail("provide `model` or `path`");
+    return text(summarizeModel(model));
+  }
+
+  if (name === "dossier_apply_edits") {
+    const edits = packetMap(args.edits, ["edits", "items"]);
+    const { path, result } = updateAndWrite(args, (model) => {
+      let applied = 0;
+      const misses = [];
+      for (const [id, entry] of Object.entries(edits)) {
+        if (!entry || typeof entry !== "object" || entry.text == null) continue;
+        let found = false;
+        walkBlocks(model.blocks, (b) => {
+          if (found || b.type !== "code-editor") return;
+          if (b.id === id || b.targetPath === entry.targetPath || b.filename === entry.filename || b.title === entry.title) {
+            b.code = String(entry.text);
+            found = true;
+            applied += 1;
+          }
+        });
+        if (!found) misses.push(id);
+      }
+      return { applied, misses };
+    });
+    return text({ ok: true, path, ...result });
+  }
+
+  if (name === "dossier_apply_process") {
+    const process = packetMap(args.process, ["process", "items"]);
+    const { path, result } = updateAndWrite(args, (model) => {
+      let applied = 0;
+      const misses = [];
+      for (const [id, entry] of Object.entries(process)) {
+        let found = false;
+        walkBlocks(model.blocks, (b) => {
+          if (found || b.type !== "process-board") return;
+          const item = (b.items || []).find((it) => it && it.id === id);
+          if (item) {
+            if (entry.verdict) item.verdict = entry.verdict;
+            if (entry.notes != null) item.notes = entry.notes;
+            found = true;
+            applied += 1;
+          }
+        });
+        if (!found) misses.push(id);
+      }
+      return { applied, misses };
+    });
+    return text({ ok: true, path, ...result });
+  }
+
+  if (name === "dossier_apply_patch_review") {
+    const patches = packetMap(args.patches, ["patches", "items"]);
+    const { path, result } = updateAndWrite(args, (model) => {
+      let applied = 0;
+      const misses = [];
+      for (const [id, entry] of Object.entries(patches)) {
+        let found = false;
+        walkBlocks(model.blocks, (b) => {
+          if (found || b.type !== "patch-set") return;
+          const patch = (b.patches || []).find((p) => p && p.id === id);
+          if (patch) {
+            if (entry.verdict) {
+              patch.review = entry.verdict;
+              if (entry.verdict === "approve") patch.status = "accepted";
+              else if (entry.verdict === "revise") patch.status = "needs-revision";
+              else if (entry.verdict === "skip") patch.status = "skipped";
+            }
+            if (entry.notes != null) patch.notes = entry.notes;
+            found = true;
+            applied += 1;
+          }
+        });
+        if (!found) misses.push(id);
+      }
+      return { applied, misses };
+    });
+    return text({ ok: true, path, ...result });
+  }
+
   if (name === "dossier_record_run") {
     const run = { id: args.run.id || "run-" + Date.now(), title: args.run.title || args.run.command || "Verification run", ...args.run };
     const { model, path } = loadModel(args);
@@ -336,8 +576,26 @@ async function handle(name, args) {
     return text(digest);
   }
 
+  if (name === "dossier_closeout_model") {
+    const { model, path } = loadModel(args);
+    if (!model) return fail("provide `model` or `path`");
+    model.blocks = Array.isArray(model.blocks) ? model.blocks : [];
+    const receipt = closeoutFromPackets(model, args.packets || {}, args);
+    model.blocks.push(receipt);
+    assertValidModel(model);
+    writeModel(path, model);
+    return text({ ok: true, path, block: receipt, model: path ? undefined : model });
+  }
+
   if (name === "dossier_get_schema") {
     return text(readFileSync(join(root, "schema/dossier.schema.json"), "utf8"));
+  }
+
+  if (name === "dossier_get_packet_schema") {
+    const allowed = new Set(["process", "edits", "verdicts", "release", "patch-review", "diff-review", "closeout"]);
+    const schemaName = String(args.name || "").replace(/\.schema\.json$/, "");
+    if (!allowed.has(schemaName)) return fail("unknown packet schema: " + args.name);
+    return text(readFileSync(join(root, `schema/packets/${schemaName}.schema.json`), "utf8"));
   }
 
   if (name === "dossier_get_starter") {

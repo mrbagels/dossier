@@ -63,7 +63,10 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 and `--plugin <file>` to add custom block types. For programmatic / multi-agent use, `dossier mcp` exposes
 `dossier_render`, `dossier_validate`, `dossier_read_decisions`, `dossier_read_process`,
 `dossier_read_edits`, `dossier_read_verdicts`, `dossier_read_release`,
-`dossier_record_run`, `dossier_attach_patchset`, and `dossier_closeout_digest`.
+`dossier_read_patch_review`, `dossier_read_diff_review`, `dossier_resume_context`,
+`dossier_apply_edits`, `dossier_apply_process`, `dossier_apply_patch_review`,
+`dossier_record_run`, `dossier_attach_patchset`, `dossier_closeout_digest`,
+`dossier_closeout_model`, and `dossier_get_packet_schema`.
 Block types beyond the basics, `figure`,
 `math`, `chart`, `footnotes` (with inline `[^id]`), and `receipt` (provenance), are in
 `references/blocks.md`.

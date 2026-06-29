@@ -261,6 +261,10 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-patch-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
 .ds-patch h4{margin:0 0 4px;font-size:15.5px}
 .ds-patch .ds-detailgrid{margin-top:12px}
+.ds-patch-review,.ds-diff-review{display:grid;gap:9px;margin-top:12px}
+.ds-patch-review label,.ds-diff-review label,.ds-hunk-head label{display:grid;gap:4px;color:var(--ds-ink-3);font-size:12px;font-weight:650}
+.ds-patch-review select,.ds-diff-review select,.ds-hunk-head select{border:1px solid var(--ds-line-2);border-radius:7px;background:var(--ds-bg);color:var(--ds-ink);padding:5px 7px;font:12px var(--ds-font)}
+.ds-patch-review textarea,.ds-diff-review textarea,.ds-diff-comment{width:100%;min-height:54px;border:1px solid var(--ds-line-2);border-radius:8px;background:var(--ds-bg);color:var(--ds-ink);padding:8px 9px;font:13px/1.45 var(--ds-font);resize:vertical}
 .ds-diffview{margin-top:15px}
 .ds-diffview.nested{border-top:1px solid var(--ds-line);padding-top:14px}
 .ds-diff-summary{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;color:var(--ds-ink-2);font-size:12.5px;font-weight:650;font-variant-numeric:tabular-nums}
@@ -277,7 +281,9 @@ pre code{background:transparent;border:0;padding:0;font-size:inherit}
 .ds-diff-stat{font-size:12px;color:var(--ds-ink-3);font-variant-numeric:tabular-nums}
 .ds-diff-meta-lines{display:grid;gap:2px;padding:9px 14px;border-top:1px solid var(--ds-line);font-family:var(--ds-mono);font-size:12px;color:var(--ds-ink-3);background:var(--ds-bg)}
 .ds-hunk{border-top:1px solid var(--ds-line)}
-.ds-hunk-head{padding:7px 14px;background:var(--ds-accent-tint);color:var(--ds-accent);font-family:var(--ds-mono);font-size:12px;font-weight:650}
+.ds-hunk-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:7px 14px;background:var(--ds-accent-tint);color:var(--ds-accent);font-family:var(--ds-mono);font-size:12px;font-weight:650}
+.ds-hunk-head label{min-width:138px;color:var(--ds-ink-2);font-family:var(--ds-font)}
+.ds-diff-comment{border-radius:0;border-left:0;border-right:0;border-top:0}
 .ds-diff-lines{margin:0;overflow:auto;background:var(--ds-bg);font-family:var(--ds-mono);font-size:12.5px;line-height:1.5}
 .ds-diff-line{display:grid;grid-template-columns:46px 46px 22px minmax(360px,1fr)}
 .ds-diff-line span{padding:0 7px}
@@ -1018,6 +1024,26 @@ SUMMARY: Dossier should evolve from an artifact for planning and review into a g
   function importRelease(){var inp=document.createElement("input");inp.type="file";inp.accept="application/json";inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);var rel=packetMap(d,"release","gates");Object.keys(rel).forEach(function(id){state.release[id]=rel[id];var cb=byAttr("[data-release-gate]","data-release-gate",id);if(cb&&rel[id].done!=null)cb.checked=!!rel[id].done;var ta=byAttr("[data-release-notes]","data-release-notes",id);if(ta&&rel[id].notes!=null)ta.value=rel[id].notes;});save();toast("Imported release state");}catch(e){toast("Import failed");}};r.readAsText(f);};inp.click();}
   $$("[data-export-release]").forEach(function(b){b.addEventListener("click",exportRelease);});
   $$("[data-import-release]").forEach(function(b){b.addEventListener("click",importRelease);});
+
+  state.patchReview=state.patchReview||{};
+  $$("[data-patch-verdict]").forEach(function(sel){var id=sel.getAttribute("data-patch-verdict");if(state.patchReview[id]&&state.patchReview[id].verdict)sel.value=state.patchReview[id].verdict;sel.addEventListener("change",function(){state.patchReview[id]=state.patchReview[id]||{};state.patchReview[id].verdict=sel.value;save();});});
+  $$("[data-patch-notes]").forEach(function(ta){var id=ta.getAttribute("data-patch-notes");if(state.patchReview[id]&&state.patchReview[id].notes)ta.value=state.patchReview[id].notes;ta.addEventListener("input",function(){state.patchReview[id]=state.patchReview[id]||{};state.patchReview[id].notes=ta.value;save();});});
+  function collectPatchReview(){var out={};$$("[data-patch-verdict]").forEach(function(sel){var id=sel.getAttribute("data-patch-verdict");var ta=byAttr("[data-patch-notes]","data-patch-notes",id);var patch=sel.closest("[data-patch]");var title=patch&&patch.querySelector("h4")?patch.querySelector("h4").textContent:"";out[id]={verdict:sel.value||"undecided",notes:ta?ta.value:"",title:title};});state.patchReview=out;save();return out;}
+  function exportPatchReview(){download(slug+".patch-review.json",JSON.stringify({schema:"dossier.patch-review/v1",slug:slug,patches:collectPatchReview()},null,2),"application/json");}
+  function importPatchReview(){var inp=document.createElement("input");inp.type="file";inp.accept="application/json";inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);var patches=packetMap(d,"patches","items");Object.keys(patches).forEach(function(id){state.patchReview[id]=patches[id];var sel=byAttr("[data-patch-verdict]","data-patch-verdict",id);if(sel&&patches[id].verdict)sel.value=patches[id].verdict;var ta=byAttr("[data-patch-notes]","data-patch-notes",id);if(ta&&patches[id].notes!=null)ta.value=patches[id].notes;});save();toast("Imported patch review");}catch(e){toast("Import failed");}};r.readAsText(f);};inp.click();}
+  $$("[data-export-patch-review]").forEach(function(b){b.addEventListener("click",exportPatchReview);});
+  $$("[data-import-patch-review]").forEach(function(b){b.addEventListener("click",importPatchReview);});
+
+  state.diffReview=state.diffReview||{files:{},hunks:{}};
+  $$("[data-diff-file-verdict]").forEach(function(sel){var id=sel.getAttribute("data-diff-file-verdict");if(state.diffReview.files&&state.diffReview.files[id]&&state.diffReview.files[id].verdict)sel.value=state.diffReview.files[id].verdict;sel.addEventListener("change",function(){state.diffReview.files=state.diffReview.files||{};state.diffReview.files[id]=state.diffReview.files[id]||{};state.diffReview.files[id].verdict=sel.value;save();});});
+  $$("[data-diff-file-comment]").forEach(function(ta){var id=ta.getAttribute("data-diff-file-comment");if(state.diffReview.files&&state.diffReview.files[id]&&state.diffReview.files[id].comment)ta.value=state.diffReview.files[id].comment;ta.addEventListener("input",function(){state.diffReview.files=state.diffReview.files||{};state.diffReview.files[id]=state.diffReview.files[id]||{};state.diffReview.files[id].comment=ta.value;save();});});
+  $$("[data-diff-hunk-verdict]").forEach(function(sel){var id=sel.getAttribute("data-diff-hunk-verdict");if(state.diffReview.hunks&&state.diffReview.hunks[id]&&state.diffReview.hunks[id].verdict)sel.value=state.diffReview.hunks[id].verdict;sel.addEventListener("change",function(){state.diffReview.hunks=state.diffReview.hunks||{};state.diffReview.hunks[id]=state.diffReview.hunks[id]||{};state.diffReview.hunks[id].verdict=sel.value;save();});});
+  $$("[data-diff-hunk-comment]").forEach(function(ta){var id=ta.getAttribute("data-diff-hunk-comment");if(state.diffReview.hunks&&state.diffReview.hunks[id]&&state.diffReview.hunks[id].comment)ta.value=state.diffReview.hunks[id].comment;ta.addEventListener("input",function(){state.diffReview.hunks=state.diffReview.hunks||{};state.diffReview.hunks[id]=state.diffReview.hunks[id]||{};state.diffReview.hunks[id].comment=ta.value;save();});});
+  function collectDiffReview(){var files={},hunks={};$$("[data-diff-file-verdict]").forEach(function(sel){var id=sel.getAttribute("data-diff-file-verdict");var ta=byAttr("[data-diff-file-comment]","data-diff-file-comment",id);files[id]={verdict:sel.value||"undecided",comment:ta?ta.value:""};});$$("[data-diff-hunk-verdict]").forEach(function(sel){var id=sel.getAttribute("data-diff-hunk-verdict");var ta=byAttr("[data-diff-hunk-comment]","data-diff-hunk-comment",id);hunks[id]={verdict:sel.value||"undecided",comment:ta?ta.value:""};});state.diffReview={files:files,hunks:hunks};save();return state.diffReview;}
+  function exportDiffReview(){var review=collectDiffReview();download(slug+".diff-review.json",JSON.stringify({schema:"dossier.diff-review/v1",slug:slug,files:review.files,hunks:review.hunks},null,2),"application/json");}
+  function importDiffReview(){var inp=document.createElement("input");inp.type="file";inp.accept="application/json";inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);var files=packetMap(d,"files"),hunks=packetMap(d,"hunks");state.diffReview={files:files,hunks:hunks};Object.keys(files).forEach(function(id){var sel=byAttr("[data-diff-file-verdict]","data-diff-file-verdict",id);if(sel&&files[id].verdict)sel.value=files[id].verdict;var ta=byAttr("[data-diff-file-comment]","data-diff-file-comment",id);if(ta&&files[id].comment!=null)ta.value=files[id].comment;});Object.keys(hunks).forEach(function(id){var sel=byAttr("[data-diff-hunk-verdict]","data-diff-hunk-verdict",id);if(sel&&hunks[id].verdict)sel.value=hunks[id].verdict;var ta=byAttr("[data-diff-hunk-comment]","data-diff-hunk-comment",id);if(ta&&hunks[id].comment!=null)ta.value=hunks[id].comment;});save();toast("Imported diff review");}catch(e){toast("Import failed");}};r.readAsText(f);};inp.click();}
+  $$("[data-export-diff-review]").forEach(function(b){b.addEventListener("click",exportDiffReview);});
+  $$("[data-import-diff-review]").forEach(function(b){b.addEventListener("click",importDiffReview);});
 
   // close the export menu after an action or an outside click
   $$(".ds-menu-list button").forEach(function(b){b.addEventListener("click",function(){var m=b.closest(".ds-menu");if(m)m.removeAttribute("open");});});

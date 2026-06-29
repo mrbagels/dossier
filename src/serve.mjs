@@ -5,27 +5,7 @@
 import { createServer } from "node:http";
 import { watch, readFileSync, writeFileSync } from "node:fs";
 import { generateFile, validateModel } from "./index.mjs";
-
-const LIVE = `<script>
-try{new EventSource('/__reload').onmessage=function(){location.reload()}}catch(e){}
-(function(){
-  function post(url,payload){return fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).then(function(r){if(!r.ok)throw new Error("request failed");return r.json();});}
-  function toast(msg){var t=document.querySelector("[data-toast]");if(!t)return; t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},1800);}
-  document.querySelectorAll("[data-code-editor]").forEach(function(ta){
-    var actions=ta.closest("[data-editor-shell]")&&ta.closest("[data-editor-shell]").querySelector(".ds-codeedit-actions");
-    if(!actions||actions.querySelector("[data-live-save]"))return;
-    var b=document.createElement("button");b.className="ds-btn ds-btn-line";b.type="button";b.textContent="Save to dossier";b.setAttribute("data-live-save","");
-    b.addEventListener("click",function(){post("/__save-editor",{id:ta.getAttribute("data-code-editor"),text:ta.value,targetPath:ta.getAttribute("data-editor-target"),filename:ta.getAttribute("data-editor-filename"),title:ta.getAttribute("data-editor-title")}).then(function(){toast("Saved to dossier JSON")}).catch(function(){toast("Save failed")});});
-    actions.appendChild(b);
-  });
-  var tools=document.querySelector(".ds-tools");
-  if(tools&&!tools.querySelector("[data-live-patch-import]")){
-    var p=document.createElement("button");p.className="ds-btn";p.type="button";p.textContent="Import patch";p.setAttribute("data-live-patch-import","");
-    p.addEventListener("click",function(){var input=document.createElement("input");input.type="file";input.accept=".json,.diff,.patch,text/plain,application/json";input.onchange=function(){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var text=String(r.result||""),payload;try{payload=JSON.parse(text)}catch(e){payload={type:"patch-set",title:"Imported patch",patches:[{id:"imported-patch",title:f.name||"Imported patch",operation:"mixed",status:"proposed",risk:"medium",diff:text}]}}post("/__append-patchset",payload).then(function(){toast("Patch set imported")}).catch(function(){toast("Patch import failed")});};r.readAsText(f);};input.click();});
-    tools.appendChild(p);
-  }
-})();
-</script>`;
+import { LIVE } from "./live-runtime.mjs";
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -94,6 +74,13 @@ function appendPatchSet(file, payload) {
   writeSourceModel(file, model);
 }
 
+function saveModel(file, payload) {
+  const model = payload && payload.model;
+  if (!model || typeof model !== "object" || Array.isArray(model)) throw new Error("payload.model must be a dossier model object");
+  assertValidModel(model);
+  writeSourceModel(file, model);
+}
+
 function openUrl(url) {
   import("node:child_process").then(({ spawn }) => {
     const cmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
@@ -148,6 +135,17 @@ export async function serve(file, opts = {}) {
     if (req.method === "POST" && req.url === "/__append-patchset") {
       try {
         appendPatchSet(file, await readBody(req));
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true }));
+      } catch (e) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: false, error: e.message }));
+      }
+      return;
+    }
+    if (req.method === "POST" && req.url === "/__save-model") {
+      try {
+        saveModel(file, await readBody(req));
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ ok: true }));
       } catch (e) {

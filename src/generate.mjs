@@ -48,6 +48,7 @@ function inlineMd(s, ctx) {
 const COPY_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
 const CHEVRON_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>`;
 const PROCESS_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "split", "retry", "block"];
+const REVIEW_VERDICTS = ["undecided", "approve", "revise", "skip", "defer", "block"];
 
 const wrap = (type, id, inner, extra = "") =>
   `<section class="ds-block" data-block="${esc(type)}" data-id="${esc(id)}"${extra}>` +
@@ -55,6 +56,9 @@ const wrap = (type, id, inner, extra = "") =>
 
 const verdictOptions = (current) =>
   PROCESS_VERDICTS.map((v) => `<option value="${esc(v)}"${(current || "undecided") === v ? " selected" : ""}>${esc(v)}</option>`).join("");
+
+const reviewOptions = (current) =>
+  REVIEW_VERDICTS.map((v) => `<option value="${esc(v)}"${(current || "undecided") === v ? " selected" : ""}>${esc(v)}</option>`).join("");
 
 function stripDiffPath(s) {
   const raw = String(s || "").trim().replace(/^"(.*)"$/, "$1");
@@ -153,21 +157,30 @@ function renderDiffView(b, ctx, nested = false) {
   const renderedFiles = files
     .map((file) => {
       const fileLabel = diffFileLabel(file);
+      const fileKey = `${b.id}:${fileLabel}`;
       const meta = file.meta.length ? `<div class="ds-diff-meta-lines">${file.meta.map((line) => `<code>${esc(line)}</code>`).join("")}</div>` : "";
       const hunks = file.hunks
-        .map((hk) => {
+        .map((hk, hunkIndex) => {
+          const hunkKey = `${fileKey}:h${hunkIndex + 1}`;
           const lines = hk.lines
             .map(
               (line) =>
                 `<span class="ds-diff-line ${line.type}"><span class="ds-diff-num">${esc(line.oldNumber)}</span><span class="ds-diff-num">${esc(line.newNumber)}</span><span class="ds-diff-mark">${esc(line.mark)}</span><span class="ds-diff-code">${esc(line.text)}</span></span>`
             )
             .join("");
-          return `<div class="ds-hunk"><div class="ds-hunk-head">${esc(hk.header)}</div><pre class="ds-diff-lines"><code>${lines}</code></pre></div>`;
+          return (
+            `<div class="ds-hunk" data-diff-hunk="${esc(hunkKey)}"><div class="ds-hunk-head"><span>${esc(hk.header)}</span>` +
+            `<label><span>Hunk verdict</span><select data-diff-hunk-verdict="${esc(hunkKey)}">${reviewOptions()}</select></label></div>` +
+            `<textarea class="ds-diff-comment" data-diff-hunk-comment="${esc(hunkKey)}" placeholder="Hunk comment or requested change"></textarea>` +
+            `<pre class="ds-diff-lines"><code>${lines}</code></pre></div>`
+          );
         })
         .join("");
       return (
-        `<details class="ds-diff-file" id="${esc(b.id)}-${esc(slugify(fileLabel))}" open>` +
+        `<details class="ds-diff-file" id="${esc(b.id)}-${esc(slugify(fileLabel))}" data-diff-file="${esc(fileKey)}" open>` +
         `<summary><span class="ds-diff-path">${esc(fileLabel)}</span><span class="ds-diff-stat">+${file.additions} -${file.deletions}</span></summary>` +
+        `<div class="ds-diff-review"><label><span>File verdict</span><select data-diff-file-verdict="${esc(fileKey)}">${reviewOptions()}</select></label>` +
+        `<label><span>File comment</span><textarea data-diff-file-comment="${esc(fileKey)}" placeholder="File-level review note"></textarea></label></div>` +
         `${meta}${hunks}</details>`
       );
     })
@@ -181,6 +194,7 @@ function renderDiffView(b, ctx, nested = false) {
     `<div class="ds-diff-summary"><span>${files.length} file${files.length === 1 ? "" : "s"}</span><span class="add">+${additions}</span><span class="del">-${deletions}</span></div>` +
     (fileTabs ? `<nav class="ds-diff-files">${fileTabs}</nav>` : "") +
     `<div class="ds-diff-body">${renderedFiles || `<pre class="ds-diff-empty"><code>${esc(b.diff || "")}</code></pre>`}</div>` +
+    `<div class="ds-codeedit-actions"><button class="ds-btn ds-btn-line" type="button" data-export-diff-review>Export diff review JSON</button><button class="ds-btn ds-btn-line" type="button" data-import-diff-review>Import</button></div>` +
     `</section>`
   );
 }
@@ -350,18 +364,21 @@ const renderers = {
         if (p.operation) chips.push(`<span class="ds-chip">${esc(p.operation)}</span>`);
         if (p.status) chips.push(`<span class="ds-chip">${esc(p.status)}</span>`);
         if (p.risk) chips.push(`<span class="ds-chip risk-${esc(slugify(p.risk))}">Risk · ${esc(p.risk)}</span>`);
+        const patchId = p.id || slugify(p.title || "patch");
         const rows = [];
         if (p.files && p.files.length) rows.push(["Files", p.files.join(", ")]);
         if (p.workItems && p.workItems.length) rows.push(["Work items", p.workItems.join(", ")]);
         if (p.verification && p.verification.length) rows.push(["Verification", p.verification.join(", ")]);
         Object.entries(p.details || {}).forEach(([k, v]) => rows.push([k, v]));
         const details = rows.map(([k, v]) => `<div class="ds-detail"><dt>${esc(k)}</dt><dd>${inlineMd(v, ctx)}</dd></div>`).join("");
-        const diff = p.diff ? renderDiffView({ type: "diff-view", id: `${p.id || slugify(p.title || "patch")}-diff`, title: "Diff", diff: p.diff }, ctx, true) : "";
+        const diff = p.diff ? renderDiffView({ type: "diff-view", id: `${patchId}-diff`, title: "Diff", diff: p.diff }, ctx, true) : "";
         return (
-          `<article class="ds-patch" data-patch="${esc(p.id || "")}">` +
+          `<article class="ds-patch" data-patch="${esc(patchId)}">` +
           `<div class="ds-patch-head"><div><h4>${esc(p.title || p.id || "Patch")}</h4>${p.summary ? `<p class="ds-muted">${inlineMd(p.summary, ctx)}</p>` : ""}</div>` +
           (chips.length ? `<div class="ds-chips">${chips.join("")}</div>` : "") +
           `</div>` +
+          `<div class="ds-patch-review"><label><span>Patch verdict</span><select data-patch-verdict="${esc(patchId)}">${reviewOptions(p.review || p.status)}</select></label>` +
+          `<label><span>Review notes</span><textarea data-patch-notes="${esc(patchId)}" placeholder="Apply, revise, skip, or follow-up notes">${esc(p.notes || "")}</textarea></label></div>` +
           (details ? `<dl class="ds-detailgrid">${details}</dl>` : "") +
           diff +
           `</article>`
@@ -373,7 +390,8 @@ const renderers = {
       b.id,
       (b.title ? `<h3 id="${esc(b.id)}">${esc(b.title)}</h3>` : "") +
         (b.summary ? `<p class="ds-muted">${inlineMd(b.summary, ctx)}</p>` : "") +
-        `<div class="ds-patchlist">${patches}</div>`
+        `<div class="ds-patchlist">${patches}</div>` +
+        `<div class="ds-codeedit-actions"><button class="ds-btn ds-btn-line" type="button" data-export-patch-review>Export patch review JSON</button><button class="ds-btn ds-btn-line" type="button" data-import-patch-review>Import</button></div>`
     );
   },
   "diff-view"(b, ctx) {
@@ -631,7 +649,7 @@ const renderers = {
           `<div class="ds-ritem-aside">${statusChip}<label class="ds-process-verdict-wrap" data-stop><span>Verdict</span><select class="ds-process-verdict" data-process-verdict="${esc(it.id)}">${verdictOptions(verdict)}</select></label><span class="ds-chev" aria-hidden="true">▾</span></div>` +
           `</div>` +
           `<div class="ds-ritem-wrap"><div class="ds-ritem-body">${ref}` +
-          `<label class="ds-notes"><span>Notes</span><textarea data-process-notes="${esc(it.id)}" placeholder="Verdict notes, constraints, follow-up instructions"></textarea></label>` +
+          `<label class="ds-notes"><span>Notes</span><textarea data-process-notes="${esc(it.id)}" placeholder="Verdict notes, constraints, follow-up instructions">${esc(it.notes || "")}</textarea></label>` +
           `</div></div></article>`
         );
       })

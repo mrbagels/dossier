@@ -90,7 +90,10 @@ Host tools can enhance the same block with CodeMirror by targeting `data-code-ed
 ## patch-set, proposed edit packets
 Use for implementation dossiers when an agent is proposing or recording concrete edits.
 Each patch can link back to `process-board` item ids, list files and verification, and
-carry an optional unified diff.
+carry an optional unified diff. Patch review controls export
+`{ "schema": "dossier.patch-review/v1", "patches": { "patch-id": { "verdict": "approve", "notes": "..." } } }`.
+Agents should read that packet with `dossier_read_patch_review` and can apply it to the
+model with `dossier_apply_patch_review`.
 ```json
 { "type": "patch-set", "title": "Patch set",
   "patches": [
@@ -106,7 +109,10 @@ carry an optional unified diff.
 
 ## diff-view, parsed unified diff
 Use for a file-first patch review surface. The renderer parses files, hunks, additions,
-and deletions from the unified diff and renders a static reviewable view.
+and deletions from the unified diff and renders a static reviewable view. File and hunk
+review controls export
+`{ "schema": "dossier.diff-review/v1", "files": { "...": { "verdict": "approve", "comment": "..." } }, "hunks": { "...": { "verdict": "revise", "comment": "..." } } }`.
+Agents should read that packet with `dossier_read_diff_review`.
 ```json
 { "type": "diff-view", "title": "Full diff",
   "summary": "Standalone diff for file-first review.",

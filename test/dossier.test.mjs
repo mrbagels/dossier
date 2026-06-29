@@ -143,9 +143,23 @@ test("patch-set and diff-view render parsed unified diffs", async () => {
   const { html, md } = await generate(structuredClone(model), {});
   assert.ok(html.includes('data-block="patch-set"'), "renders patch-set");
   assert.ok(html.includes('data-block="diff-view"'), "renders diff-view");
+  assert.ok(html.includes('data-patch-verdict="patch-one"'), "renders patch review verdict control");
+  assert.ok(html.includes('data-diff-file-verdict="diff-1:src/file.ts"'), "renders file review verdict control");
+  assert.ok(html.includes("dossier.patch-review/v1"), "runtime can export patch review packets");
+  assert.ok(html.includes("dossier.diff-review/v1"), "runtime can export diff review packets");
   assert.ok(html.includes("ds-diff-line add"), "renders additions");
   assert.ok(html.includes("ds-diff-line del"), "renders deletions");
   assert.ok(md.includes("```diff"), "exports diff markdown");
+});
+
+test("packet schemas are published for agent handoff contracts", () => {
+  const packetDir = join(root, "schema", "packets");
+  const names = ["process", "edits", "verdicts", "release", "patch-review", "diff-review", "closeout"];
+  for (const name of names) {
+    const schema = JSON.parse(readFileSync(join(packetDir, `${name}.schema.json`), "utf8"));
+    assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema", name);
+    assert.ok(schema.title.includes("Dossier"), name);
+  }
 });
 
 test("code-editor renders editable text hooks and edit packet export", async () => {
@@ -315,6 +329,53 @@ test("mcp helpers normalize packets and validate writes before touching disk", a
   assert.equal(model.blocks.length, 1, "invalid write was not persisted");
 });
 
+test("mcp apply and closeout tools update models with packet state", async () => {
+  const { handleTool } = await import("../mcp/server.mjs");
+  const dir = mkdtempSync(join(tmpdir(), "dossier-mcp-apply-"));
+  const file = join(dir, "apply.dossier.json");
+  writeFileSync(
+    file,
+    JSON.stringify(
+      {
+        dossierVersion: "1.0",
+        meta: { title: "Apply", slug: "apply" },
+        blocks: [
+          { type: "code-editor", id: "config-editor", title: "Config", targetPath: "config.json", code: "{}\n" },
+          { type: "process-board", title: "Work", items: [{ id: "config-work", title: "Config work" }] },
+          { type: "patch-set", title: "Patches", patches: [{ id: "config-patch", title: "Config patch" }] },
+        ],
+      },
+      null,
+      2
+    )
+  );
+  let res = await handleTool("dossier_apply_edits", {
+    path: file,
+    edits: { schema: "dossier.edits/v1", edits: { "config-editor": { text: "{\n  \"enabled\": true\n}\n" } } },
+  });
+  assert.equal(JSON.parse(res.content[0].text).applied, 1);
+  res = await handleTool("dossier_apply_process", {
+    path: file,
+    process: { schema: "dossier.process/v1", process: { "config-work": { verdict: "approve", notes: "Ready." } } },
+  });
+  assert.equal(JSON.parse(res.content[0].text).applied, 1);
+  res = await handleTool("dossier_apply_patch_review", {
+    path: file,
+    patches: { schema: "dossier.patch-review/v1", patches: { "config-patch": { verdict: "approve", notes: "Apply." } } },
+  });
+  assert.equal(JSON.parse(res.content[0].text).applied, 1);
+  await handleTool("dossier_closeout_model", {
+    path: file,
+    packets: { edits: { edits: { "config-editor": { targetPath: "config.json", text: "x" } } } },
+    summary: "Closed out.",
+  });
+  const model = JSON.parse(readFileSync(file, "utf8"));
+  assert.equal(model.blocks[0].code, "{\n  \"enabled\": true\n}\n");
+  assert.equal(model.blocks[1].items[0].notes, "Ready.");
+  assert.equal(model.blocks[2].patches[0].status, "accepted");
+  assert.equal(model.blocks.at(-1).type, "process-receipt");
+});
+
 test("serve exposes validated save-back and patch import endpoints", async () => {
   const { serve } = await import("../src/serve.mjs");
   const dir = mkdtempSync(join(tmpdir(), "dossier-serve-"));
@@ -360,6 +421,27 @@ test("serve exposes validated save-back and patch import endpoints", async () =>
     assert.equal(res.ok, true, await res.text());
     model = JSON.parse(readFileSync(file, "utf8"));
     assert.equal(model.blocks[1].type, "patch-set");
+
+    res = await fetch(live.url + "/__save-model", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: {
+          dossierVersion: "1.0",
+          kind: "implementation",
+          meta: { title: "Live saved", slug: "live" },
+          blocks: [{ type: "prose", markdown: "Saved from model editor." }],
+        },
+      }),
+    });
+    assert.equal(res.ok, true, await res.text());
+    model = JSON.parse(readFileSync(file, "utf8"));
+    assert.equal(model.meta.title, "Live saved");
+
+    res = await fetch(live.url);
+    const html = await res.text();
+    assert.ok(html.includes("DossierEditorEnhancer"), "live runtime includes editor enhancer");
+    assert.ok(html.includes("data-live-model-open"), "live runtime includes model editor control");
   } finally {
     await live.close();
   }
