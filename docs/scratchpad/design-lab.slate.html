@@ -582,8 +582,10 @@ tbody tr:hover td{color:var(--ds-ink)}
    Base type — slightly denser, tabular data
    ============================================================ */
 body{font-size:15.5px;line-height:1.5}
-.ds-content>.ds-block+.ds-block{margin-top:28px}
-.ds-content>.ds-block+.ds-section{margin-top:44px}
+/* wider canvas (~+19%); data blocks can scroll on overflow. More air between sections. */
+:root{--ds-frame:1400px}
+.ds-content>.ds-block+.ds-block{margin-top:32px}
+.ds-content>.ds-block+.ds-section{margin-top:76px}
 table,.ds-stat strong,.ds-meta .ds-val,.ds-date,.ds-detail dd,.ds-diff-summary{font-variant-numeric:tabular-nums}
 
 /* masthead */
@@ -680,7 +682,7 @@ table,.ds-stat strong,.ds-meta .ds-val,.ds-date,.ds-detail dd,.ds-diff-summary{f
 /* ============================================================
    Tables — framed, surface header, zebra, symmetric padding
    ============================================================ */
-.ds-tablewrap{border:1px solid var(--ds-line-2);border-radius:11px;overflow:hidden}
+.ds-tablewrap{border:1px solid var(--ds-line-2);border-radius:11px;overflow:auto}
 .ds-tablewrap table{font-size:14px}
 th{background:var(--ds-bg-3);font-family:var(--ds-mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;padding:9px 14px;border-bottom:1px solid var(--ds-line-2)}
 td{padding:9px 14px;border-bottom:1px solid var(--ds-line)}
@@ -743,16 +745,40 @@ tr.ds-rec td strong{color:var(--ds-ink)}
 /* ============================================================
    Release checklist — fix the gate title/chip collision
    ============================================================ */
-.ds-release-gate{display:grid;gap:9px}
-.ds-release-list .ds-action{flex-wrap:wrap;align-items:flex-start;gap:10px}
-.ds-release-list .ds-action label{flex:1 1 auto}
-.ds-release-list .ds-action-meta{flex-wrap:wrap}
+/* gate: title left, status chips right, notes textarea spanning full width below */
+.ds-release-gate{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center;padding:15px 0}
+.ds-release-gate>label{grid-column:1;min-width:0}
+.ds-release-gate>.ds-action-meta{grid-column:2;justify-self:end;flex-wrap:wrap}
+.ds-release-gate>textarea{grid-column:1 / -1;width:100%;min-height:64px}
 
 /* ============================================================
    Code / lang accents inherit the indigo accent automatically.
    Diagram light backdrop stays white; charts pick up accent (indigo).
    ============================================================ */
 .ds-code-bar .ds-lang,.ds-codeedit-bar .ds-lang{color:var(--ds-accent)}
+
+/* ============================================================
+   ITERATION 2 — layout & padding fixes
+   ============================================================ */
+/* two-col columns are bare <div>s with no gap -> blocks touch. Space them. */
+.ds-twocol>div{display:grid;gap:18px;align-content:start}
+.ds-cardgrid{gap:16px}
+
+/* input panels had 0 padding so fields sat flush to the container edge */
+.ds-diff-review{padding:13px 15px;display:grid;gap:11px}
+.ds-diff-review label{display:grid;gap:5px;margin:0}
+.ds-patch-review{padding:13px 15px;display:grid;gap:11px}
+.ds-diff-meta-lines{padding:2px 15px 12px}
+.ds-notes{padding-left:0;padding-right:0}
+
+/* copy button: an elevated chip that reads as a control and clears divider lines */
+.ds-copy{top:12px;right:12px;background:var(--ds-bg);border-color:var(--ds-line-2);box-shadow:0 2px 8px rgba(20,16,40,.10)}
+.ds-section>.ds-copy{display:none}     /* sections are containers; copy their nested blocks instead */
+
+/* no harsh blue selection rectangle on controls; softer text selection */
+button,summary,.ds-btn,.ds-copy,.ds-chip,.ds-status,.ds-pill,.ds-lvl,.ds-toggle,.ds-action label,.ds-toc-link{-webkit-user-select:none;user-select:none}
+::selection{background:var(--ds-accent-tint-2)}
+:focus-visible{outline:2px solid var(--ds-accent);outline-offset:2px}
 </style>
 </head>
 <body>
