@@ -39,6 +39,9 @@ jobs:
       - name: Build examples and process docs
         run: node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json
 
+      - name: Build example workspace index
+        run: node bin/dossier.mjs workspace index examples
+
       - name: Package dry run
         run: npm pack --dry-run --json > npm-pack-dry-run.json
 
@@ -66,7 +69,7 @@ jobs:
           --version "${{ steps.release.outputs.version }}"
           --since "${{ steps.release.outputs.since }}"
           --out "docs/releases/${{ steps.release.outputs.version }}.dossier.json"
-          --checks "npm test,node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json,node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json,npm pack --dry-run --json"
+          --checks "npm test,node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json,node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json,node bin/dossier.mjs workspace index examples,npm pack --dry-run --json"
 
       - name: Upload release evidence
         uses: actions/upload-artifact@v4

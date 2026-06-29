@@ -18,7 +18,9 @@
     "mcp",
     "skill",
     "examples/*.dossier.json",
+    "examples/*.workspace.json",
     "examples/plugins",
+    "examples/packs",
     "README.md",
     "LICENSE"
   ],

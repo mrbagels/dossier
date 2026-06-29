@@ -62,9 +62,18 @@ Other commands: `dossier validate <file>` (check without rendering), `dossier se
 --open` (live-reload preview while iterating, with the same `--theme` and `--skin`
 presentation flags as build), `dossier diff <old> <new>` (what changed),
 `dossier publish <dir> --out <dir>` (build a static folder with a catalog index),
+`dossier pack add <repo-or-path>` (register reusable templates and plugins),
+`dossier init <name> --template <pack/id>` (scaffold from a pack template),
+`dossier workspace index <manifest-or-dir>` (build an agent-readable multi-dossier
+status index), `dossier workspace query <manifest-or-dir> --needs release|process|trust`
+(find open work), `dossier workspace publish <manifest-or-dir> --out <dir>` (publish a
+workspace site), `dossier release collect --checks "npm test,npm pack --dry-run --json"`
+(write release evidence),
 `dossier init <name> --kind plan|implementation|review|debug|integration-loop|release|incident|adr|runbook|postmortem|review-board`,
-`--theme <pack>`, `--skin console-slate`, `--embed`, and `--plugin <file>` to add custom block
-types. For programmatic / multi-agent use, `dossier mcp` exposes
+`--theme <pack>`, `--skin console-slate`, `--embed`, `--plugin <file>` for one-off custom block
+types, and `--pack <name>` to load trusted pack plugins. Pack templates are data-only.
+Pack plugins execute JavaScript at build time, so require `dossier pack trust <name>`.
+For programmatic / multi-agent use, `dossier mcp` exposes
 `dossier_render`, `dossier_validate`, `dossier_read_decisions`, `dossier_read_process`,
 `dossier_read_edits`, `dossier_read_verdicts`, `dossier_read_release`,
 `dossier_read_patch_review`, `dossier_read_diff_review`, `dossier_read_trust`,
@@ -142,6 +151,20 @@ for release, incident, review, and integration loops. `dossier serve` enhances
 and can import patches into a new `patch-set` block. MCP
 tools can read human state and append run, claim, or patch evidence without scraping the
 HTML.
+
+## Packs, workspaces, and release evidence
+
+- Use a pack when the user wants reusable templates or domain-specific block renderers.
+  Register it with `dossier pack add`, scaffold data-only templates with
+  `dossier init --template <pack/id>`, and only load executable plugins after
+  `dossier pack trust <name>`.
+- Use a workspace when several dossiers should act as one operational surface. Run
+  `dossier workspace status` for a compact summary, `dossier workspace query --needs ...`
+  to find open work, and `dossier workspace index` to generate a `workspace-index`
+  dossier with readiness gates, agent work queue, trust gaps, and link graph.
+- Use release evidence before publishing. `dossier release collect` should run after
+  verification commands. It creates a release dossier with git range, changed files,
+  checks, release gates, trust report, and closeout receipt.
 
 ## What the reader gets (built in)
 

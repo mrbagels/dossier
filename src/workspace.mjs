@@ -42,6 +42,7 @@ function normalizeManifest(manifest = {}) {
     schema: manifest.schema || WORKSPACE_SCHEMA,
     name: manifest.name || "Dossier Workspace",
     roots: normalizeList(manifest.roots, ["."]),
+    exclude: normalizeList(manifest.exclude, []),
     packs: normalizeList(manifest.packs, []),
     output: manifest.output || "site",
     description: manifest.description || "",
@@ -66,11 +67,11 @@ function resolveWorkspace(input, opts = {}) {
   return { manifest: normalizeManifest(readJson(path)), path, baseDir: dirname(path) };
 }
 
-function collectDossierFiles(rootDir, files = []) {
+function collectDossierFiles(rootDir, files = [], skipDirs = SKIP_DIRS) {
   if (!existsSync(rootDir)) return files;
   for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
-      if (!SKIP_DIRS.has(entry.name)) collectDossierFiles(join(rootDir, entry.name), files);
+      if (!skipDirs.has(entry.name)) collectDossierFiles(join(rootDir, entry.name), files, skipDirs);
       continue;
     }
     if (entry.isFile() && entry.name.endsWith(".dossier.json") && entry.name !== "index.dossier.json" && entry.name !== "workspace-index.dossier.json") {
@@ -245,6 +246,7 @@ export function createWorkspaceManifest(opts = {}) {
   return normalizeManifest({
     name: opts.name || "Dossier Workspace",
     roots: normalizeList(opts.roots, ["."]),
+    exclude: normalizeList(opts.exclude, []),
     packs: normalizeList(opts.packs, []),
     output: opts.output || "site",
     description: opts.description || "",
@@ -263,8 +265,9 @@ export function readWorkspaceManifest(input, opts = {}) {
 export function scanWorkspace(input, opts = {}) {
   const workspace = resolveWorkspace(input, opts);
   const files = [];
+  const skipDirs = new Set([...SKIP_DIRS, ...workspace.manifest.exclude]);
   for (const root of workspace.manifest.roots) {
-    collectDossierFiles(resolve(workspace.baseDir, root), files);
+    collectDossierFiles(resolve(workspace.baseDir, root), files, skipDirs);
   }
   const uniqueFiles = [...new Set(files)].sort();
   const docs = uniqueFiles.map((file) => loadDoc(file, workspace.baseDir)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "") || a.title.localeCompare(b.title));

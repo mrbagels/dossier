@@ -18,8 +18,14 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm ci
       - run: npm test
-      - name: Build the example
-        run: node bin/dossier.mjs build examples/sample.dossier.json
+      - name: Validate examples and process docs
+        run: node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json
+      - name: Build examples and process docs
+        run: node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json
+      - name: Build example workspace index
+        run: node bin/dossier.mjs workspace index examples
+      - name: Package dry run
+        run: npm pack --dry-run --json
 
   react:
     runs-on: ubuntu-latest

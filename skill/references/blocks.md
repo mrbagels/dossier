@@ -25,6 +25,47 @@ CSS token overrides; theme values win after the base CSS and selected skin.
 Build with `--embed` when a host app needs a chrome-stripped `<slug>.embed.html`
 variant that keeps block interactivity and the embedded model islands.
 
+## ecosystem manifests and process commands
+Pack manifest:
+```json
+{
+  "name": "engineering",
+  "version": "0.1.0",
+  "templates": [
+    { "id": "security-review", "title": "Security review", "kind": "review", "path": "templates/security-review.dossier.json" }
+  ],
+  "plugins": [
+    { "id": "signal-banner", "entry": "plugins/signal-banner.plugin.mjs", "permissions": ["render"] }
+  ]
+}
+```
+
+Workspace manifest:
+```json
+{
+  "schema": "dossier.workspace/v1",
+  "name": "Dossier Examples",
+  "roots": ["."],
+  "exclude": ["packs"],
+  "packs": ["engineering"],
+  "output": "site"
+}
+```
+
+Useful commands:
+```bash
+dossier pack add <repo-or-path>
+dossier init security-review --template engineering/security-review
+dossier pack trust engineering
+dossier build custom.dossier.json --pack engineering
+dossier workspace status <manifest-or-dir> --json
+dossier workspace query <manifest-or-dir> --needs release
+dossier workspace index <manifest-or-dir>
+dossier release collect --version 0.6.0 --since v0.5.5 --checks "npm test,npm pack --dry-run --json"
+```
+Templates are data-only. Pack plugins execute JavaScript at build time and should be
+loaded only after an explicit trust decision.
+
 ## hero, page opener (use one, first)
 ```json
 { "type": "hero", "eyebrow": "Kicker", "title": "The headline",

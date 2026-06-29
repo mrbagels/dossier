@@ -7,7 +7,7 @@ import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { esc, generate, generateFile, inlineMd, parseUnifiedDiff, registerBlock, slugify, validateModel } from "../src/index.mjs";
 import { diffModels } from "../src/diff.mjs";
-import { addPack, listPacks, loadTrustedPackPlugins, resolveTemplateRef, trustPack } from "../src/packs.mjs";
+import { addPack, listPacks, loadTrustedPackPlugins, readPackManifest, resolveTemplateRef, trustPack } from "../src/packs.mjs";
 import { collectReleaseEvidence, writeReleaseEvidence } from "../src/release.mjs";
 import { WORKSPACE_MANIFEST, buildWorkspaceIndex, createWorkspaceManifest, publishWorkspace, queryWorkspace, scanWorkspace, writeWorkspaceIndex, writeWorkspaceManifest } from "../src/workspace.mjs";
 
@@ -600,6 +600,16 @@ test("packs register templates and only load trusted render plugins", async () =
   assert.ok(html.includes("&lt;ready&gt;"));
 });
 
+test("example pack templates validate", () => {
+  const packDir = join(examplesDir, "packs", "engineering");
+  const manifest = readPackManifest(packDir);
+  assert.equal(manifest.name, "engineering");
+  for (const template of manifest.templates) {
+    const model = JSON.parse(readFileSync(join(packDir, template.path), "utf8"));
+    assert.deepEqual(validateModel(model).errors, [], template.id);
+  }
+});
+
 test("renderer sanitizes hostile input (href schemes, theme vars, ragged rows)", async () => {
   const { html } = await generate({
     dossierVersion: "1.0",
@@ -713,8 +723,10 @@ test("publish builds a static dossier site with catalog index", async () => {
 test("workspace scans dossiers, builds an agent status index, queries, and publishes", async () => {
   const d = mkdtempSync(join(tmpdir(), "dossier-workspace-"));
   const docsDir = join(d, "docs");
+  const ignoredDir = join(d, "packs");
   mkdirSync(docsDir, { recursive: true });
-  writeWorkspaceManifest(join(d, WORKSPACE_MANIFEST), createWorkspaceManifest({ name: "QA Workspace", roots: ["docs"], output: "public" }));
+  mkdirSync(ignoredDir, { recursive: true });
+  writeWorkspaceManifest(join(d, WORKSPACE_MANIFEST), createWorkspaceManifest({ name: "QA Workspace", roots: ["."], exclude: ["packs"], output: "public" }));
   writeFileSync(
     join(docsDir, "implementation.dossier.json"),
     JSON.stringify(
@@ -751,6 +763,7 @@ test("workspace scans dossiers, builds an agent status index, queries, and publi
       2
     )
   );
+  writeFileSync(join(ignoredDir, "template.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "Ignored", slug: "ignored" }, blocks: [] }, null, 2));
 
   const scan = scanWorkspace(join(d, WORKSPACE_MANIFEST));
   assert.equal(scan.docs.length, 2);

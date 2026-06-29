@@ -6,11 +6,13 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
-[![Version](https://img.shields.io/badge/version-0.5.5-7048e8.svg)](#release-status)
+[![Version](https://img.shields.io/badge/version-0.6.0-7048e8.svg)](#release-status)
 [![Output](https://img.shields.io/badge/output-single%20HTML%20file-7048e8.svg)](#how-dossier-works)
 [![Runtime](https://img.shields.io/badge/viewer%20runtime-zero%20external%20assets-c81e4a.svg)](#how-dossier-works)
 [![Agent Ready](https://img.shields.io/badge/agent%20ready-MCP%20%2B%20packets-0f7a52.svg)](#agent-workflows)
 [![Blocks](https://img.shields.io/badge/built--in%20blocks-42-9a5b00.svg)](#block-catalog)
+[![Packs](https://img.shields.io/badge/packs-templates%20%2B%20trusted%20plugins-0f7a52.svg)](#packs-templates-and-plugins)
+[![Workspaces](https://img.shields.io/badge/workspaces-multi--dossier%20status-7048e8.svg)](#workspaces)
 [![Live demo](https://img.shields.io/badge/live%20demo-open-7048e8.svg)](https://mrbagels.github.io/dossier/)
 
 <a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="860"></a>
@@ -33,6 +35,10 @@ AI produces structured model
         ^                                  |
         |                                  v
 agent reads packets  <-  human decisions, edits, evidence, release gates
+
+repo pack -> templates/plugins -> trusted local build
+workspace manifest -> status/query/index/publish across many dossiers
+release evidence -> gates, git range, checks, trust report, receipt
 ```
 
 Use it for planning, specs, research, code implementation packets, patch review, QA checklists, release gates, incident response, integration loops, and any process where humans and agents need to pass structured state back and forth.
@@ -84,6 +90,9 @@ The agent should write `my-refactor.dossier.json`, run `dossier build`, and give
 | Release readiness | `--kind release` | `release-checklist`, `risk-register`, `verification-run`, `trust-report`, `process-receipt` |
 | Incident response | `--kind incident` | `timeline`, `evidence-log`, `decision-log`, `verification-run`, `process-receipt` |
 | A folder of docs | `dossier publish docs --out site` | catalog, cross-links, static site output |
+| A reusable template library | `dossier pack add <repo-or-path>` | data-only templates, trusted render plugins, lockfile provenance |
+| Multi-dossier operations | `dossier workspace index` | workspace readiness, agent work queue, release gaps, trust gaps |
+| Release automation evidence | `dossier release collect` | git range, changed files, verification commands, release trust report |
 
 ## Example Gallery
 
@@ -103,6 +112,8 @@ npm run site
 | [Engineering release](examples/engineering-release.html) | [`examples/engineering-release.dossier.json`](examples/engineering-release.dossier.json) | Release checklist, verification receipts, trust claims, and closeout. | You need public QA or release readiness. |
 | [Incident response](examples/incident-response.html) | [`examples/incident-response.dossier.json`](examples/incident-response.dossier.json) | Timeline, evidence log, decision log, risk register, remediation board. | You need an incident or post-incident packet. |
 | [Implementation packet](examples/implementation-packet.html) | [`examples/implementation-packet.dossier.json`](examples/implementation-packet.dossier.json) | Process board, editable code, patch set, diff review, and verification plan. | You need agentic code editing with human approval. |
+| [Example workspace](examples/workspace-index.html) | [`examples/dossier.workspace.json`](examples/dossier.workspace.json) | Multi-dossier status, workspace query, generated readiness index, static publishing. | You want to manage a set of dossiers as one operational surface. |
+| Engineering pack | [`examples/packs/engineering/dossier.pack.json`](examples/packs/engineering/dossier.pack.json) | Repo-backed templates plus a trusted render plugin example. | You want reusable templates or domain-specific blocks. |
 
 The Pages build also emits a hosted gallery at `examples.html`, with every example cross-linked as a static Dossier site.
 
@@ -120,9 +131,11 @@ The Pages build also emits a hosted gallery at `examples.html`, with every examp
 | Evidence | Verification runs, evidence logs, process receipts, generation receipts, trust reports. |
 | Trust | Structured source records, per-claim status and confidence, source/evidence links, MCP trust readback. |
 | Publishing | `catalog` and `publish` commands for static dossier sites. |
+| Workspaces | Manifest-driven multi-dossier scan, readiness index, query, and static workspace publish. |
 | Export | HTML, Markdown, DOCX, PDF through Playwright, plus React SSR/components. |
 | Presentation | Theme packs, per-document `meta.theme` tokens, and the opt-in `console-slate` skin. |
-| Extensibility | Plugin renderer registry for Node and React block components. |
+| Extensibility | Repo-backed packs with data-only templates, explicit-trust render plugins, and lockfile provenance. |
+| Release automation | Release evidence dossiers from git ranges, checks, changed files, gates, trust claims, and CI artifacts. |
 
 ## How Dossier Works
 
@@ -192,6 +205,88 @@ dossier publish docs --out site --embed
 ```
 
 That writes `my-doc.embed.html`. The embed file removes the topbar, TOC, footer, source modal, command palette, and theme studio, but keeps block interactivity, packet exports, runtime state, and the same `#dossier-model`, `#dossier-markdown`, and `#dossier-digest` islands.
+
+## Packs, Templates, And Plugins
+
+Packs are the reusable ecosystem unit. A pack is a repository or local folder with a `dossier.pack.json` manifest, data-only templates, and optional render plugins.
+
+```bash
+dossier pack add examples/packs/engineering
+dossier pack list
+dossier init auth-review --template engineering/security-review
+```
+
+Templates are safe by default because they are JSON models. Render plugins are executable JavaScript, so they only load after explicit trust:
+
+```bash
+dossier pack trust engineering
+dossier build custom.dossier.json --pack engineering
+```
+
+`dossier pack add` writes `dossier.lock.json` with the pack source, local path, Git ref, pinned commit when available, templates, plugins, and trust state. This keeps agent workflows reproducible and makes the executable-code boundary visible during review.
+
+Pack manifest shape:
+
+```json
+{
+  "name": "engineering",
+  "version": "0.1.0",
+  "templates": [
+    { "id": "security-review", "title": "Security review", "kind": "review", "path": "templates/security-review.dossier.json" }
+  ],
+  "plugins": [
+    { "id": "signal-banner", "entry": "plugins/signal-banner.plugin.mjs", "permissions": ["render"] }
+  ]
+}
+```
+
+## Workspaces
+
+Use a workspace when one dossier is no longer enough. A workspace manifest scans multiple roots, extracts process items, release gates, trust claims, verification runs, and `[[slug]]` links, then builds an agent-readable status index.
+
+```bash
+dossier workspace init examples --name "Dossier Examples" --roots . --exclude packs
+dossier workspace status examples
+dossier workspace query examples --needs release
+dossier workspace index examples --skin console-slate
+dossier workspace publish examples --out site
+```
+
+Workspace manifest shape:
+
+```json
+{
+  "schema": "dossier.workspace/v1",
+  "name": "Dossier Examples",
+  "roots": ["."],
+  "exclude": ["packs"],
+  "packs": ["engineering"],
+  "output": "site"
+}
+```
+
+The generated `workspace-index.dossier.json` includes:
+
+| Surface | What it answers |
+|---|---|
+| Workspace readiness | Are docs valid, process queues clear, release gates passed, trust gaps closed, and links resolved? |
+| Agent work queue | Which process items, release gates, trust claims, or links need attention? |
+| Workspace dossiers table | What exists, what kind it is, and how many open gaps each doc has. |
+| Trust report | Which claims still need evidence before agents should rely on them. |
+| Link graph | How dossiers connect through `[[slug]]` references. |
+
+## Release Evidence Automation
+
+`dossier release collect` creates a release dossier from git state and verification commands. It records the range, HEAD, branch, changed files, commits, checks, release gates, trust claims, and closeout receipt.
+
+```bash
+dossier release collect \
+  --version 0.6.0 \
+  --since v0.5.5 \
+  --checks "npm test,node bin/dossier.mjs build examples/*.dossier.json,npm pack --dry-run --json"
+```
+
+By default it writes `docs/releases/<version>.dossier.json`, `release-<version>.html`, and `release-<version>.md`. The GitHub Actions workflow in [`.github/workflows/release-evidence.yml`](.github/workflows/release-evidence.yml) runs tests, validates and builds examples, runs `npm pack --dry-run --json`, generates the release dossier, and uploads the evidence as an artifact. Publishing packages or creating GitHub Releases stays an explicit human-controlled step.
 
 ## Themes And Skins
 
@@ -345,12 +440,22 @@ Every block has a copy-paste example in [`skill/references/blocks.md`](skill/ref
 | Command | What it does |
 |---|---|
 | `dossier init [name] --kind <kind>` | Scaffold from a starter. |
-| `dossier build <file> [--watch] [--plugin a,b] [--theme <pack>] [--skin console-slate] [--embed]` | Validate and render to `<slug>.html` plus `<slug>.md`; `--embed` also writes `<slug>.embed.html`. |
+| `dossier init <name> --template <pack/id>` | Scaffold from a registered pack template. |
+| `dossier build <file> [--watch] [--plugin a,b] [--pack name] [--theme <pack>] [--skin console-slate] [--embed]` | Validate and render to `<slug>.html` plus `<slug>.md`; `--pack` loads trusted pack plugins, `--embed` also writes `<slug>.embed.html`. |
 | `dossier serve <file> [--open] [--port] [--theme <pack>] [--skin console-slate]` | Build, serve, live reload, and enable save-back tools with the same presentation flags as `build`. |
 | `dossier validate <file>` | Validate a model without rendering. |
 | `dossier diff <old> <new>` | Structural diff between two dossier models. |
 | `dossier catalog <dir>` | Build an index model for a folder of dossiers. |
 | `dossier publish <dir> --out site [--theme <pack>] [--skin console-slate] [--embed]` | Build every dossier plus an `index.html` catalog into a static site; `--embed` writes sibling embed files. |
+| `dossier pack add <repo-or-path> [--name <name>] [--ref <ref>]` | Register a local or Git-backed pack in `dossier.lock.json`. |
+| `dossier pack trust <name>` | Allow a registered pack to load executable render plugins. |
+| `dossier pack list [--json]` | List registered packs, templates, plugins, source type, and trust state. |
+| `dossier workspace init [dir] [--name <name>] [--roots <a,b>] [--exclude <dir,dir>]` | Create `dossier.workspace.json`. |
+| `dossier workspace index [manifest\|dir]` | Generate and render `workspace-index.dossier.json`. |
+| `dossier workspace status [manifest\|dir] [--json]` | Print workspace status for agents or humans. |
+| `dossier workspace query [manifest\|dir] [--kind <kind>] [--tag <tag>] [--needs process\|release\|trust]` | Filter workspace dossiers by metadata or open work. |
+| `dossier workspace publish [manifest\|dir] --out site` | Publish every workspace dossier plus the workspace index into one static site. |
+| `dossier release collect [--version <v>] [--since <ref>] [--checks <cmd,cmd>]` | Generate release evidence JSON, HTML, and Markdown. |
 | `dossier export <file> --format docx\|md\|pdf` | Export to Word, Markdown, or PDF. |
 | `dossier mcp` | Run the MCP server over stdio. |
 
@@ -374,7 +479,7 @@ The React dispatcher covers the built-in blocks, reuses the core design system, 
 
 ## Plugins
 
-Register custom blocks without forking:
+Register custom blocks without forking. For one-off local development, load a plugin file directly:
 
 ```bash
 dossier build my.dossier.json --plugin ./my-plugin.mjs
@@ -390,6 +495,16 @@ export default function ({ registerBlock, esc }) {
 ```
 
 React plugins can call `registerComponent(type, Component)` for native component parity. See [`examples/plugins/badge-row.plugin.mjs`](examples/plugins/badge-row.plugin.mjs).
+
+For reusable teams or public sharing, prefer a pack:
+
+```bash
+dossier pack add examples/packs/engineering
+dossier pack trust engineering
+dossier build my.dossier.json --pack engineering
+```
+
+The trust step is intentionally separate because pack plugins execute code at build time. Pack templates can be used without trusting the pack.
 
 ## Publishing And Embedding
 
@@ -427,6 +542,7 @@ Current patch train:
 
 | Version | Focus |
 |---|---|
+| `0.6.0` | Repo-backed packs, trusted plugin loading, pack templates, multi-dossier workspaces, workspace publish/query/status, release evidence automation, example engineering pack. |
 | `0.5.5` | Live CodeMirror editor adapter for `dossier serve`, CodeMirror module serving, docs roadmap closeout, refreshed overview and release examples. |
 | `0.5.4` | Chrome-stripped embed output, presentation flag parity, React render hardening, refreshed gallery docs. |
 | `0.5.3` | Trust reports, provenance packet, MCP trust tools, README and public manual QA readiness. |
@@ -444,6 +560,8 @@ npm install
 npm test
 node bin/dossier.mjs validate examples/*.dossier.json
 node bin/dossier.mjs build examples/*.dossier.json
+node bin/dossier.mjs workspace index examples --updated 2026-06-29T00:00:00.000Z
+node bin/dossier.mjs release collect --version 0.0.0-dev --since v0.5.5 --out docs/releases/dev.dossier.json --updated 2026-06-29T00:00:00.000Z --checks "npm test"
 
 cd react
 npm install
@@ -459,9 +577,10 @@ Project map:
 | `schema/` | Document schema and packet schemas. |
 | `mcp/` | MCP server. |
 | `skill/` | Agent skill and block references. |
-| `examples/` | Gallery models for overview, showcase, product launch, research, implementation, release, and incident workflows. |
+| `examples/` | Gallery models, workspace manifest, plugins, and example packs. |
 | `docs/product/` | Durable product scope and QA docs. |
-| `.github/workflows/` | CI and Pages demo deployment. |
+| `docs/releases/` | Generated release evidence dossiers. |
+| `.github/workflows/` | CI, Pages demo deployment, and release evidence artifact workflow. |
 
 Before opening a PR or cutting a release:
 
@@ -469,6 +588,7 @@ Before opening a PR or cutting a release:
 npm test
 node bin/dossier.mjs validate examples/*.dossier.json
 node bin/dossier.mjs build examples/*.dossier.json
+npm pack --dry-run --json
 cd react && npx tsc --noEmit
 ```
 
@@ -494,7 +614,7 @@ When adding a block type, update:
 | Showcase | `examples/showcase.dossier.json` |
 | Tests | `test/dossier.test.mjs` |
 
-CI runs tests on Node 18, 20, and 22. The Pages demo redeploys on pushes to `next`.
+CI runs tests on Node 18, 20, and 22. The Pages demo redeploys on pushes to `next`. Release evidence can be generated locally with `dossier release collect` or through the `Release Evidence` workflow.
 
 ## License
 

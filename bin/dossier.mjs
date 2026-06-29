@@ -33,6 +33,7 @@ const VALUE_FLAGS = new Set([
   "name",
   "ref",
   "roots",
+  "exclude",
   "status",
   "tag",
   "owner",
@@ -41,6 +42,7 @@ const VALUE_FLAGS = new Set([
   "version",
   "since",
   "checks",
+  "updated",
 ]);
 const flags = {};
 const args = [];
@@ -232,6 +234,7 @@ if (cmd === "build" && args.length) {
       const manifest = createWorkspaceManifest({
         name: flags.name || basename(dir) || "Dossier Workspace",
         roots: flags.roots || ".",
+        exclude: flags.exclude || [],
         packs: flags.pack || [],
         output: flags.out || "site",
       });
@@ -240,7 +243,7 @@ if (cmd === "build" && args.length) {
       console.log("  next: dossier workspace index " + outPath);
     } else if (sub === "index") {
       await loadPacksFromFlag();
-      const r = await writeWorkspaceIndex(input, { out: flags.out, title: flags.title, baseUrl: flags["base-url"], theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
+      const r = await writeWorkspaceIndex(input, { out: flags.out, title: flags.title, baseUrl: flags["base-url"], updated: flags.updated, theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
       console.log(`✓ ${r.outPath}  (${r.docs.length} dossiers)`);
       if (r.rendered) {
         console.log(`  html: ${r.rendered.htmlPath}`);
@@ -271,11 +274,11 @@ if (cmd === "build" && args.length) {
       else rows.forEach((doc) => console.log(`${doc.slug}  ${doc.kind}  ${doc.status || "-"}  ${doc.file}`));
     } else if (sub === "publish") {
       await loadPacksFromFlag();
-      const r = await publishWorkspace(input, { out: flags.out, title: flags.title, baseUrl: flags["base-url"], theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
+      const r = await publishWorkspace(input, { out: flags.out, title: flags.title, baseUrl: flags["base-url"], updated: flags.updated, theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
       console.log(`✓ published ${r.rendered.length} dossier${r.rendered.length === 1 ? "" : "s"} to ${r.outDir}`);
       console.log(`  index: ${r.index.rendered.htmlPath}`);
     } else {
-      console.log("Usage: dossier workspace init [dir] [--name <name>] [--roots <a,b>]\n       dossier workspace index [manifest|dir] [--out <file>]\n       dossier workspace status [manifest|dir] [--json]\n       dossier workspace query [manifest|dir] [--kind <kind>] [--tag <tag>] [--needs process|release|trust]\n       dossier workspace publish [manifest|dir] [--out <dir>]");
+      console.log("Usage: dossier workspace init [dir] [--name <name>] [--roots <a,b>] [--exclude <dir,dir>]\n       dossier workspace index [manifest|dir] [--out <file>]\n       dossier workspace status [manifest|dir] [--json]\n       dossier workspace query [manifest|dir] [--kind <kind>] [--tag <tag>] [--needs process|release|trust]\n       dossier workspace publish [manifest|dir] [--out <dir>]");
       process.exit(sub ? 0 : 1);
     }
   } catch (e) {
@@ -291,6 +294,7 @@ if (cmd === "build" && args.length) {
         since: flags.since,
         out: flags.out,
         checks: flags.checks,
+        generatedAt: flags.updated,
         theme: flags.theme,
         skin: flags.skin,
         embed: !!flags.embed,
