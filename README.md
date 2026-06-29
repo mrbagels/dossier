@@ -200,6 +200,7 @@ Themes are token packs. Skins are fuller layout and component treatments.
 ```bash
 dossier build my-doc.dossier.json --theme forest
 dossier build my-doc.dossier.json --skin console-slate
+dossier serve my-doc.dossier.json --theme forest --skin console-slate --open
 dossier publish docs --out site --theme ocean --skin console-slate
 ```
 
@@ -342,7 +343,7 @@ Every block has a copy-paste example in [`skill/references/blocks.md`](skill/ref
 |---|---|
 | `dossier init [name] --kind <kind>` | Scaffold from a starter. |
 | `dossier build <file> [--watch] [--plugin a,b] [--theme <pack>] [--skin console-slate] [--embed]` | Validate and render to `<slug>.html` plus `<slug>.md`; `--embed` also writes `<slug>.embed.html`. |
-| `dossier serve <file> [--open] [--port]` | Build, serve, live reload, and enable save-back tools. |
+| `dossier serve <file> [--open] [--port] [--theme <pack>] [--skin console-slate]` | Build, serve, live reload, and enable save-back tools with the same presentation flags as `build`. |
 | `dossier validate <file>` | Validate a model without rendering. |
 | `dossier diff <old> <new>` | Structural diff between two dossier models. |
 | `dossier catalog <dir>` | Build an index model for a folder of dossiers. |

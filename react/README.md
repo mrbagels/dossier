@@ -16,7 +16,8 @@ Graphviz), so the output matches the Node generator. `model.meta.skin` and
 `model.meta.theme` are honored by the shared shell. CLI:
 
 ```bash
-npx tsx src/cli.tsx ../examples/sample.dossier.json --embed   # -> *.react.html + *.react.embed.html
+npx tsx src/cli.tsx ../examples/sample.dossier.json --theme forest --skin console-slate --embed
+# -> *.react.html + *.react.embed.html
 ```
 
 ## Use it live in a React app
@@ -55,7 +56,7 @@ runtime benefit (there is no client React at view time).
 
 | Export | Description |
 |---|---|
-| `renderDossier(model)` | SSR -> `{ html, embedHtml, md, digest }` (self-contained full and embed files). |
+| `renderDossier(model, { theme, skin })` | SSR -> `{ html, embedHtml, md, digest }` (self-contained full and embed files). |
 | `DossierDocument` | Live document component; `animate` adds a Motion scroll entrance (hydrated). |
 | `Block` | Component dispatcher over all built-in block types. |
 | `registerComponent(type, Comp)` | Register a React component for a custom block type, plugin parity with the Node generator's `registerBlock`. Unregistered-but-known types fall back to the Node string renderer. |

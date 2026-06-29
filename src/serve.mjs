@@ -98,7 +98,7 @@ export async function serve(file, opts = {}) {
 
   async function rebuild() {
     try {
-      const r = await generateFile(file);
+      const r = await generateFile(file, { theme: opts.theme, skin: opts.skin, embed: !!opts.embed });
       htmlPath = r.htmlPath;
       return true;
     } catch (e) {

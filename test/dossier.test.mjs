@@ -460,7 +460,7 @@ test("serve exposes validated save-back and patch import endpoints", async () =>
       2
     )
   );
-  const live = await serve(file, { port: 0, quiet: true });
+  const live = await serve(file, { port: 0, quiet: true, theme: "forest", skin: "console-slate" });
   try {
     let res = await fetch(live.url + "/__save-editor", {
       method: "POST",
@@ -509,6 +509,8 @@ test("serve exposes validated save-back and patch import endpoints", async () =>
     const html = await res.text();
     assert.ok(html.includes("DossierEditorEnhancer"), "live runtime includes editor enhancer");
     assert.ok(html.includes("data-live-model-open"), "live runtime includes model editor control");
+    assert.ok(html.includes('data-skin="console-slate"'), "serve applies skin flag");
+    assert.ok(html.includes("--ds-accent: #2f7d55"), "serve applies theme flag");
   } finally {
     await live.close();
   }

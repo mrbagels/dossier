@@ -22,6 +22,9 @@ declare module "*/generate.mjs" {
     opts: { body: string; toc: any[]; md: string; digest: string; generator?: string; footer?: string; chrome?: "full" | "embed" }
   ) => string;
 }
+declare module "*/presentation.mjs" {
+  export const applyPresentationOptions: (model: any, opts?: { theme?: string; skin?: string }) => any;
+}
 declare module "*/tokens.css.mjs" {
   export const CSS: string;
 }

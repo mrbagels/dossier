@@ -104,7 +104,7 @@ if (cmd === "build" && args.length) {
   }
 } else if (cmd === "serve" && args.length) {
   const { serve } = await import("../src/serve.mjs");
-  await serve(args[0], { port: flags.port, open: !!flags.open });
+  await serve(args[0], { port: flags.port, open: !!flags.open, theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
 } else if (cmd === "mcp") {
   const { main } = await import("../mcp/server.mjs");
   await main();

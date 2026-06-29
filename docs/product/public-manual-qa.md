@@ -102,12 +102,13 @@ In `examples/showcase.html`:
 Run:
 
 ```bash
-dossier serve examples/showcase.dossier.json --port 4174 --open
+dossier serve examples/showcase.dossier.json --port 4174 --open --theme forest --skin console-slate
 ```
 
 Verify:
 
 - Page reloads after saving the source JSON.
+- Served HTML keeps the requested theme and skin.
 - `code-editor` blocks show enhanced controls.
 - Search inside an editor works.
 - JSON format button formats valid JSON and reports invalid JSON without saving.
