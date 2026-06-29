@@ -120,6 +120,20 @@ function isTrustGap(claim) {
   return !["verified", "accepted"].includes(status);
 }
 
+function docRef(doc) {
+  return {
+    file: doc.file,
+    slug: doc.slug,
+    title: doc.title,
+    kind: doc.kind,
+    status: doc.status,
+    owner: doc.owner,
+    tags: doc.tags,
+    updated: doc.updated,
+    valid: doc.valid,
+  };
+}
+
 function docSlug(model, file) {
   return (model.meta && model.meta.slug) || basename(file).replace(/\.(dossier\.)?json$/i, "");
 }
@@ -222,10 +236,10 @@ function buildGraphDot(docs) {
 
 function summarize(docs, manifest) {
   const slugs = new Set(docs.map((doc) => doc.slug));
-  const openProcessItems = docs.flatMap((doc) => doc.processItems.filter(isOpenProcessItem).map((item) => ({ ...item, doc })));
-  const openReleaseGates = docs.flatMap((doc) => doc.releaseGates.filter((gate) => gate.required && isOpenReleaseGate(gate)).map((gate) => ({ ...gate, doc })));
-  const trustGaps = docs.flatMap((doc) => doc.trustClaims.filter(isTrustGap).map((claim) => ({ ...claim, doc })));
-  const brokenLinks = docs.flatMap((doc) => doc.links.filter((link) => !slugs.has(link)).map((link) => ({ doc, link })));
+  const openProcessItems = docs.flatMap((doc) => doc.processItems.filter(isOpenProcessItem).map((item) => ({ ...item, doc: docRef(doc) })));
+  const openReleaseGates = docs.flatMap((doc) => doc.releaseGates.filter((gate) => gate.required && isOpenReleaseGate(gate)).map((gate) => ({ ...gate, doc: docRef(doc) })));
+  const trustGaps = docs.flatMap((doc) => doc.trustClaims.filter(isTrustGap).map((claim) => ({ ...claim, doc: docRef(doc) })));
+  const brokenLinks = docs.flatMap((doc) => doc.links.filter((link) => !slugs.has(link)).map((link) => ({ doc: docRef(doc), link })));
   return {
     docs: docs.length,
     processDocs: docs.filter((doc) => PROCESS_KINDS.has(doc.kind)).length,
