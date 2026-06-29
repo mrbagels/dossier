@@ -59,7 +59,7 @@ dossier init security-review --template engineering/security-review
 dossier pack trust engineering
 dossier build custom.dossier.json --pack engineering
 dossier workspace status <manifest-or-dir> --json
-dossier workspace query <manifest-or-dir> --needs release
+dossier workspace query <manifest-or-dir> --needs release|process|trust|invalid
 dossier workspace index <manifest-or-dir>
 dossier release collect --version 0.6.0 --since v0.5.5 --checks "npm test,npm pack --dry-run --json"
 ```

@@ -42,6 +42,10 @@
         {
           "value": "2",
           "label": "Missing links"
+        },
+        {
+          "value": "0",
+          "label": "Invalid docs"
         }
       ]
     },

@@ -90,6 +90,11 @@ function releaseRange(since) {
   return since ? `${since}..HEAD` : "HEAD";
 }
 
+function changedFilesForRange(since, range, cwd) {
+  if (since) return splitLines(git(["diff", "--name-only", range], cwd));
+  return splitLines(git(["ls-files"], cwd));
+}
+
 export function collectReleaseEvidence(opts = {}) {
   const cwd = resolve(opts.cwd || process.cwd());
   const version = String(opts.version || packageVersion(cwd) || "unversioned");
@@ -102,7 +107,7 @@ export function collectReleaseEvidence(opts = {}) {
   const tagsAtHead = splitLines(git(["tag", "--points-at", "HEAD"], cwd));
   const status = splitLines(git(["status", "--short"], cwd));
   const commits = splitLines(git(["log", "--oneline", "--no-decorate", range], cwd));
-  const changedFiles = splitLines(git(["diff", "--name-only", range], cwd));
+  const changedFiles = changedFilesForRange(since, range, cwd);
   const checks = normalizeChecks(opts.checks || opts.runs);
   const clean = status.length === 0;
   const hasNpmPack = checks.some((check) => /npm\s+pack/.test(check.command));
@@ -232,9 +237,9 @@ export async function writeReleaseEvidence(opts = {}) {
   const cwd = resolve(opts.cwd || process.cwd());
   const result = collectReleaseEvidence(opts);
   const outPath = resolve(cwd, opts.out || join(RELEASE_DIR, `${result.summary.version}.dossier.json`));
-  writeJson(outPath, result.model);
   const validation = validateModel(result.model);
   if (!validation.ok) throw new Error("invalid release evidence dossier:\n  - " + validation.errors.join("\n  - "));
+  writeJson(outPath, result.model);
   const { html, embedHtml, md } = await generate(result.model, { baseDir: dirname(outPath), theme: opts.theme, skin: opts.skin });
   const slug = result.model.meta.slug || basename(outPath).replace(/\.(dossier\.)?json$/i, "");
   const htmlPath = join(dirname(outPath), `${slug}.html`);

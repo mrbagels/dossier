@@ -131,11 +131,54 @@ function docRef(doc) {
     tags: doc.tags,
     updated: doc.updated,
     valid: doc.valid,
+    errors: doc.errors || [],
+    openProcessItems: doc.openProcessItems || 0,
+    openReleaseGates: doc.openReleaseGates || 0,
+    trustGaps: doc.trustGaps || 0,
   };
 }
 
 function docSlug(model, file) {
   return (model.meta && model.meta.slug) || basename(file).replace(/\.(dossier\.)?json$/i, "");
+}
+
+function docCounts(doc) {
+  const processItems = Array.isArray(doc.processItems) ? doc.processItems : [];
+  const releaseGates = Array.isArray(doc.releaseGates) ? doc.releaseGates : [];
+  const trustClaims = Array.isArray(doc.trustClaims) ? doc.trustClaims : [];
+  return {
+    openProcessItems: processItems.filter(isOpenProcessItem).length,
+    openReleaseGates: releaseGates.filter((gate) => gate.required && isOpenReleaseGate(gate)).length,
+    trustGaps: trustClaims.filter(isTrustGap).length,
+  };
+}
+
+function withDocCounts(doc) {
+  return { ...doc, ...docCounts(doc) };
+}
+
+function invalidDoc(file, baseDir, error) {
+  const slug = basename(file).replace(/\.(dossier\.)?json$/i, "");
+  const message = error && error.message ? error.message : String(error || "Unable to load dossier.");
+  return withDocCounts({
+    file: rel(baseDir, file),
+    path: file,
+    slug,
+    title: slug,
+    kind: "invalid",
+    status: "invalid",
+    owner: "",
+    tags: [],
+    updated: "",
+    links: [],
+    processItems: [],
+    releaseGates: [],
+    trustClaims: [],
+    verificationRuns: [],
+    valid: false,
+    errors: [message],
+    model: null,
+  });
 }
 
 function loadDoc(file, baseDir) {
@@ -204,7 +247,8 @@ function loadDoc(file, baseDir) {
     }
   }
 
-  return {
+  const validation = validateModel(model);
+  return withDocCounts({
     file: rel(baseDir, file),
     path: file,
     slug,
@@ -219,9 +263,10 @@ function loadDoc(file, baseDir) {
     releaseGates,
     trustClaims,
     verificationRuns,
-    valid: validateModel(model).ok,
+    valid: validation.ok,
+    errors: validation.errors,
     model,
-  };
+  });
 }
 
 function buildGraphDot(docs) {
@@ -240,6 +285,7 @@ function summarize(docs, manifest) {
   const openReleaseGates = docs.flatMap((doc) => doc.releaseGates.filter((gate) => gate.required && isOpenReleaseGate(gate)).map((gate) => ({ ...gate, doc: docRef(doc) })));
   const trustGaps = docs.flatMap((doc) => doc.trustClaims.filter(isTrustGap).map((claim) => ({ ...claim, doc: docRef(doc) })));
   const brokenLinks = docs.flatMap((doc) => doc.links.filter((link) => !slugs.has(link)).map((link) => ({ doc: docRef(doc), link })));
+  const invalidDocs = docs.filter((doc) => !doc.valid).map((doc) => ({ doc: docRef(doc), errors: doc.errors || [] }));
   return {
     docs: docs.length,
     processDocs: docs.filter((doc) => PROCESS_KINDS.has(doc.kind)).length,
@@ -247,12 +293,13 @@ function summarize(docs, manifest) {
     openReleaseGates: openReleaseGates.length,
     trustGaps: trustGaps.length,
     brokenLinks: brokenLinks.length,
-    invalidDocs: docs.filter((doc) => !doc.valid).length,
+    invalidDocs: invalidDocs.length,
     packs: manifest.packs.length,
     openProcessItemsList: openProcessItems,
     openReleaseGatesList: openReleaseGates,
     trustGapsList: trustGaps,
     brokenLinksList: brokenLinks,
+    invalidDocsList: invalidDocs,
   };
 }
 
@@ -284,12 +331,30 @@ export function scanWorkspace(input, opts = {}) {
     collectDossierFiles(resolve(workspace.baseDir, root), files, skipDirs);
   }
   const uniqueFiles = [...new Set(files)].sort();
-  const docs = uniqueFiles.map((file) => loadDoc(file, workspace.baseDir)).sort((a, b) => (b.updated || "").localeCompare(a.updated || "") || a.title.localeCompare(b.title));
+  const docs = uniqueFiles
+    .map((file) => {
+      try {
+        return loadDoc(file, workspace.baseDir);
+      } catch (error) {
+        return invalidDoc(file, workspace.baseDir, error);
+      }
+    })
+    .sort((a, b) => (b.updated || "").localeCompare(a.updated || "") || a.title.localeCompare(b.title));
   const summary = summarize(docs, workspace.manifest);
   return { ...workspace, docs, summary, graph: buildGraphDot(docs) };
 }
 
 function queueItems(summary) {
+  const invalid = summary.invalidDocsList.slice(0, 24).map(({ doc, errors }) => ({
+    id: uniqueId(`invalid-${doc.slug}`),
+    title: `${doc.title}: invalid dossier`,
+    summary: errors.join("; ") || "Dossier could not be parsed or validated.",
+    status: "blocked",
+    owner: doc.owner || "agent",
+    priority: "P1",
+    verdict: "revise",
+    files: [doc.file],
+  }));
   const process = summary.openProcessItemsList.slice(0, 24).map((item) => ({
     id: uniqueId(`process-${item.doc.slug}-${item.id}`),
     title: `${item.doc.title}: ${item.title}`,
@@ -330,7 +395,7 @@ function queueItems(summary) {
     verdict: "revise",
     files: [doc.file],
   }));
-  const items = [...process, ...release, ...trust, ...links];
+  const items = [...invalid, ...process, ...release, ...trust, ...links];
   if (items.length) return items;
   return [{ id: "workspace-clean", title: "Workspace has no open scan items", status: "done", owner: "agent", verdict: "approve", summary: "No open process, release, trust, or link gaps were found." }];
 }
@@ -352,9 +417,9 @@ function docsTableRows(docs) {
     doc.status || "-",
     doc.tags.join(", ") || "-",
     doc.updated || "-",
-    String(doc.processItems.filter(isOpenProcessItem).length),
-    String(doc.releaseGates.filter((gate) => gate.required && isOpenReleaseGate(gate)).length),
-    String(doc.trustClaims.filter(isTrustGap).length),
+    String(doc.openProcessItems || 0),
+    String(doc.openReleaseGates || 0),
+    String(doc.trustGaps || 0),
   ]);
 }
 
@@ -377,6 +442,7 @@ export function buildWorkspaceIndex(input, opts = {}) {
         { value: String(summary.openReleaseGates), label: "Release gaps" },
         { value: String(summary.trustGaps), label: "Trust gaps" },
         { value: String(summary.brokenLinks), label: "Missing links" },
+        { value: String(summary.invalidDocs), label: "Invalid docs" },
       ],
     },
     { type: "release-checklist", title: "Workspace readiness", gates: readinessGates(summary) },
@@ -430,7 +496,7 @@ export function buildWorkspaceIndex(input, opts = {}) {
   blocks.push({
     type: "process-receipt",
     title: "Workspace scan receipt",
-    outcome: summary.openProcessItems || summary.openReleaseGates || summary.trustGaps || summary.brokenLinks ? "needs-attention" : "ready",
+    outcome: summary.openProcessItems || summary.openReleaseGates || summary.trustGaps || summary.brokenLinks || summary.invalidDocs ? "needs-attention" : "ready",
     owner: "dossier workspace",
     changedFiles: docs.map((doc) => doc.file),
     commands: ["dossier workspace index"],
@@ -463,9 +529,10 @@ export function queryWorkspace(input, filters = {}, opts = {}) {
     if (filters.status && doc.status !== filters.status) return false;
     if (filters.owner && doc.owner !== filters.owner) return false;
     if (tags.length && !tags.every((tag) => doc.tags.includes(tag))) return false;
-    if (filters.needs === "process" && !doc.processItems.some(isOpenProcessItem)) return false;
-    if (filters.needs === "release" && !doc.releaseGates.some((gate) => gate.required && isOpenReleaseGate(gate))) return false;
-    if (filters.needs === "trust" && !doc.trustClaims.some(isTrustGap)) return false;
+    if (filters.needs === "process" && !doc.openProcessItems) return false;
+    if (filters.needs === "release" && !doc.openReleaseGates) return false;
+    if (filters.needs === "trust" && !doc.trustGaps) return false;
+    if (filters.needs === "invalid" && doc.valid) return false;
     if (text && !`${doc.title} ${doc.slug} ${doc.kind} ${doc.tags.join(" ")}`.toLowerCase().includes(text)) return false;
     return true;
   });
@@ -489,16 +556,21 @@ async function writeRendered(model, sourceFile, outDir, opts = {}) {
 export async function writeWorkspaceIndex(input, opts = {}) {
   const result = buildWorkspaceIndex(input, opts);
   const outPath = resolve(result.baseDir, opts.out || "workspace-index.dossier.json");
-  writeJson(outPath, result.model);
-  if (opts.render === false) return { ...result, outPath, rendered: null };
   const validation = validateModel(result.model);
   if (!validation.ok) throw new Error("invalid workspace index:\n  - " + validation.errors.join("\n  - "));
+  writeJson(outPath, result.model);
+  if (opts.render === false) return { ...result, outPath, rendered: null };
   const rendered = await writeRendered(result.model, outPath, dirname(outPath), opts);
   return { ...result, outPath, rendered };
 }
 
 export async function publishWorkspace(input, opts = {}) {
   const scan = scanWorkspace(input, opts);
+  const invalidDocs = scan.docs.filter((doc) => !doc.valid);
+  if (invalidDocs.length) {
+    const details = invalidDocs.map((doc) => `${doc.file}${doc.errors?.length ? `: ${doc.errors.join("; ")}` : ""}`);
+    throw new Error("workspace contains invalid dossier(s):\n  - " + details.join("\n  - "));
+  }
   const outDir = resolve(scan.baseDir, opts.out || scan.manifest.output || "site");
   mkdirSync(outDir, { recursive: true });
   const rendered = [];

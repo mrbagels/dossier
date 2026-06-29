@@ -8,7 +8,7 @@ updated: "2026-06-29T00:00:00.000Z"
 
 Gallery workspace for the built-in examples, process packets, release evidence, and agent-readable handoff surfaces.
 
-**7** Dossiers · **5** Open process · **1** Release gaps · **4** Trust gaps · **2** Missing links
+**7** Dossiers · **5** Open process · **1** Release gaps · **4** Trust gaps · **2** Missing links · **0** Invalid docs
 
 ## Workspace readiness
 

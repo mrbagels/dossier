@@ -65,7 +65,7 @@ presentation flags as build), `dossier diff <old> <new>` (what changed),
 `dossier pack add <repo-or-path>` (register reusable templates and plugins),
 `dossier init <name> --template <pack/id>` (scaffold from a pack template),
 `dossier workspace index <manifest-or-dir>` (build an agent-readable multi-dossier
-status index), `dossier workspace query <manifest-or-dir> --needs release|process|trust`
+status index), `dossier workspace query <manifest-or-dir> --needs release|process|trust|invalid`
 (find open work), `dossier workspace publish <manifest-or-dir> --out <dir>` (publish a
 workspace site), `dossier release collect --checks "npm test,npm pack --dry-run --json"`
 (write release evidence),

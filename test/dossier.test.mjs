@@ -793,6 +793,37 @@ test("workspace scans dossiers, builds an agent status index, queries, and publi
   assert.ok(existsSync(join(d, "public", "workspace-index.html")), "publishes workspace index");
 });
 
+test("workspace surfaces invalid dossiers without crashing and blocks publish", async () => {
+  const d = mkdtempSync(join(tmpdir(), "dossier-workspace-invalid-"));
+  writeWorkspaceManifest(join(d, WORKSPACE_MANIFEST), createWorkspaceManifest({ name: "Invalid Workspace", roots: ["."], output: "public" }));
+  writeFileSync(join(d, "valid.dossier.json"), JSON.stringify({ dossierVersion: "1.0", meta: { title: "Valid", slug: "valid" }, blocks: [] }, null, 2));
+  writeFileSync(join(d, "broken.dossier.json"), "{ not json");
+
+  const scan = scanWorkspace(join(d, WORKSPACE_MANIFEST));
+  assert.equal(scan.docs.length, 2);
+  assert.equal(scan.summary.invalidDocs, 1);
+  const broken = scan.docs.find((doc) => doc.slug === "broken");
+  assert.equal(broken.valid, false);
+  assert.ok(broken.errors.length > 0, "invalid docs keep parser or validation errors");
+
+  const invalidNeeds = queryWorkspace(scan, { needs: "invalid" });
+  assert.deepEqual(
+    invalidNeeds.map((doc) => doc.slug),
+    ["broken"]
+  );
+
+  const index = buildWorkspaceIndex(join(d, WORKSPACE_MANIFEST), { updated: "2026-01-03T00:00:00.000Z" });
+  assert.deepEqual(validateModel(index.model).errors, []);
+  const queue = index.model.blocks.find((block) => block.type === "process-board" && block.title === "Agent work queue");
+  assert.ok(queue.items.some((item) => item.files.includes("broken.dossier.json")), "invalid document is added to the agent work queue");
+
+  const written = await writeWorkspaceIndex(join(d, WORKSPACE_MANIFEST), { updated: "2026-01-03T00:00:00.000Z" });
+  assert.ok(existsSync(written.outPath), "invalid workspace still writes a diagnostic index");
+  assert.ok(existsSync(join(d, "workspace-index.html")), "invalid workspace still renders diagnostic HTML");
+
+  await assert.rejects(() => publishWorkspace(join(d, WORKSPACE_MANIFEST), { out: "public" }), /workspace contains invalid dossier/);
+});
+
 test("release evidence collects git range, gates, trust claims, and rendered artifacts", async () => {
   const d = mkdtempSync(join(tmpdir(), "dossier-release-"));
   const git = (...args) => {
@@ -824,6 +855,17 @@ test("release evidence collects git range, gates, trust claims, and rendered art
   assert.deepEqual(validateModel(evidence.model).errors, []);
   assert.ok(evidence.model.blocks.some((block) => block.type === "release-checklist"));
   assert.ok(evidence.model.blocks.some((block) => block.type === "trust-report"));
+
+  const firstRelease = collectReleaseEvidence({
+    cwd: d,
+    version: "0.2.0",
+    since: "",
+    checks: "npm test",
+    generatedAt: "2026-01-04T00:00:00.000Z",
+  });
+  assert.equal(firstRelease.summary.range, "HEAD");
+  assert.ok(firstRelease.changedFiles.includes("package.json"), "first release evidence includes tracked files");
+  assert.ok(firstRelease.changedFiles.includes("feature.txt"), "first release evidence includes later tracked files");
 
   const written = await writeReleaseEvidence({
     cwd: d,

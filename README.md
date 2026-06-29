@@ -242,12 +242,13 @@ Pack manifest shape:
 
 ## Workspaces
 
-Use a workspace when one dossier is no longer enough. A workspace manifest scans multiple roots, extracts process items, release gates, trust claims, verification runs, and `[[slug]]` links, then builds an agent-readable status index.
+Use a workspace when one dossier is no longer enough. A workspace manifest scans multiple roots, extracts process items, release gates, trust claims, verification runs, invalid dossier diagnostics, and `[[slug]]` links, then builds an agent-readable status index.
 
 ```bash
 dossier workspace init examples --name "Dossier Examples" --roots . --exclude packs
 dossier workspace status examples
 dossier workspace query examples --needs release
+dossier workspace query examples --needs invalid
 dossier workspace index examples --skin console-slate
 dossier workspace publish examples --out site
 ```
@@ -453,7 +454,7 @@ Every block has a copy-paste example in [`skill/references/blocks.md`](skill/ref
 | `dossier workspace init [dir] [--name <name>] [--roots <a,b>] [--exclude <dir,dir>]` | Create `dossier.workspace.json`. |
 | `dossier workspace index [manifest\|dir]` | Generate and render `workspace-index.dossier.json`. |
 | `dossier workspace status [manifest\|dir] [--json]` | Print workspace status for agents or humans. |
-| `dossier workspace query [manifest\|dir] [--kind <kind>] [--tag <tag>] [--needs process\|release\|trust]` | Filter workspace dossiers by metadata or open work. |
+| `dossier workspace query [manifest\|dir] [--kind <kind>] [--tag <tag>] [--needs process\|release\|trust\|invalid]` | Filter workspace dossiers by metadata, open work, or invalid dossier diagnostics. |
 | `dossier workspace publish [manifest\|dir] --out site` | Publish every workspace dossier plus the workspace index into one static site. |
 | `dossier release collect [--version <v>] [--since <ref>] [--checks <cmd,cmd>]` | Generate release evidence JSON, HTML, and Markdown. |
 | `dossier export <file> --format docx\|md\|pdf` | Export to Word, Markdown, or PDF. |

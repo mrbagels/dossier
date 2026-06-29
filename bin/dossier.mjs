@@ -265,9 +265,13 @@ if (cmd === "build" && args.length) {
       const docs = queryWorkspace(input, { kind: flags.kind, status: flags.status, tag: flags.tag, owner: flags.owner, needs: flags.needs, text: flags.text });
       const rows = docs.map(({ model, path, processItems, releaseGates, trustClaims, verificationRuns, ...doc }) => ({
         ...doc,
-        openProcessItems: processItems.filter((item) => item.status !== "done" && item.verdict !== "approve").length,
+        openProcessItems: doc.openProcessItems || 0,
+        openReleaseGates: doc.openReleaseGates || 0,
+        trustGaps: doc.trustGaps || 0,
+        processItems: processItems.length,
         releaseGates: releaseGates.length,
         trustClaims: trustClaims.length,
+        verificationRuns: verificationRuns.length,
       }));
       if (flags.json) console.log(JSON.stringify(rows, null, 2));
       else if (!rows.length) console.log("No matching dossiers.");
@@ -278,8 +282,8 @@ if (cmd === "build" && args.length) {
       console.log(`✓ published ${r.rendered.length} dossier${r.rendered.length === 1 ? "" : "s"} to ${r.outDir}`);
       console.log(`  index: ${r.index.rendered.htmlPath}`);
     } else {
-      console.log("Usage: dossier workspace init [dir] [--name <name>] [--roots <a,b>] [--exclude <dir,dir>]\n       dossier workspace index [manifest|dir] [--out <file>]\n       dossier workspace status [manifest|dir] [--json]\n       dossier workspace query [manifest|dir] [--kind <kind>] [--tag <tag>] [--needs process|release|trust]\n       dossier workspace publish [manifest|dir] [--out <dir>]");
-      process.exit(sub ? 0 : 1);
+      console.log("Usage: dossier workspace init [dir] [--name <name>] [--roots <a,b>] [--exclude <dir,dir>]\n       dossier workspace index [manifest|dir] [--out <file>]\n       dossier workspace status [manifest|dir] [--json]\n       dossier workspace query [manifest|dir] [--kind <kind>] [--tag <tag>] [--needs process|release|trust|invalid]\n       dossier workspace publish [manifest|dir] [--out <dir>]");
+      process.exit(1);
     }
   } catch (e) {
     console.error("✗ " + e.message);
@@ -310,7 +314,7 @@ if (cmd === "build" && args.length) {
       }
     } else {
       console.log("Usage: dossier release collect [--version <version>] [--since <ref>] [--out <file>] [--checks <cmd,cmd>] [--json]");
-      process.exit(sub ? 0 : 1);
+      process.exit(1);
     }
   } catch (e) {
     console.error("✗ " + e.message);
