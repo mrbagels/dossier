@@ -54,7 +54,11 @@ export function buildCatalogModel(dir, opts = {}) {
   docs.sort((a, b) => (b.updated || "").localeCompare(a.updated || "") || a.title.localeCompare(b.title));
 
   const allTags = [...new Set(docs.flatMap((d) => d.tags))];
+  const processKinds = new Set(["plan", "implementation", "review", "debug", "integration-loop", "release", "incident"]);
+  const processDocs = docs.filter((d) => processKinds.has(d.kind));
+  const kindCounts = [...processKinds].map((kind) => [kind, String(docs.filter((d) => d.kind === kind).length)]).filter(([, n]) => n !== "0");
   const rows = docs.map((d) => [`[[${d.slug}]]`, d.kind, d.status || "-", (d.tags || []).join(", ") || "-", d.updated || "-"]);
+  const processRows = processDocs.map((d) => [`[[${d.slug}]]`, d.kind, d.status || "-", d.updated || "-", (d.tags || []).join(", ") || "-"]);
   const dot = buildGraphDot(docs);
 
   const blocks = [
@@ -63,10 +67,13 @@ export function buildCatalogModel(dir, opts = {}) {
       type: "stat-strip",
       stats: [
         { value: String(docs.length), label: "Documents" },
+        { value: String(processDocs.length), label: "Process docs" },
         { value: String(allTags.length), label: "Tags" },
         { value: String(docs.filter((d) => d.status === "durable").length), label: "Durable" },
       ],
     },
+    ...(kindCounts.length ? [{ type: "table", title: "Process facets", columns: ["Kind", "Count"], rows: kindCounts }] : []),
+    ...(processRows.length ? [{ type: "table", title: "Process documents", columns: ["Title", "Kind", "Status", "Updated", "Tags"], rows: processRows }] : []),
     { type: "table", title: "All documents", columns: ["Title", "Kind", "Status", "Tags", "Updated"], rows },
   ];
   if (dot) blocks.push({ type: "section", title: "Link graph", subtitle: "Cross-document [[links]].", blocks: [{ type: "diagram", format: "dot", spec: dot }] });

@@ -12,7 +12,7 @@
     ],
     "status": "durable",
     "owner": "Kyle",
-    "updated": "2026-06-26",
+    "updated": "2026-06-29",
     "tags": [
       "demo",
       "blocks"
@@ -30,7 +30,7 @@
       "title": "One JSON file becomes this",
       "lede": "Everything below, navigation, search, theme, code, diagrams, charts, math, and an interactive review board, lives in **one self-contained HTML file** with no external assets. The page is a projection of the JSON your AI wrote.",
       "pills": [
-        "30 block types",
+        "41 block types",
         "Self-contained",
         "Agent-readable",
         "Light + dark"
@@ -60,7 +60,7 @@
       "type": "stat-strip",
       "stats": [
         {
-          "value": "30",
+          "value": "41",
           "label": "Block types"
         },
         {
@@ -508,6 +508,158 @@
       "title": "Diff view, file-first review",
       "summary": "A standalone unified diff renders with file summaries, hunks, additions, and deletions.",
       "diff": "diff --git a/src/runtime/runtime.mjs b/src/runtime/runtime.mjs\n--- a/src/runtime/runtime.mjs\n+++ b/src/runtime/runtime.mjs\n@@ -1,3 +1,4 @@\n const state = loadState();\n+state.process = state.process || {};\n \n exportProcess(state);"
+    },
+    {
+      "type": "section",
+      "title": "Process closeout blocks",
+      "subtitle": "The same artifact now covers implementation, review, integration, release, and incident loops.",
+      "blocks": [
+        {
+          "type": "verification-run",
+          "title": "Verification run",
+          "runs": [
+            {
+              "id": "test-suite",
+              "title": "Test suite",
+              "command": "npm test",
+              "status": "passed",
+              "expected": "All tests pass.",
+              "actual": "17 passing."
+            }
+          ]
+        },
+        {
+          "type": "evidence-log",
+          "title": "Evidence log",
+          "items": [
+            {
+              "id": "build-log",
+              "title": "Build log",
+              "kind": "command",
+              "source": "local",
+              "trust": "high",
+              "body": "`npm test` completed successfully."
+            }
+          ]
+        },
+        {
+          "type": "verdict-gate",
+          "title": "Apply gate",
+          "gateId": "apply-process-patch",
+          "prompt": "Approve, revise, skip, defer, split, retry, or block this process packet.",
+          "verdict": "undecided"
+        },
+        {
+          "type": "finding-list",
+          "title": "Review findings",
+          "findings": [
+            {
+              "id": "missing-evidence",
+              "title": "Missing evidence link",
+              "severity": "medium",
+              "body": "Attach the verification run to the work item before closeout.",
+              "files": ["src/starters/review.dossier.json"],
+              "recommendation": "Link the finding to a `verification-run` id."
+            }
+          ]
+        },
+        {
+          "type": "comment-thread",
+          "title": "Review thread",
+          "threads": [
+            {
+              "id": "thread-agent-access",
+              "subject": "Agent access",
+              "comments": [
+                { "author": "Kyle", "body": "Make the packet readable without DOM scraping." },
+                { "author": "Agent", "body": "Use MCP readback and versioned export packets." }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "cycle-board",
+          "title": "Integration cycles",
+          "cycles": [
+            {
+              "id": "producer-consumer",
+              "title": "Producer to consumer",
+              "status": "done",
+              "summary": "Consumer project accepted the packet shape."
+            }
+          ]
+        },
+        {
+          "type": "integration-report",
+          "title": "Integration report",
+          "producer": "dossier",
+          "consumer": "lumen",
+          "status": "accepted",
+          "version": "0.4.1",
+          "nextStep": "Dogfood against a live dependency change.",
+          "items": [
+            {
+              "id": "process-packets",
+              "title": "Process packets",
+              "summary": "Verdicts, releases, edits, and process state all export as structured packets."
+            }
+          ]
+        },
+        {
+          "type": "upstream-response",
+          "title": "Upstream response",
+          "upstream": "CodeMirror host adapter",
+          "status": "tracked",
+          "request": "Enhance `data-code-editor` hooks in a host runtime.",
+          "response": "Ready for a hosted adapter without changing the dossier model.",
+          "nextStep": "Build the adapter in the consuming app."
+        },
+        {
+          "type": "release-checklist",
+          "title": "Release checklist",
+          "gates": [
+            {
+              "id": "tests",
+              "title": "Tests pass",
+              "status": "passed",
+              "required": true,
+              "evidence": "npm test"
+            },
+            {
+              "id": "docs",
+              "title": "Docs regenerated",
+              "status": "todo",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": "decision-log",
+          "title": "Decision log",
+          "decisions": [
+            {
+              "id": "host-runtime",
+              "decision": "Keep execution in host tools",
+              "owner": "Kyle + Codex",
+              "rationale": "Dossier records state and evidence while CLI, MCP, Lumen, or another host performs filesystem and Git work."
+            }
+          ]
+        },
+        {
+          "type": "process-receipt",
+          "title": "Process receipt",
+          "outcome": "functionality closeout ready for bug bash",
+          "owner": "Codex",
+          "date": "2026-06-29",
+          "changedFiles": [
+            "src/generate.mjs",
+            "src/runtime/runtime.mjs",
+            "mcp/server.mjs"
+          ],
+          "commands": ["npm test"],
+          "followUps": ["Run the bug bash pass before release."]
+        }
+      ]
     },
     {
       "type": "glossary",

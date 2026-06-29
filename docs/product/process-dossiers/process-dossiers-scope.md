@@ -2,7 +2,7 @@
 title: "Process Dossiers Product Scope"
 slug: "process-dossiers-scope"
 status: "draft"
-updated: "2026-06-28"
+updated: "2026-06-29"
 ---
 # Process Dossiers: structured human-agent workflows for real work
 
@@ -46,7 +46,7 @@ The important reframing is: **planning is one process kind**. Implementation, re
 | `action-items` | Checklist state can persist and export. | `work-items` with owners, branch/worktree refs, verification, and handoff status. |
 | `code` | Code can be highlighted in static artifacts. | `code-editor` and `diff-view` blocks for reviewing and editing snippets or proposed patches. |
 | `receipt` | Provenance can be represented in the artifact. | `run-receipt`, `verification-receipt`, and `decision-receipt` packets. |
-| MCP `read_decisions` | Agents can consume human decisions without scraping. | MCP `read_process`, `read_verdicts`, `record_run`, and `record_patchset` tools. |
+| MCP `read_decisions` | Agents can consume human decisions without scraping. | MCP `read_process`, `read_verdicts`, `read_release`, `record_run`, and `attach_patchset` tools. |
 
 
 ## Lumen Inspiration To Lift
@@ -95,12 +95,12 @@ Agents can render, validate, read verdict packets, record run evidence, attach p
 | Kind | Purpose | Core blocks |
 | --- | --- | --- |
 | `plan` | Strategy, option selection, feature planning. | `review-board`, `decision-matrix`, `assumptions`, `action-items` |
-| `implementation` | Actual code edit loop. | `context-map`, `process-board`, `patch-set`, `diff-view`, `verification-run`, `receipt` |
+| `implementation` | Actual code edit loop. | `context-map`, `process-board`, `patch-set`, `diff-view`, `verification-run`, `process-receipt` |
 | `review` | Code review, design review, security review. | `review-board`, `finding-list`, `diff-view`, `comment-thread`, `verdict-gate` |
 | `debug` | Bug reproduction, hypotheses, traces, fixes. | `evidence-log`, `hypothesis-board`, `patch-set`, `verification-run` |
-| `integration-loop` | Producer/consumer dependency dogfooding. | `cycle-board`, `integration-report`, `upstream-response`, `closeout` |
-| `release` | Release prep, checks, approvals, changelog. | `release-checklist`, `risk-register`, `verification-run`, `receipt` |
-| `incident` | Timeline, impact, mitigation, follow-ups. | `timeline`, `evidence-log`, `decision-log`, `action-items` |
+| `integration-loop` | Producer/consumer dependency dogfooding. | `cycle-board`, `integration-report`, `upstream-response`, `process-receipt` |
+| `release` | Release prep, checks, approvals, changelog. | `release-checklist`, `risk-register`, `verification-run`, `process-receipt` |
+| `incident` | Timeline, impact, mitigation, follow-ups. | `timeline`, `evidence-log`, `decision-log`, `verification-run`, `process-receipt` |
 
 
 ## New Block Families
@@ -117,6 +117,13 @@ These are the product primitives to add beyond the current planning catalog.
 | `evidence-log` | Append-only observations: screenshots, logs, links, command outputs, API responses, source refs. | Evidence ids, trust level, source, created time, linked work items. |
 | `verdict-gate` | A focused approval surface for apply/revise/skip/defer/split/retry decisions. | Structured verdict packet for agents and MCP tools. |
 | `process-receipt` | Closeout/provenance summary covering model, tools, commands, files, tests, risks, and failures. | Receipt packet plus digest text. |
+| `finding-list` | Review findings with severity, affected files, recommendations, and evidence. | Finding ids, severity, files, recommendation state. |
+| `comment-thread` | Structured review discussions grouped by subject or file. | Thread ids and comments that agents can turn into follow-up work. |
+| `cycle-board` | Producer/consumer integration cycles with status and outcome. | Cycle ids, status, evidence, and next-step ownership. |
+| `integration-report` | Integration closeout across producer, consumer, version, status, and issues. | Acceptance state, compatibility notes, and remaining work. |
+| `upstream-response` | Upstream request/response handoff for dependency work. | Request, response, URL, status, and next step. |
+| `release-checklist` | Interactive release readiness gates with required markers and evidence notes. | Versioned `dossier.release/v1` gate packet. |
+| `decision-log` | Durable decisions for incidents, releases, integrations, and reviews. | Decision ids, owner, rationale, and follow-up context. |
 
 ```json
 {
@@ -195,10 +202,10 @@ Commit boundaries should map to user-visible product increments and keep rollbac
 - **M2** (done), Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.
 - **M3** (done), Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.
 - **M4** (done), Embeddable editor foundation: add code-editor blocks, static fallback, host enhancement hooks for CodeMirror, edited-text export/import, validation, docs, and examples.
-- **M5** (planned), Process MCP protocol: render, validate, read process verdicts, record run receipts, attach patchsets, and return closeout digest.
-- **M6** (planned), Live Studio: CodeMirror bundling, save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.
-- **M7** (planned), Integration-loop dossiers: producer/consumer packet templates, cycle control, closeout packets, and dogfood examples.
-- **M8** (planned), Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, and release readiness.
+- **M5** (done), Process MCP protocol: render, validate, read process verdicts, read release gates, record run receipts, attach patchsets, and return closeout digest.
+- **M6** (done), Live Studio hooks: save-back model editing, patch import, watcher integration, editor hooks, and source model writeback in `dossier serve`.
+- **M7** (done), Integration-loop dossiers: producer/consumer packet templates, cycle control, upstream response, integration report, and closeout examples.
+- **M8** (done), Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, release readiness, and incident closeout blocks.
 
 ### Immediate next commits
 
@@ -207,6 +214,10 @@ Commit boundaries should map to user-visible product increments and keep rollbac
 - [x] Commit M2 process-board render and verdict export loop. (@Codex)
 - [x] Commit M3 diff-view and patch-set static rendering. (@Codex)
 - [x] Commit M4 code-editor block and edit packet export. (@Codex)
+- [x] Commit M5 process protocol blocks and MCP helpers. (@Codex)
+- [x] Commit M6 live serve save-back and patch import. (@Codex)
+- [x] Commit M7 integration-loop packet blocks and starters. (@Codex)
+- [x] Commit M8 release, incident, docs, catalog, and accessibility closeout. (@Codex)
 
 
 ## Data Model Direction

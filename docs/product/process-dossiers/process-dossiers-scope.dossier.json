@@ -8,7 +8,7 @@
     "eyebrow": "Product direction",
     "status": "draft",
     "owner": "Kyle + Codex",
-    "updated": "2026-06-28",
+    "updated": "2026-06-29",
     "tags": ["process-dossiers", "agent-workflows", "implementation", "editor", "diff"]
   },
   "blocks": [
@@ -67,7 +67,7 @@
             ["`action-items`", "Checklist state can persist and export.", "`work-items` with owners, branch/worktree refs, verification, and handoff status."],
             ["`code`", "Code can be highlighted in static artifacts.", "`code-editor` and `diff-view` blocks for reviewing and editing snippets or proposed patches."],
             ["`receipt`", "Provenance can be represented in the artifact.", "`run-receipt`, `verification-receipt`, and `decision-receipt` packets."],
-            ["MCP `read_decisions`", "Agents can consume human decisions without scraping.", "MCP `read_process`, `read_verdicts`, `record_run`, and `record_patchset` tools."]
+            ["MCP `read_decisions`", "Agents can consume human decisions without scraping.", "MCP `read_process`, `read_verdicts`, `read_release`, `record_run`, and `attach_patchset` tools."]
           ]
         }
       ]
@@ -132,12 +132,12 @@
           "columns": ["Kind", "Purpose", "Core blocks"],
           "rows": [
             ["`plan`", "Strategy, option selection, feature planning.", "`review-board`, `decision-matrix`, `assumptions`, `action-items`"],
-            ["`implementation`", "Actual code edit loop.", "`context-map`, `process-board`, `patch-set`, `diff-view`, `verification-run`, `receipt`"],
+            ["`implementation`", "Actual code edit loop.", "`context-map`, `process-board`, `patch-set`, `diff-view`, `verification-run`, `process-receipt`"],
             ["`review`", "Code review, design review, security review.", "`review-board`, `finding-list`, `diff-view`, `comment-thread`, `verdict-gate`"],
             ["`debug`", "Bug reproduction, hypotheses, traces, fixes.", "`evidence-log`, `hypothesis-board`, `patch-set`, `verification-run`"],
-            ["`integration-loop`", "Producer/consumer dependency dogfooding.", "`cycle-board`, `integration-report`, `upstream-response`, `closeout`"],
-            ["`release`", "Release prep, checks, approvals, changelog.", "`release-checklist`, `risk-register`, `verification-run`, `receipt`"],
-            ["`incident`", "Timeline, impact, mitigation, follow-ups.", "`timeline`, `evidence-log`, `decision-log`, `action-items`"]
+            ["`integration-loop`", "Producer/consumer dependency dogfooding.", "`cycle-board`, `integration-report`, `upstream-response`, `process-receipt`"],
+            ["`release`", "Release prep, checks, approvals, changelog.", "`release-checklist`, `risk-register`, `verification-run`, `process-receipt`"],
+            ["`incident`", "Timeline, impact, mitigation, follow-ups.", "`timeline`, `evidence-log`, `decision-log`, `verification-run`, `process-receipt`"]
           ]
         }
       ]
@@ -158,7 +158,14 @@
             ["`verification-run`", "Commands, expected results, actual results, logs, artifacts, and rerun guidance.", "Pass/fail/blocked state, command receipt refs, selected rerun requests."],
             ["`evidence-log`", "Append-only observations: screenshots, logs, links, command outputs, API responses, source refs.", "Evidence ids, trust level, source, created time, linked work items."],
             ["`verdict-gate`", "A focused approval surface for apply/revise/skip/defer/split/retry decisions.", "Structured verdict packet for agents and MCP tools."],
-            ["`process-receipt`", "Closeout/provenance summary covering model, tools, commands, files, tests, risks, and failures.", "Receipt packet plus digest text."]
+            ["`process-receipt`", "Closeout/provenance summary covering model, tools, commands, files, tests, risks, and failures.", "Receipt packet plus digest text."],
+            ["`finding-list`", "Review findings with severity, affected files, recommendations, and evidence.", "Finding ids, severity, files, recommendation state."],
+            ["`comment-thread`", "Structured review discussions grouped by subject or file.", "Thread ids and comments that agents can turn into follow-up work."],
+            ["`cycle-board`", "Producer/consumer integration cycles with status and outcome.", "Cycle ids, status, evidence, and next-step ownership."],
+            ["`integration-report`", "Integration closeout across producer, consumer, version, status, and issues.", "Acceptance state, compatibility notes, and remaining work."],
+            ["`upstream-response`", "Upstream request/response handoff for dependency work.", "Request, response, URL, status, and next step."],
+            ["`release-checklist`", "Interactive release readiness gates with required markers and evidence notes.", "Versioned `dossier.release/v1` gate packet."],
+            ["`decision-log`", "Durable decisions for incidents, releases, integrations, and reviews.", "Decision ids, owner, rationale, and follow-up context."]
           ]
         },
         {
@@ -221,10 +228,10 @@
             { "label": "M2", "body": "Process-board foundation: render work items, verdict controls, notes, local persistence, import/export, and MCP readback.", "status": "done" },
             { "label": "M3", "body": "Patch and diff foundation: add patch-set and diff-view blocks, unified diff parsing, Markdown export, print-safe styling, and sample implementation dossier.", "status": "done" },
             { "label": "M4", "body": "Embeddable editor foundation: add code-editor blocks, static fallback, host enhancement hooks for CodeMirror, edited-text export/import, validation, docs, and examples.", "status": "done" },
-            { "label": "M5", "body": "Process MCP protocol: render, validate, read process verdicts, record run receipts, attach patchsets, and return closeout digest.", "status": "planned" },
-            { "label": "M6", "body": "Live Studio: CodeMirror bundling, save-back model editing, patch import, watcher integration, richer editor and diff interactions, and browser smoke tests.", "status": "planned" },
-            { "label": "M7", "body": "Integration-loop dossiers: producer/consumer packet templates, cycle control, closeout packets, and dogfood examples.", "status": "planned" },
-            { "label": "M8", "body": "Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, and release readiness.", "status": "planned" }
+            { "label": "M5", "body": "Process MCP protocol: render, validate, read process verdicts, read release gates, record run receipts, attach patchsets, and return closeout digest.", "status": "done" },
+            { "label": "M6", "body": "Live Studio hooks: save-back model editing, patch import, watcher integration, editor hooks, and source model writeback in `dossier serve`.", "status": "done" },
+            { "label": "M7", "body": "Integration-loop dossiers: producer/consumer packet templates, cycle control, upstream response, integration report, and closeout examples.", "status": "done" },
+            { "label": "M8", "body": "Polish and platform: catalog facets for process artifacts, accessibility, docs, examples, release readiness, and incident closeout blocks.", "status": "done" }
           ]
         },
         {
@@ -235,7 +242,11 @@
             { "title": "Commit M1 process kinds, starters, README and skill positioning.", "owner": "Codex", "status": "done" },
             { "title": "Commit M2 process-board render and verdict export loop.", "owner": "Codex", "status": "done" },
             { "title": "Commit M3 diff-view and patch-set static rendering.", "owner": "Codex", "status": "done" },
-            { "title": "Commit M4 code-editor block and edit packet export.", "owner": "Codex", "status": "done" }
+            { "title": "Commit M4 code-editor block and edit packet export.", "owner": "Codex", "status": "done" },
+            { "title": "Commit M5 process protocol blocks and MCP helpers.", "owner": "Codex", "status": "done" },
+            { "title": "Commit M6 live serve save-back and patch import.", "owner": "Codex", "status": "done" },
+            { "title": "Commit M7 integration-loop packet blocks and starters.", "owner": "Codex", "status": "done" },
+            { "title": "Commit M8 release, incident, docs, catalog, and accessibility closeout.", "owner": "Codex", "status": "done" }
           ]
         }
       ]
@@ -298,7 +309,7 @@
       "type": "receipt",
       "title": "Planning receipt",
       "generatedBy": "Codex",
-      "date": "2026-06-28",
+      "date": "2026-06-29",
       "confidence": "medium",
       "tools": ["repo inspection", "Lumen docs review", "Context7 attempted", "web source verification queued"],
       "sources": [

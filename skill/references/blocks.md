@@ -38,7 +38,7 @@ optional (auto-derived). `section`, `two-col`, and `tabs` nest other blocks.
 
 ## stat-strip, KPI figures
 ```json
-{ "type": "stat-strip", "stats": [ { "value": "30", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
+{ "type": "stat-strip", "stats": [ { "value": "41", "label": "Block types" }, { "value": "0", "label": "Runtime deps" } ] }
 ```
 
 ## flow, numbered steps
@@ -236,3 +236,97 @@ Agents should read that packet with `dossier_read_process`.
       "badges": ["auth"] } ] }
 ```
 `item.id` must be kebab-case (it keys the exported process JSON).
+
+## verification-run, commands and outcomes
+Use for tests, builds, smoke checks, repro commands, or CI evidence. Agents can append a
+run with `dossier_record_run`.
+```json
+{ "type": "verification-run", "title": "Verification",
+  "runs": [
+    { "id": "unit-tests", "title": "Unit tests", "command": "npm test",
+      "status": "passed", "expected": "All tests pass.", "actual": "17 passing." } ] }
+```
+
+## evidence-log, append-only source material
+```json
+{ "type": "evidence-log", "title": "Evidence",
+  "items": [
+    { "id": "build-log", "title": "Build log", "kind": "command",
+      "source": "local", "trust": "high", "body": "`npm test` passed." } ] }
+```
+
+## verdict-gate, focused approval packet
+Renders one approval control plus notes. It exports
+`{ "schema": "dossier.verdicts/v1", "verdicts": { "gate-id": { "verdict": "...", "notes": "..." } } }`.
+Agents should read it with `dossier_read_verdicts`.
+```json
+{ "type": "verdict-gate", "title": "Apply patch?", "gateId": "apply-auth-patch",
+  "prompt": "Approve, revise, skip, defer, split, retry, or block this change.",
+  "verdict": "undecided" }
+```
+
+## process-receipt, closeout/provenance panel
+```json
+{ "type": "process-receipt", "title": "Closeout receipt",
+  "outcome": "implemented", "owner": "Codex", "date": "2026-06-28",
+  "changedFiles": ["src/auth/session.ts"], "commands": ["npm test -- auth"],
+  "followUps": ["Run full CI before release."] }
+```
+
+## finding-list, review findings
+```json
+{ "type": "finding-list", "title": "Findings",
+  "findings": [
+    { "id": "null-guard", "title": "Missing null guard", "severity": "medium",
+      "body": "The boundary should validate missing input.", "files": ["src/auth/session.ts"],
+      "recommendation": "Return a typed validation error." } ] }
+```
+
+## comment-thread, review discussion
+```json
+{ "type": "comment-thread", "title": "Review threads",
+  "threads": [
+    { "id": "thread-1", "subject": "Session migration",
+      "comments": [ { "author": "Kyle", "body": "Keep the public API stable." } ] } ] }
+```
+
+## cycle-board, integration / dogfood cycles
+```json
+{ "type": "cycle-board", "title": "Dogfood cycles",
+  "cycles": [
+    { "id": "producer-to-consumer", "title": "Producer to consumer",
+      "status": "done", "summary": "Consumer passed against the local package." } ] }
+```
+
+## integration-report, producer/consumer closeout
+```json
+{ "type": "integration-report", "title": "Integration report",
+  "producer": "dossier", "consumer": "lumen", "status": "accepted",
+  "items": [ { "id": "api", "title": "API contract", "summary": "No breaking change." } ] }
+```
+
+## upstream-response, dependency or upstream handoff
+```json
+{ "type": "upstream-response", "title": "Upstream response",
+  "upstream": "codemirror", "status": "opened",
+  "request": "Accept the compatibility patch.", "response": "Pending maintainer review." }
+```
+
+## release-checklist, release readiness gates
+Interactive release gates persist locally and export
+`{ "schema": "dossier.release/v1", "release": { "gate-id": { "done": true, "notes": "..." } } }`.
+Agents should read it with `dossier_read_release`.
+```json
+{ "type": "release-checklist", "title": "Release gates",
+  "gates": [
+    { "id": "tests", "title": "Tests pass", "status": "passed",
+      "required": true, "evidence": "npm test" } ] }
+```
+
+## decision-log, durable operational decisions
+```json
+{ "type": "decision-log", "title": "Incident decisions",
+  "decisions": [
+    { "id": "rollback", "decision": "Rollback release",
+      "owner": "incident commander", "rationale": "Error rate stayed elevated." } ] }
+```

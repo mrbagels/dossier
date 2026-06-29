@@ -7,7 +7,7 @@
     "slug": "replace-with-slug",
     "eyebrow": "Review dossier",
     "status": "review",
-    "updated": "2026-06-28",
+    "updated": "2026-06-29",
     "tags": ["review", "process"],
     "lifecycle": { "stage": "review", "note": "Triage findings and export the accepted fix list.", "promoteTo": "durable" }
   },
@@ -17,6 +17,21 @@
       "eyebrow": "Review dossier",
       "title": "Replace with the review subject",
       "lede": "A structured review surface for findings, evidence, severity, decisions, and follow-up fixes."
+    },
+    {
+      "type": "finding-list",
+      "title": "Structured findings",
+      "findings": [
+        {
+          "id": "finding-one",
+          "title": "Finding one",
+          "severity": "high",
+          "status": "open",
+          "body": "Explain the issue and why it matters.",
+          "files": ["path/to/file.ts"],
+          "recommendation": "Replace with a concrete repair."
+        }
+      ]
     },
     {
       "type": "review-board",
@@ -51,6 +66,20 @@
       "title": "Accepted fixes",
       "items": [
         { "title": "Implement accepted findings.", "owner": "agent", "status": "todo" }
+      ]
+    },
+    {
+      "type": "comment-thread",
+      "title": "Review comments",
+      "threads": [
+        {
+          "id": "thread-one",
+          "subject": "Replace with review thread",
+          "status": "open",
+          "comments": [
+            { "author": "reviewer", "body": "Replace with exact concern and requested change." }
+          ]
+        }
       ]
     }
   ]

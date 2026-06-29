@@ -7,7 +7,7 @@
     "slug": "replace-with-slug",
     "eyebrow": "Debug dossier",
     "status": "review",
-    "updated": "2026-06-28",
+    "updated": "2026-06-29",
     "tags": ["debug", "process"]
   },
   "blocks": [
@@ -27,6 +27,20 @@
           { "title": "Observe", "body": "Expected versus actual behavior." }
         ] },
         { "type": "code", "lang": "bash", "filename": "repro-command", "code": "replace-with-command-that-reproduces-the-bug" }
+      ]
+    },
+    {
+      "type": "evidence-log",
+      "title": "Evidence log",
+      "items": [
+        {
+          "id": "observation-one",
+          "title": "Observation one",
+          "kind": "log",
+          "source": "replace-with-log-or-trace",
+          "trust": "medium",
+          "body": "Record exact output, screenshot, trace, request, or source reference."
+        }
       ]
     },
     {
@@ -51,6 +65,20 @@
           "effort": "Small",
           "body": "Describe the code change, why it addresses the hypothesis, and how to verify it.",
           "details": { "Verification": "`npm test -- replace`" }
+        }
+      ]
+    },
+    {
+      "type": "verification-run",
+      "title": "Verification runs",
+      "runs": [
+        {
+          "id": "repro-run",
+          "title": "Reproduction command",
+          "command": "replace-with-command-that-reproduces-the-bug",
+          "status": "failing",
+          "expected": "Expected behavior.",
+          "actual": "Actual failing behavior."
         }
       ]
     }

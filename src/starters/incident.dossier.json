@@ -7,7 +7,7 @@
     "slug": "replace-with-slug",
     "eyebrow": "Incident dossier",
     "status": "review",
-    "updated": "2026-06-28",
+    "updated": "2026-06-29",
     "tags": ["incident", "process"],
     "lifecycle": { "stage": "review", "note": "Capture timeline, decisions, mitigation, and follow-ups.", "promoteTo": "durable" }
   },
@@ -34,6 +34,33 @@
       ]
     },
     {
+      "type": "evidence-log",
+      "title": "Evidence",
+      "items": [
+        {
+          "id": "alert-one",
+          "title": "Alert or observation one",
+          "kind": "alert",
+          "source": "replace-with-dashboard-log-or-alert",
+          "trust": "high",
+          "body": "Record observed impact, error rate, customer reports, screenshots, or logs."
+        }
+      ]
+    },
+    {
+      "type": "decision-log",
+      "title": "Decision log",
+      "decisions": [
+        {
+          "id": "decision-one",
+          "decision": "Replace with mitigation decision.",
+          "owner": "incident commander",
+          "status": "active",
+          "rationale": "Replace with rationale, alternatives considered, and expected effect."
+        }
+      ]
+    },
+    {
       "type": "review-board",
       "title": "Decisions",
       "candidates": [
@@ -55,6 +82,27 @@
       "items": [
         { "title": "Replace with corrective action.", "owner": "agent", "status": "todo" }
       ]
+    },
+    {
+      "type": "verification-run",
+      "title": "Mitigation verification",
+      "runs": [
+        {
+          "id": "impact-check",
+          "title": "Impact reduced",
+          "command": "replace-with-dashboard-or-command-check",
+          "status": "pending",
+          "expected": "Customer impact is reduced or eliminated."
+        }
+      ]
+    },
+    {
+      "type": "process-receipt",
+      "title": "Incident closeout receipt",
+      "owner": "incident commander",
+      "date": "2026-06-29",
+      "outcome": "pending",
+      "summary": "Replace with final impact, root cause, mitigation, verification, and follow-ups."
     }
   ]
 }

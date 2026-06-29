@@ -9,7 +9,7 @@
     "status": "review",
     "owner": "Kyle",
     "project": "Dossier",
-    "updated": "2026-06-26",
+    "updated": "2026-06-29",
     "version": "0.1.0",
     "tags": ["docs", "tooling", "design-system"],
     "lifecycle": { "stage": "review", "note": "First end-to-end render of the kit.", "promoteTo": "durable" },
@@ -33,7 +33,7 @@
     {
       "type": "stat-strip",
       "stats": [
-        { "value": "30", "label": "Block types" },
+        { "value": "41", "label": "Block types" },
         { "value": "18", "label": "Selected features" },
         { "value": "1", "label": "JSON file to author" },
         { "value": "0", "label": "Runtime dependencies" }
@@ -81,9 +81,9 @@
           "phases": [
             { "label": "Phase 1", "body": "Schema + tokens/themes.", "status": "done" },
             { "label": "Phase 2", "body": "Generator engine + data island + Markdown export.", "status": "done" },
-            { "label": "Phase 3", "body": "Full static catalog.", "status": "in-progress" },
-            { "label": "Phase 4", "body": "The 18 selected features.", "status": "in-progress" },
-            { "label": "Phase 5", "body": "Skill + examples + global wiring.", "status": "planned" }
+            { "label": "Phase 3", "body": "Full static catalog.", "status": "done" },
+            { "label": "Phase 4", "body": "Process dossier closeout.", "status": "done" },
+            { "label": "Phase 5", "body": "Bug bash and release polish.", "status": "planned" }
           ]
         }
       ]
@@ -142,9 +142,9 @@
       "type": "action-items",
       "title": "Next implementation steps",
       "items": [
-        { "title": "Bake Mermaid diagrams to inline SVG (feature 23)", "owner": "agent", "status": "todo" },
-        { "title": "Generate-time syntax highlighting (feature 24)", "owner": "agent", "status": "todo" },
-        { "title": "Author the dossier skill", "owner": "agent", "status": "todo" }
+        { "title": "Bug bash process dossier workflows.", "owner": "agent", "status": "todo" },
+        { "title": "Polish release artifacts.", "owner": "agent", "status": "todo" },
+        { "title": "Dogfood MCP process packets in another agent.", "owner": "agent", "status": "todo" }
       ]
     },
     {

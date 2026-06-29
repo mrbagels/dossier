@@ -126,8 +126,9 @@ It bundles a [block cheatsheet](skill/references/blocks.md) and a
 stdio, so any MCP-capable agent can drive Dossier, including the full human-and-agent loop.
 Tools: `dossier_render`, `dossier_validate`, `dossier_read_decisions` (read back the options a
 human selected on a review board), `dossier_read_process` (read process-board verdicts and
-notes), `dossier_read_edits` (read code-editor edit packets), `dossier_get_schema`,
-`dossier_get_starter`.
+notes), `dossier_read_edits` (read code-editor edit packets), `dossier_read_verdicts`,
+`dossier_read_release`, `dossier_record_run`, `dossier_attach_patchset`,
+`dossier_closeout_digest`, `dossier_get_schema`, and `dossier_get_starter`.
 
 ```jsonc
 // e.g. an MCP client config
@@ -167,7 +168,7 @@ Full contract: [`schema/dossier.schema.json`](schema/dossier.schema.json).
 
 ## Block types
 
-30 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
+41 built-in, plus your own (see [plugins](#plugins--cli)). Every one has a copy-paste JSON
 example in [`skill/references/blocks.md`](skill/references/blocks.md):
 
 | Group | Blocks |
@@ -176,7 +177,7 @@ example in [`skill/references/blocks.md`](skill/references/blocks.md):
 | **At a glance** | `summary-cards`, `stat-strip`, `flow`, `timeline`, `callout` |
 | **Reference** | `table`, `code` (Shiki), `code-editor`, `patch-set`, `diff-view`, `diagram` (DOT or Mermaid to SVG), `references`, `faq`, `glossary` |
 | **Media & data** | `figure` (inlined), `math` (KaTeX to MathML), `chart` (bar/line/area SVG), `footnotes` |
-| **Decisions, process & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `process-board`, `receipt` |
+| **Decisions, process & trust** | `decision-matrix`, `risk-register`, `assumptions`, `action-items`, `review-board`, `process-board`, `verification-run`, `evidence-log`, `verdict-gate`, `process-receipt`, `finding-list`, `comment-thread`, `cycle-board`, `integration-report`, `upstream-response`, `release-checklist`, `decision-log`, `receipt` |
 
 ## Review / triage
 
@@ -205,9 +206,11 @@ work loop:
 | `incident` | Timeline, mitigation decisions, evidence, and follow-ups. |
 
 They use the existing block catalog plus `process-board` for work items, `code-editor` for
-bounded editable snippets, `patch-set` for proposed edit packets, and `diff-view` for static
-unified diff review. Follow-on process blocks for verification runs and process receipts are tracked in
-[`docs/product/process-dossiers/process-dossiers-scope.md`](docs/product/process-dossiers/process-dossiers-scope.md).
+bounded editable snippets, `patch-set` for proposed edit packets, `diff-view` for static
+unified diff review, `verification-run` for commands and outcomes, `evidence-log` for source
+material, `verdict-gate` for human approval, and closeout blocks for release, incident,
+review, and integration loops. In `dossier serve`, editor blocks can save changes back to the
+source model and patch imports can append a `patch-set` block for the next agent turn.
 
 ## React
 
@@ -225,7 +228,7 @@ import { DossierDocument } from "@mrbagels/dossier-react";
 <DossierDocument model={model} animate />
 ```
 
-The `<Block>` dispatcher covers all 30 block types and reuses the core's CSS, runtime, and
+The `<Block>` dispatcher covers all 41 block types and reuses the core's CSS, runtime, and
 enrichment, so SSR output matches the Node generator. See [`react/README.md`](react/README.md).
 
 ## Plugins & CLI

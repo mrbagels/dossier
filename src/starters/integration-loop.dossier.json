@@ -7,7 +7,7 @@
     "slug": "replace-with-slug",
     "eyebrow": "Integration loop",
     "status": "review",
-    "updated": "2026-06-28",
+    "updated": "2026-06-29",
     "tags": ["integration-loop", "dogfood", "process"],
     "lifecycle": { "stage": "review", "note": "Review producer and consumer packets before continuing the loop.", "promoteTo": "durable" }
   },
@@ -40,30 +40,52 @@
       ]
     },
     {
-      "type": "review-board",
-      "title": "Current cycle packets",
-      "candidates": [
+      "type": "cycle-board",
+      "title": "Cycle board",
+      "cycles": [
         {
-          "id": "integration-report",
-          "title": "Integration report",
-          "summary": "Consumer findings from the current cycle.",
-          "category": "Consumer",
-          "status": "pending-review",
-          "impact": "High",
-          "effort": "Medium",
-          "body": "Record tested version/source ref, install steps, touched areas, failing commands, logs, blockers, workarounds, and requested producer changes."
-        },
-        {
-          "id": "upstream-response",
-          "title": "Upstream response",
-          "summary": "Producer response and retry instructions.",
-          "category": "Producer",
-          "status": "pending-review",
-          "impact": "High",
-          "effort": "Medium",
-          "body": "Record fixed, rejected, deferred, or docs-only findings, plus commits, new source refs, migration notes, verification, and retry guidance."
+          "id": "cycle-one",
+          "title": "Cycle one",
+          "status": "active",
+          "producer": "replace-with-producer",
+          "consumer": "replace-with-consumer",
+          "summary": "Adopt the dependency in real product code and send findings back upstream.",
+          "nextStep": "Run consumer verification and emit an integration report."
         }
       ]
+    },
+    {
+      "type": "integration-report",
+      "title": "Consumer integration report",
+      "producer": "replace-with-producer",
+      "consumer": "replace-with-consumer",
+      "status": "pending-review",
+      "version": "replace-with-version-or-ref",
+      "summary": "Record tested version/source ref, install steps, touched areas, failing commands, logs, blockers, workarounds, and requested producer changes.",
+      "items": [
+        {
+          "id": "consumer-blocker-one",
+          "title": "Consumer blocker one",
+          "status": "open",
+          "severity": "high",
+          "body": "Replace with blocker, reproduction, affected files, and requested upstream change."
+        }
+      ]
+    },
+    {
+      "type": "upstream-response",
+      "title": "Producer upstream response",
+      "upstream": "replace-with-producer",
+      "status": "pending",
+      "request": "Replace with the consumer request.",
+      "response": "Replace with accepted, rejected, deferred, or docs-only response.",
+      "nextStep": "Replace with retry guidance or closeout condition."
+    },
+    {
+      "type": "verdict-gate",
+      "title": "Continue the loop?",
+      "gateId": "continue-loop",
+      "prompt": "Choose whether the next agent should retry, close, split, or block the integration cycle."
     }
   ]
 }

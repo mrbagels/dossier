@@ -7,7 +7,7 @@
     "slug": "replace-with-slug",
     "eyebrow": "Release dossier",
     "status": "review",
-    "updated": "2026-06-28",
+    "updated": "2026-06-29",
     "tags": ["release", "process"],
     "lifecycle": { "stage": "review", "note": "Confirm readiness, risks, rollback, and approvals.", "promoteTo": "durable" }
   },
@@ -19,13 +19,26 @@
       "lede": "A release readiness surface covering scope, checks, risks, approvals, rollback, and closeout."
     },
     {
-      "type": "action-items",
-      "title": "Release checklist",
-      "items": [
-        { "title": "Confirm version, branch, and changelog.", "owner": "agent", "status": "todo" },
-        { "title": "Run required tests, typecheck, build, or smoke checks.", "owner": "agent", "status": "todo" },
-        { "title": "Confirm rollback or recovery path.", "owner": "agent", "status": "todo" },
-        { "title": "Record approvals and publish result.", "owner": "agent", "status": "todo" }
+      "type": "release-checklist",
+      "title": "Release gates",
+      "gates": [
+        { "id": "version-branch-changelog", "title": "Confirm version, branch, and changelog.", "status": "todo", "required": true },
+        { "id": "required-checks", "title": "Run required tests, typecheck, build, or smoke checks.", "status": "todo", "required": true },
+        { "id": "rollback-path", "title": "Confirm rollback or recovery path.", "status": "todo", "required": true },
+        { "id": "approvals-publish", "title": "Record approvals and publish result.", "status": "todo", "required": true }
+      ]
+    },
+    {
+      "type": "verification-run",
+      "title": "Release verification",
+      "runs": [
+        {
+          "id": "release-build",
+          "title": "Release build",
+          "command": "replace-with-build-command",
+          "status": "pending",
+          "expected": "Build succeeds and produces publishable artifact."
+        }
       ]
     },
     {
@@ -36,12 +49,14 @@
       ]
     },
     {
-      "type": "receipt",
-      "generatedBy": "release agent",
-      "date": "2026-06-28",
-      "confidence": "medium",
-      "tools": ["tests", "build", "manual smoke"],
-      "notes": "Replace with final release evidence and unresolved risks."
+      "type": "process-receipt",
+      "title": "Release closeout receipt",
+      "owner": "release agent",
+      "date": "2026-06-29",
+      "outcome": "pending",
+      "summary": "Replace with final release evidence and unresolved risks.",
+      "commands": ["replace-with-build-command"],
+      "followUps": ["Replace with post-release monitoring or cleanup."]
     }
   ]
 }
