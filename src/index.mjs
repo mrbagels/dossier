@@ -6,6 +6,30 @@ import { applyPresentationOptions } from "./presentation.mjs";
 
 export { generate, validateModel };
 export { publishDir } from "./publish.mjs";
+export {
+  PACK_CACHE_DIR,
+  PACK_LOCK,
+  PACK_MANIFEST,
+  addPack,
+  listPacks,
+  loadTrustedPackPlugins,
+  readPackLock,
+  resolveTemplateRef,
+  trustPack,
+  writePackLock,
+} from "./packs.mjs";
+export {
+  WORKSPACE_MANIFEST,
+  WORKSPACE_SCHEMA,
+  buildWorkspaceIndex,
+  createWorkspaceManifest,
+  publishWorkspace,
+  queryWorkspace,
+  readWorkspaceManifest,
+  scanWorkspace,
+  writeWorkspaceIndex,
+  writeWorkspaceManifest,
+} from "./workspace.mjs";
 export { THEMES } from "./themes.mjs";
 export { SKINS, resolveSkin, skinNames } from "./skins.mjs";
 // Plugin authoring surface.

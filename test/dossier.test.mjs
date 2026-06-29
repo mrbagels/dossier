@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { esc, generate, generateFile, inlineMd, parseUnifiedDiff, registerBlock, slugify, validateModel } from "../src/index.mjs";
 import { diffModels } from "../src/diff.mjs";
 import { addPack, listPacks, loadTrustedPackPlugins, resolveTemplateRef, trustPack } from "../src/packs.mjs";
+import { WORKSPACE_MANIFEST, buildWorkspaceIndex, createWorkspaceManifest, publishWorkspace, queryWorkspace, scanWorkspace, writeWorkspaceIndex, writeWorkspaceManifest } from "../src/workspace.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const examplesDir = join(root, "examples");
@@ -705,6 +706,76 @@ test("publish builds a static dossier site with catalog index", async () => {
   const embed = readFileSync(join(out, "a.embed.html"), "utf8");
   assert.ok(embed.includes('data-dossier-embed="true"'), "publish applies embed flag");
   assert.ok(embed.includes('data-skin="console-slate"'), "publish embed keeps skin flag");
+});
+
+test("workspace scans dossiers, builds an agent status index, queries, and publishes", async () => {
+  const d = mkdtempSync(join(tmpdir(), "dossier-workspace-"));
+  const docsDir = join(d, "docs");
+  mkdirSync(docsDir, { recursive: true });
+  writeWorkspaceManifest(join(d, WORKSPACE_MANIFEST), createWorkspaceManifest({ name: "QA Workspace", roots: ["docs"], output: "public" }));
+  writeFileSync(
+    join(docsDir, "implementation.dossier.json"),
+    JSON.stringify(
+      {
+        dossierVersion: "1.0",
+        kind: "implementation",
+        meta: { title: "Implementation plan", slug: "implementation-plan", status: "active", owner: "agent", tags: ["qa"], updated: "2026-01-01" },
+        blocks: [
+          { type: "prose", markdown: "Coordinates with [[release-notes]] and [[missing-note]]." },
+          { type: "process-board", title: "Work", items: [{ id: "wire-cli", title: "Wire CLI", status: "doing", verdict: "undecided", owner: "agent" }] },
+          { type: "release-checklist", title: "Release", gates: [{ id: "manual-qa", title: "Manual QA complete", status: "pending", required: true, evidence: "Run the demo." }] },
+          {
+            type: "trust-report",
+            title: "Trust",
+            sources: [{ id: "local-test", label: "Local test", kind: "command", trust: "medium" }],
+            claims: [{ id: "tests-pass", claim: "Tests pass.", status: "pending", confidence: "medium", sources: ["local-test"] }],
+          },
+        ],
+      },
+      null,
+      2
+    )
+  );
+  writeFileSync(
+    join(docsDir, "release.dossier.json"),
+    JSON.stringify(
+      {
+        dossierVersion: "1.0",
+        kind: "release",
+        meta: { title: "Release notes", slug: "release-notes", status: "durable", tags: ["release"], updated: "2026-01-02" },
+        blocks: [{ type: "release-checklist", title: "Release", gates: [{ id: "tests", title: "Tests pass", status: "passed", required: true }] }],
+      },
+      null,
+      2
+    )
+  );
+
+  const scan = scanWorkspace(join(d, WORKSPACE_MANIFEST));
+  assert.equal(scan.docs.length, 2);
+  assert.equal(scan.summary.openProcessItems, 1);
+  assert.equal(scan.summary.openReleaseGates, 1);
+  assert.equal(scan.summary.trustGaps, 1);
+  assert.equal(scan.summary.brokenLinks, 1);
+
+  const index = buildWorkspaceIndex(join(d, WORKSPACE_MANIFEST), { updated: "2026-01-03T00:00:00.000Z" });
+  assert.deepEqual(validateModel(index.model).errors, []);
+  assert.ok(index.model.blocks.some((block) => block.type === "process-board" && block.title === "Agent work queue"));
+  assert.ok(index.model.blocks.some((block) => block.type === "trust-report"), "trust gaps are agent-readable");
+
+  const releaseNeeds = queryWorkspace(scan, { needs: "release" });
+  assert.deepEqual(
+    releaseNeeds.map((doc) => doc.slug),
+    ["implementation-plan"]
+  );
+
+  const written = await writeWorkspaceIndex(join(d, WORKSPACE_MANIFEST), { updated: "2026-01-03T00:00:00.000Z" });
+  assert.ok(existsSync(written.outPath), "writes workspace index JSON");
+  assert.ok(existsSync(join(d, "workspace-index.html")), "renders workspace index HTML");
+
+  const published = await publishWorkspace(join(d, WORKSPACE_MANIFEST), { out: "public", updated: "2026-01-03T00:00:00.000Z" });
+  assert.equal(published.rendered.length, 2);
+  assert.ok(existsSync(join(d, "public", "implementation-plan.html")), "publishes workspace document");
+  assert.ok(existsSync(join(d, "public", "workspace-index.html")), "publishes workspace index");
 });
 
 test("diff detects added and changed blocks", () => {

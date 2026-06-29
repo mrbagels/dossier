@@ -4,11 +4,20 @@ import { resolve, join, basename, dirname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateFile, validateModel, registerBlock, esc, inlineMd, slugify } from "../src/index.mjs";
 import { addPack, listPacks, loadTrustedPackPlugins, resolveTemplateRef, trustPack } from "../src/packs.mjs";
+import {
+  WORKSPACE_MANIFEST,
+  createWorkspaceManifest,
+  publishWorkspace,
+  queryWorkspace,
+  scanWorkspace,
+  writeWorkspaceIndex,
+  writeWorkspaceManifest,
+} from "../src/workspace.mjs";
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
 // pull out --flags; rest are positional
-const VALUE_FLAGS = new Set(["kind", "out", "plugin", "pack", "template", "port", "title", "base-url", "format", "theme", "skin", "name", "ref"]);
+const VALUE_FLAGS = new Set(["kind", "out", "plugin", "pack", "template", "port", "title", "base-url", "format", "theme", "skin", "name", "ref", "roots", "status", "tag", "owner", "needs", "text"]);
 const flags = {};
 const args = [];
 const rest = argv.slice(1);
@@ -59,24 +68,33 @@ const USAGE = [
   "  dossier pack add <repo-or-path>          register a local or Git-backed template/plugin pack",
   "  dossier pack trust <name>                allow a registered pack to load render plugins",
   "  dossier pack list                        list registered packs from dossier.lock.json",
+  "  dossier workspace init [dir]             create dossier.workspace.json",
+  "  dossier workspace index [manifest|dir]   build workspace-index.dossier.json (+ HTML)",
+  "  dossier workspace status [manifest|dir]  print agent-readable workspace status",
+  "  dossier workspace query [manifest|dir]   filter workspace docs (--kind, --tag, --needs)",
+  "  dossier workspace publish [manifest|dir] publish all workspace dossiers into a static site",
   "  dossier mcp                              run the MCP server (stdio) for agents",
   "",
   "Starters (--kind): " + STARTERS.join(", "),
   "Flags: --theme <pack>, --skin console-slate, --embed (write <slug>.embed.html), --no-validate (build without validating), --pack <name>, --template <pack/id>",
 ].join("\n");
 
-if (cmd === "build" && args.length) {
+async function loadPacksFromFlag() {
   if (flags.pack) {
-    try {
-      const packs = String(flags.pack)
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      await loadTrustedPackPlugins(packs, { registerBlock, esc, inlineMd, slugify });
-    } catch (e) {
-      console.error("✗ pack plugin: " + e.message);
-      process.exit(1);
-    }
+    const packs = String(flags.pack)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    await loadTrustedPackPlugins(packs, { registerBlock, esc, inlineMd, slugify });
+  }
+}
+
+if (cmd === "build" && args.length) {
+  try {
+    await loadPacksFromFlag();
+  } catch (e) {
+    console.error("✗ pack plugin: " + e.message);
+    process.exit(1);
   }
   if (flags.plugin) {
     for (const p of String(flags.plugin).split(",").map((s) => s.trim()).filter(Boolean)) {
@@ -171,6 +189,70 @@ if (cmd === "build" && args.length) {
     console.log(`✓ published ${r.docs.length} dossier${r.docs.length === 1 ? "" : "s"} to ${r.outDir}`);
     console.log(`  index: ${r.index.htmlPath}`);
     if (r.index.embedPath) console.log(`  embed index: ${r.index.embedPath}`);
+  } catch (e) {
+    console.error("✗ " + e.message);
+    process.exitCode = 1;
+  }
+} else if (cmd === "workspace") {
+  const sub = args[0];
+  const input = args[1] || ".";
+  try {
+    if (sub === "init") {
+      const dir = resolve(input);
+      const outPath = join(dir, WORKSPACE_MANIFEST);
+      if (existsSync(outPath)) {
+        console.error("✗ " + outPath + " already exists");
+        process.exit(1);
+      }
+      const manifest = createWorkspaceManifest({
+        name: flags.name || basename(dir) || "Dossier Workspace",
+        roots: flags.roots || ".",
+        packs: flags.pack || [],
+        output: flags.out || "site",
+      });
+      writeWorkspaceManifest(outPath, manifest);
+      console.log(`✓ wrote ${outPath}`);
+      console.log("  next: dossier workspace index " + outPath);
+    } else if (sub === "index") {
+      await loadPacksFromFlag();
+      const r = await writeWorkspaceIndex(input, { out: flags.out, title: flags.title, baseUrl: flags["base-url"], theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
+      console.log(`✓ ${r.outPath}  (${r.docs.length} dossiers)`);
+      if (r.rendered) {
+        console.log(`  html: ${r.rendered.htmlPath}`);
+        if (r.rendered.embedPath) console.log(`  embed: ${r.rendered.embedPath}`);
+      }
+    } else if (sub === "status") {
+      const r = scanWorkspace(input);
+      if (flags.json) {
+        console.log(JSON.stringify({ manifest: r.manifest, summary: r.summary, docs: r.docs.map(({ model, path, ...doc }) => doc) }, null, 2));
+      } else {
+        console.log(`${r.manifest.name}: ${r.summary.docs} dossiers`);
+        console.log(`  open process: ${r.summary.openProcessItems}`);
+        console.log(`  release gaps: ${r.summary.openReleaseGates}`);
+        console.log(`  trust gaps: ${r.summary.trustGaps}`);
+        console.log(`  missing links: ${r.summary.brokenLinks}`);
+        console.log(`  invalid docs: ${r.summary.invalidDocs}`);
+      }
+    } else if (sub === "query") {
+      const docs = queryWorkspace(input, { kind: flags.kind, status: flags.status, tag: flags.tag, owner: flags.owner, needs: flags.needs, text: flags.text });
+      const rows = docs.map(({ model, path, processItems, releaseGates, trustClaims, verificationRuns, ...doc }) => ({
+        ...doc,
+        openProcessItems: processItems.filter((item) => item.status !== "done" && item.verdict !== "approve").length,
+        releaseGates: releaseGates.length,
+        trustClaims: trustClaims.length,
+      }));
+      if (flags.json) console.log(JSON.stringify(rows, null, 2));
+      else if (!rows.length) console.log("No matching dossiers.");
+      else rows.forEach((doc) => console.log(`${doc.slug}  ${doc.kind}  ${doc.status || "-"}  ${doc.file}`));
+    } else if (sub === "publish") {
+      await loadPacksFromFlag();
+      const r = await publishWorkspace(input, { out: flags.out, title: flags.title, baseUrl: flags["base-url"], theme: flags.theme, skin: flags.skin, embed: !!flags.embed });
+      console.log(`✓ published ${r.rendered.length} dossier${r.rendered.length === 1 ? "" : "s"} to ${r.outDir}`);
+      console.log(`  index: ${r.index.rendered.htmlPath}`);
+    } else {
+      console.log("Usage: dossier workspace init [dir] [--name <name>] [--roots <a,b>]\n       dossier workspace index [manifest|dir] [--out <file>]\n       dossier workspace status [manifest|dir] [--json]\n       dossier workspace query [manifest|dir] [--kind <kind>] [--tag <tag>] [--needs process|release|trust]\n       dossier workspace publish [manifest|dir] [--out <dir>]");
+      process.exit(sub ? 0 : 1);
+    }
   } catch (e) {
     console.error("✗ " + e.message);
     process.exitCode = 1;
