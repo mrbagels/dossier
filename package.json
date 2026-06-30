@@ -1,11 +1,11 @@
 {
   "name": "@mrbagels/dossier",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Generate polished, self-contained, agent-readable HTML dossiers and Markdown from a single JSON document model.",
   "type": "module",
   "license": "MIT",
   "bin": {
-    "dossier": "./bin/dossier.mjs"
+    "dossier": "bin/dossier.mjs"
   },
   "exports": {
     ".": "./src/index.mjs",
