@@ -1,17 +1,17 @@
 {
   "name": "@kylebegeman/dossier",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "Generate polished, self-contained, agent-readable HTML dossiers and Markdown from a single JSON document model.",
   "type": "module",
   "license": "MIT",
   "author": "Kyle Begeman",
-  "homepage": "https://github.com/mrbagels/dossier#readme",
+  "homepage": "https://github.com/kylebegeman/dossier#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrbagels/dossier.git"
+    "url": "git+https://github.com/kylebegeman/dossier.git"
   },
   "bugs": {
-    "url": "https://github.com/mrbagels/dossier/issues"
+    "url": "https://github.com/kylebegeman/dossier/issues"
   },
   "bin": {
     "dossier": "bin/dossier.mjs"

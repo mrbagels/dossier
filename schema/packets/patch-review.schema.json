@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mrbagels/dossier/schema/packets/patch-review.schema.json",
+  "$id": "https://github.com/kylebegeman/dossier/schema/packets/patch-review.schema.json",
   "title": "Dossier Patch Review Packet",
   "type": "object",
   "required": ["schema", "patches"],

@@ -16,7 +16,7 @@ Evidence collected for changes from v0.6.1 to f530f1e.
 - [x] Git HEAD resolved (required), f530f1e4e14233f6c6963c1e667dd5ae4ecc4646
 - [x] Working tree clean before evidence write (required), No git status entries before writing release evidence.
 - [x] Release commits collected (required), 2 commit(s) from v0.6.1..HEAD
-- [x] Verification commands recorded (required), npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
+- [x] Verification commands recorded (required), npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source kylebegeman/tap/dossier, brew test kylebegeman/tap/dossier, brew audit --strict --formula kylebegeman/tap/dossier
 - [x] npm package dry run recorded, npm pack command listed in verification checks.
 
 ## Verification evidence
@@ -77,28 +77,28 @@ npm publish --dry-run --access public
 - **Expected:** Command completes before release evidence collection.
 - **Actual:** Completed before this release dossier was generated.
 
-### brew install --build-from-source mrbagels/dossier/dossier (passed)
+### brew install --build-from-source kylebegeman/tap/dossier (passed)
 
 ```sh
-brew install --build-from-source mrbagels/dossier/dossier
+brew install --build-from-source kylebegeman/tap/dossier
 ```
 
 - **Expected:** Command completes before release evidence collection.
 - **Actual:** Completed before this release dossier was generated.
 
-### brew test mrbagels/dossier/dossier (passed)
+### brew test kylebegeman/tap/dossier (passed)
 
 ```sh
-brew test mrbagels/dossier/dossier
+brew test kylebegeman/tap/dossier
 ```
 
 - **Expected:** Command completes before release evidence collection.
 - **Actual:** Completed before this release dossier was generated.
 
-### brew audit --strict --formula mrbagels/dossier/dossier (passed)
+### brew audit --strict --formula kylebegeman/tap/dossier (passed)
 
 ```sh
-brew audit --strict --formula mrbagels/dossier/dossier
+brew audit --strict --formula kylebegeman/tap/dossier
 ```
 
 - **Expected:** Command completes before release evidence collection.
@@ -162,7 +162,7 @@ Claims downstream agents can consume before continuing a release.
 - **source-git-status:** Git status (high)
   Clean
 - **source-verification:** Verification commands (high)
-  npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
+  npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source kylebegeman/tap/dossier, brew test kylebegeman/tap/dossier, brew audit --strict --formula kylebegeman/tap/dossier
 
 ### Claims
 
@@ -174,7 +174,7 @@ Claims downstream agents can consume before continuing a release.
   - Evidence: git-status
 - **Verification commands completed before evidence collection.** (verified), confidence: high
   - Sources: source-verification
-  - Evidence: npm-test, node-bin-dossier-mjs-validate-examples-dossier-json-docs-product, node-bin-dossier-mjs-build-examples-dossier-json-docs-product-pr, cd-react-npx-tsc-noemit, npm-pack-dry-run-json, npm-publish-dry-run-access-public, brew-install-build-from-source-mrbagels-dossier-dossier, brew-test-mrbagels-dossier-dossier, brew-audit-strict-formula-mrbagels-dossier-dossier
+  - Evidence: npm-test, node-bin-dossier-mjs-validate-examples-dossier-json-docs-product, node-bin-dossier-mjs-build-examples-dossier-json-docs-product-pr, cd-react-npx-tsc-noemit, npm-pack-dry-run-json, npm-publish-dry-run-access-public, brew-install-build-from-source-kylebegeman-dossier-dossier, brew-test-kylebegeman-dossier-dossier, brew-audit-strict-formula-kylebegeman-dossier-dossier
 
 ## Release evidence receipt
 
@@ -182,4 +182,4 @@ Claims downstream agents can consume before continuing a release.
 - **owner:** release automation
 - **date:** 2026-06-30T15:07:49.000Z
 - **Changed files:** README.md, docs/releases/0.6.2.dossier.json, docs/releases/release-0-6-2.html, docs/releases/release-0-6-2.md, examples/showcase.html, package-lock.json, package.json
-- **Commands:** npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
+- **Commands:** npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source kylebegeman/tap/dossier, brew test kylebegeman/tap/dossier, brew audit --strict --formula kylebegeman/tap/dossier
