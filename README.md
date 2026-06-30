@@ -6,14 +6,14 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-c81e4a.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-c81e4a.svg)](#requirements)
-[![Version](https://img.shields.io/badge/version-0.6.2-7048e8.svg)](#release-status)
+[![Version](https://img.shields.io/badge/version-0.6.3-7048e8.svg)](#release-status)
 [![Output](https://img.shields.io/badge/output-single%20HTML%20file-7048e8.svg)](#how-dossier-works)
 [![Runtime](https://img.shields.io/badge/viewer%20runtime-zero%20external%20assets-c81e4a.svg)](#how-dossier-works)
 [![Agent Ready](https://img.shields.io/badge/agent%20ready-MCP%20%2B%20packets-0f7a52.svg)](#agent-workflows)
 [![Blocks](https://img.shields.io/badge/built--in%20blocks-42-9a5b00.svg)](#block-catalog)
 [![Packs](https://img.shields.io/badge/packs-templates%20%2B%20trusted%20plugins-0f7a52.svg)](#packs-templates-and-plugins)
 [![Workspaces](https://img.shields.io/badge/workspaces-multi--dossier%20status-7048e8.svg)](#workspaces)
-[![Homebrew](https://img.shields.io/badge/homebrew-mrbagels%2Fdossier-0f7a52.svg)](https://github.com/mrbagels/homebrew-dossier)
+[![Homebrew](https://img.shields.io/badge/homebrew-mrbagels%2Ftap-0f7a52.svg)](https://github.com/mrbagels/homebrew-tap)
 [![Live demo](https://img.shields.io/badge/live%20demo-open-7048e8.svg)](https://mrbagels.github.io/dossier/)
 
 <a href="https://mrbagels.github.io/dossier/"><img src="docs/assets/showcase.png" alt="A Dossier rendered from one JSON file" width="860"></a>
@@ -60,21 +60,21 @@ The core idea: **a dossier is not just a document. It is a portable human-agent 
 Install with Homebrew:
 
 ```bash
-brew install mrbagels/dossier/dossier
+brew install mrbagels/tap/dossier
 dossier --help
 ```
 
 Or tap first if you prefer the shorter package name:
 
 ```bash
-brew tap mrbagels/dossier
+brew tap mrbagels/tap
 brew install dossier
 ```
 
 If your Homebrew setup requires explicit third-party trust, trust only this formula:
 
 ```bash
-brew trust --formula mrbagels/dossier/dossier
+brew trust --formula mrbagels/tap/dossier
 ```
 
 The npm package target is `@mrbagels/dossier`. Once the first npm registry publish is complete, install it with:
@@ -86,7 +86,7 @@ npm install -g @mrbagels/dossier
 Until the registry publish is available, install the tagged GitHub release through npm:
 
 ```bash
-npm install -g github:mrbagels/dossier#v0.6.2
+npm install -g github:mrbagels/dossier#v0.6.3
 ```
 
 Create and build a document:
@@ -570,6 +570,7 @@ Current patch train:
 
 | Version | Focus |
 |---|---|
+| `0.6.3` | Conventional Homebrew tap naming, install docs use `mrbagels/tap/dossier`. |
 | `0.6.2` | Package-manager distribution readiness, npm CLI bin metadata, Homebrew tap publishing, install docs. |
 | `0.6.1` | Workspace invalid-dossier diagnostics, stricter workspace publish behavior, no-tag release evidence changed files, CLI subcommand exit hardening. |
 | `0.6.0` | Repo-backed packs, trusted plugin loading, pack templates, multi-dossier workspaces, workspace publish/query/status, release evidence automation, example engineering pack. |
