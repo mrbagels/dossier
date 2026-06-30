@@ -2,22 +2,22 @@
 title: "Release 0.6.2 Evidence"
 slug: "release-0-6-2"
 status: "ready"
-updated: "2026-06-30T15:06:47.000Z"
+updated: "2026-06-30T15:07:49.000Z"
 ---
 # Release 0.6.2
 
-Evidence collected for changes from v0.6.1 to cb4c99c.
+Evidence collected for changes from v0.6.1 to f530f1e.
 
-**0.6.2** Version · **1** Commits · **4** Changed files · **8** Checks · **0** Dirty entries
+**0.6.2** Version · **2** Commits · **7** Changed files · **9** Checks · **0** Dirty entries
 
 ## Release gates
 
 - [x] Package version resolved (required), 0.6.2
-- [x] Git HEAD resolved (required), cb4c99ceee30c08c29e157ebfa7d60580ed3cf14
+- [x] Git HEAD resolved (required), f530f1e4e14233f6c6963c1e667dd5ae4ecc4646
 - [x] Working tree clean before evidence write (required), No git status entries before writing release evidence.
-- [x] Release commits collected (required), 1 commit(s) from v0.6.1..HEAD
-- [x] Verification commands recorded (required), npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
-- [ ] npm package dry run recorded, Run npm pack --dry-run --json before publishing.
+- [x] Release commits collected (required), 2 commit(s) from v0.6.1..HEAD
+- [x] Verification commands recorded (required), npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
+- [x] npm package dry run recorded, npm pack command listed in verification checks.
 
 ## Verification evidence
 
@@ -54,6 +54,15 @@ node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers
 
 ```sh
 cd react && npx tsc --noEmit
+```
+
+- **Expected:** Command completes before release evidence collection.
+- **Actual:** Completed before this release dossier was generated.
+
+### npm pack --dry-run --json (passed)
+
+```sh
+npm pack --dry-run --json
 ```
 
 - **Expected:** Command completes before release evidence collection.
@@ -100,6 +109,7 @@ brew audit --strict --formula mrbagels/dossier/dossier
 
 | Commit | Summary |
 | --- | --- |
+| f530f1e | Add 0.6.2 release evidence |
 | cb4c99c | Prepare package manager distribution |
 
 ### Changed files
@@ -107,6 +117,9 @@ brew audit --strict --formula mrbagels/dossier/dossier
 | File | Status |
 | --- | --- |
 | README.md | changed |
+| docs/releases/0.6.2.dossier.json | changed |
+| docs/releases/release-0-6-2.html | changed |
+| docs/releases/release-0-6-2.md | changed |
 | examples/showcase.html | changed |
 | package-lock.json | changed |
 | package.json | changed |
@@ -119,7 +132,7 @@ brew audit --strict --formula mrbagels/dossier/dossier
 - **source:** git rev-parse HEAD
 - **trust:** high
 
-cb4c99ceee30c08c29e157ebfa7d60580ed3cf14
+f530f1e4e14233f6c6963c1e667dd5ae4ecc4646
 
 ### Release range
 
@@ -145,15 +158,15 @@ Claims downstream agents can consume before continuing a release.
 ### Sources
 
 - **source-git-head:** Git HEAD (high)
-  cb4c99ceee30c08c29e157ebfa7d60580ed3cf14
+  f530f1e4e14233f6c6963c1e667dd5ae4ecc4646
 - **source-git-status:** Git status (high)
   Clean
 - **source-verification:** Verification commands (high)
-  npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
+  npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
 
 ### Claims
 
-- **Release evidence was collected from cb4c99c.** (verified), confidence: high
+- **Release evidence was collected from f530f1e.** (verified), confidence: high
   - Sources: source-git-head
   - Evidence: git-head
 - **The working tree was clean before writing release evidence.** (verified), confidence: high
@@ -161,13 +174,12 @@ Claims downstream agents can consume before continuing a release.
   - Evidence: git-status
 - **Verification commands completed before evidence collection.** (verified), confidence: high
   - Sources: source-verification
-  - Evidence: npm-test, node-bin-dossier-mjs-validate-examples-dossier-json-docs-product, node-bin-dossier-mjs-build-examples-dossier-json-docs-product-pr, cd-react-npx-tsc-noemit, npm-publish-dry-run-access-public, brew-install-build-from-source-mrbagels-dossier-dossier, brew-test-mrbagels-dossier-dossier, brew-audit-strict-formula-mrbagels-dossier-dossier
+  - Evidence: npm-test, node-bin-dossier-mjs-validate-examples-dossier-json-docs-product, node-bin-dossier-mjs-build-examples-dossier-json-docs-product-pr, cd-react-npx-tsc-noemit, npm-pack-dry-run-json, npm-publish-dry-run-access-public, brew-install-build-from-source-mrbagels-dossier-dossier, brew-test-mrbagels-dossier-dossier, brew-audit-strict-formula-mrbagels-dossier-dossier
 
 ## Release evidence receipt
 
 - **outcome:** ready-for-publish
 - **owner:** release automation
-- **date:** 2026-06-30T15:06:47.000Z
-- **Changed files:** README.md, examples/showcase.html, package-lock.json, package.json
-- **Commands:** npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier
-- **Follow-ups:** Run npm pack --dry-run --json before publishing.
+- **date:** 2026-06-30T15:07:49.000Z
+- **Changed files:** README.md, docs/releases/0.6.2.dossier.json, docs/releases/release-0-6-2.html, docs/releases/release-0-6-2.md, examples/showcase.html, package-lock.json, package.json
+- **Commands:** npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier

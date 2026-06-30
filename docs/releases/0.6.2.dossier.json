@@ -7,7 +7,7 @@
     "eyebrow": "Release evidence",
     "status": "ready",
     "owner": "release automation",
-    "updated": "2026-06-30T15:06:47.000Z",
+    "updated": "2026-06-30T15:07:49.000Z",
     "tags": [
       "release",
       "evidence",
@@ -19,11 +19,11 @@
       "type": "hero",
       "eyebrow": "Release evidence",
       "title": "Release 0.6.2",
-      "lede": "Evidence collected for changes from v0.6.1 to cb4c99c.",
+      "lede": "Evidence collected for changes from v0.6.1 to f530f1e.",
       "pills": [
         "master",
-        "1 commits",
-        "4 files",
+        "2 commits",
+        "7 files",
         "clean tree"
       ]
     },
@@ -35,15 +35,15 @@
           "label": "Version"
         },
         {
-          "value": "1",
+          "value": "2",
           "label": "Commits"
         },
         {
-          "value": "4",
+          "value": "7",
           "label": "Changed files"
         },
         {
-          "value": "8",
+          "value": "9",
           "label": "Checks"
         },
         {
@@ -68,7 +68,7 @@
           "title": "Git HEAD resolved",
           "status": "passed",
           "required": true,
-          "evidence": "cb4c99ceee30c08c29e157ebfa7d60580ed3cf14"
+          "evidence": "f530f1e4e14233f6c6963c1e667dd5ae4ecc4646"
         },
         {
           "id": "working-tree-clean",
@@ -82,21 +82,21 @@
           "title": "Release commits collected",
           "status": "passed",
           "required": true,
-          "evidence": "1 commit(s) from v0.6.1..HEAD"
+          "evidence": "2 commit(s) from v0.6.1..HEAD"
         },
         {
           "id": "verification-recorded",
           "title": "Verification commands recorded",
           "status": "passed",
           "required": true,
-          "evidence": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier"
+          "evidence": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier"
         },
         {
           "id": "package-dry-run",
           "title": "npm package dry run recorded",
-          "status": "pending",
+          "status": "passed",
           "required": false,
-          "evidence": "Run npm pack --dry-run --json before publishing."
+          "evidence": "npm pack command listed in verification checks."
         }
       ]
     },
@@ -136,6 +136,15 @@
           "id": "cd-react-npx-tsc-noemit",
           "title": "cd react && npx tsc --noEmit",
           "command": "cd react && npx tsc --noEmit",
+          "status": "passed",
+          "expected": "Command completes before release evidence collection.",
+          "actual": "Completed before this release dossier was generated.",
+          "artifacts": []
+        },
+        {
+          "id": "npm-pack-dry-run-json",
+          "title": "npm pack --dry-run --json",
+          "command": "npm pack --dry-run --json",
           "status": "passed",
           "expected": "Command completes before release evidence collection.",
           "actual": "Completed before this release dossier was generated.",
@@ -188,6 +197,10 @@
       ],
       "rows": [
         [
+          "f530f1e",
+          "Add 0.6.2 release evidence"
+        ],
+        [
           "cb4c99c",
           "Prepare package manager distribution"
         ]
@@ -203,6 +216,18 @@
       "rows": [
         [
           "README.md",
+          "changed"
+        ],
+        [
+          "docs/releases/0.6.2.dossier.json",
+          "changed"
+        ],
+        [
+          "docs/releases/release-0-6-2.html",
+          "changed"
+        ],
+        [
+          "docs/releases/release-0-6-2.md",
           "changed"
         ],
         [
@@ -229,7 +254,7 @@
           "kind": "command",
           "source": "git rev-parse HEAD",
           "trust": "high",
-          "body": "cb4c99ceee30c08c29e157ebfa7d60580ed3cf14"
+          "body": "f530f1e4e14233f6c6963c1e667dd5ae4ecc4646"
         },
         {
           "id": "git-range",
@@ -259,7 +284,7 @@
           "label": "Git HEAD",
           "kind": "command",
           "trust": "high",
-          "summary": "cb4c99ceee30c08c29e157ebfa7d60580ed3cf14"
+          "summary": "f530f1e4e14233f6c6963c1e667dd5ae4ecc4646"
         },
         {
           "id": "source-git-status",
@@ -273,13 +298,13 @@
           "label": "Verification commands",
           "kind": "command",
           "trust": "high",
-          "summary": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier"
+          "summary": "npm test, node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json, node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json, cd react && npx tsc --noEmit, npm pack --dry-run --json, npm publish --dry-run --access public, brew install --build-from-source mrbagels/dossier/dossier, brew test mrbagels/dossier/dossier, brew audit --strict --formula mrbagels/dossier/dossier"
         }
       ],
       "claims": [
         {
           "id": "claim-head-collected",
-          "claim": "Release evidence was collected from cb4c99c.",
+          "claim": "Release evidence was collected from f530f1e.",
           "status": "verified",
           "confidence": "high",
           "sources": [
@@ -314,6 +339,7 @@
             "node-bin-dossier-mjs-validate-examples-dossier-json-docs-product",
             "node-bin-dossier-mjs-build-examples-dossier-json-docs-product-pr",
             "cd-react-npx-tsc-noemit",
+            "npm-pack-dry-run-json",
             "npm-publish-dry-run-access-public",
             "brew-install-build-from-source-mrbagels-dossier-dossier",
             "brew-test-mrbagels-dossier-dossier",
@@ -327,9 +353,12 @@
       "title": "Release evidence receipt",
       "outcome": "ready-for-publish",
       "owner": "release automation",
-      "date": "2026-06-30T15:06:47.000Z",
+      "date": "2026-06-30T15:07:49.000Z",
       "changedFiles": [
         "README.md",
+        "docs/releases/0.6.2.dossier.json",
+        "docs/releases/release-0-6-2.html",
+        "docs/releases/release-0-6-2.md",
         "examples/showcase.html",
         "package-lock.json",
         "package.json"
@@ -339,15 +368,14 @@
         "node bin/dossier.mjs validate examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json docs/releases/0.6.1.dossier.json",
         "node bin/dossier.mjs build examples/*.dossier.json docs/product/process-dossiers/process-dossiers-scope.dossier.json docs/releases/0.6.0.dossier.json",
         "cd react && npx tsc --noEmit",
+        "npm pack --dry-run --json",
         "npm publish --dry-run --access public",
         "brew install --build-from-source mrbagels/dossier/dossier",
         "brew test mrbagels/dossier/dossier",
         "brew audit --strict --formula mrbagels/dossier/dossier"
       ],
       "risks": [],
-      "followUps": [
-        "Run npm pack --dry-run --json before publishing."
-      ]
+      "followUps": []
     }
   ]
 }
