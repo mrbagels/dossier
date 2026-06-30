@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/kylebegeman/dossier/schema/packets/edits.schema.json",
+  "$id": "https://github.com/mrbagels/dossier/schema/packets/edits.schema.json",
   "title": "Dossier Edits Packet",
   "type": "object",
   "required": ["schema", "edits"],

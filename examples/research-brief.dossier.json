@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/kylebegeman/dossier/next/schema/dossier.schema.json",
+  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
   "dossierVersion": "1.0",
   "kind": "research",
   "meta": {
@@ -64,7 +64,7 @@
       "type": "trust-report",
       "title": "Claim ledger",
       "sources": [
-        { "id": "repo", "label": "Dossier repository", "kind": "source", "url": "https://github.com/kylebegeman/dossier", "trust": "high", "license": "MIT", "summary": "Source, examples, schemas, and package metadata." },
+        { "id": "repo", "label": "Dossier repository", "kind": "source", "url": "https://github.com/mrbagels/dossier", "trust": "high", "license": "MIT", "summary": "Source, examples, schemas, and package metadata." },
         { "id": "examples", "label": "Example gallery", "kind": "artifact", "trust": "medium", "summary": "Local examples demonstrate multiple use cases." }
       ],
       "claims": [
@@ -99,7 +99,7 @@
       "type": "references",
       "title": "Source queue",
       "items": [
-        { "label": "Repository", "url": "https://github.com/kylebegeman/dossier", "signal": "Primary source", "use": "Confirm schema, examples, and release notes." },
+        { "label": "Repository", "url": "https://github.com/mrbagels/dossier", "signal": "Primary source", "use": "Confirm schema, examples, and release notes." },
         { "label": "Manual QA guide", "url": "../docs/product/public-manual-qa.md", "signal": "Release confidence", "use": "Check public-readiness gates." }
       ]
     }

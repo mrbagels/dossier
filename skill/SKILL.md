@@ -36,9 +36,9 @@ navigation, or a decision loop.
 
 Install the `dossier` CLI, one line, any platform (needs Node 18+):
 ```
-npm install -g github:kylebegeman/dossier
+npm install -g github:mrbagels/dossier
 ```
-Or run without installing: `npx github:kylebegeman/dossier build <file>`. To scaffold a new
+Or run without installing: `npx github:mrbagels/dossier build <file>`. To scaffold a new
 document: `dossier init <name>` writes `<name>.dossier.json` from the starter.
 
 ## Workflow
