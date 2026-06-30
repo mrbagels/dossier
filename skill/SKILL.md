@@ -36,9 +36,9 @@ navigation, or a decision loop.
 
 Install the `dossier` CLI, one line, any platform (needs Node 18+):
 ```
-npm install -g github:mrbagels/dossier
+npm install -g github:kylebegeman/dossier
 ```
-Or run without installing: `npx github:mrbagels/dossier build <file>`. To scaffold a new
+Or run without installing: `npx github:kylebegeman/dossier build <file>`. To scaffold a new
 document: `dossier init <name>` writes `<name>.dossier.json` from the starter.
 
 ## Workflow
@@ -93,7 +93,7 @@ For React/Next codebases, the same design renders via typed TSX components:
 ```
 cd react && npm install && npx tsx src/cli.tsx <file>   # -> <slug>.react.html
 ```
-Identical output; reuses the same design system. Importable: `import { renderDossier } from "@mrbagels/dossier-react"`.
+Identical output; reuses the same design system. Importable: `import { renderDossier } from "@kylebegeman/dossier-react"`.
 
 ## Authoring essentials
 

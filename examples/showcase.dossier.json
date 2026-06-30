@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "$schema": "https://raw.githubusercontent.com/kylebegeman/dossier/next/schema/dossier.schema.json",
   "dossierVersion": "1.0",
   "kind": "dossier",
   "meta": {
@@ -17,7 +17,7 @@
       "demo",
       "blocks"
     ],
-    "baseUrl": "https://mrbagels.github.io/dossier",
+    "baseUrl": "https://kylebegeman.github.io/dossier",
     "skin": "console-slate",
     "lifecycle": {
       "stage": "durable",
@@ -109,7 +109,7 @@
       "blocks": [
         {
           "type": "prose",
-          "markdown": "This is a **prose** block with `inline code`, a [link](https://github.com/mrbagels/dossier), and a footnote.[^island]\n\n- Bullet lists render as real lists.\n- Inline markdown still works inside list items.\n\n1. Numbered lists work too.\n2. Paragraph rhythm stays intact.\n\nA second paragraph to show vertical rhythm."
+          "markdown": "This is a **prose** block with `inline code`, a [link](https://github.com/kylebegeman/dossier), and a footnote.[^island]\n\n- Bullet lists render as real lists.\n- Inline markdown still works inside list items.\n\n1. Numbered lists work too.\n2. Paragraph rhythm stays intact.\n\nA second paragraph to show vertical rhythm."
         },
         {
           "type": "flow",
@@ -189,7 +189,7 @@
                   "type": "code",
                   "lang": "ts",
                   "filename": "render.ts",
-                  "code": "import { renderDossier } from \"@mrbagels/dossier-react\";\nconst { html, md } = await renderDossier(model); // one self-contained file"
+                  "code": "import { renderDossier } from \"@kylebegeman/dossier-react\";\nconst { html, md } = await renderDossier(model); // one self-contained file"
                 }
               ]
             },
@@ -244,7 +244,7 @@
           "items": [
             {
               "label": "Repository",
-              "url": "https://github.com/mrbagels/dossier",
+              "url": "https://github.com/kylebegeman/dossier",
               "signal": "Source + docs",
               "use": "Clone, star, contribute"
             }
@@ -369,7 +369,7 @@
           "title": "Try it",
           "items": [
             {
-              "title": "Install: npm i -g github:mrbagels/dossier",
+              "title": "Install: npm i -g github:kylebegeman/dossier",
               "status": "todo"
             },
             {

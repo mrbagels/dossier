@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/mrbagels/dossier/next/schema/dossier.schema.json",
+  "$schema": "https://raw.githubusercontent.com/kylebegeman/dossier/next/schema/dossier.schema.json",
   "dossierVersion": "1.0",
   "kind": "implementation",
   "meta": {

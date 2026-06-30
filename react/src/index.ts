@@ -1,4 +1,4 @@
-// Public entry for @mrbagels/dossier-react.
+// Public entry for @kylebegeman/dossier-react.
 //
 // renderDossier(model) -> { html, embedHtml, md, digest }, SSR self-contained artifacts.
 // <Block b={...}/>                               , render an individual block (live or SSR).

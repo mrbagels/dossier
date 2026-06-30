@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mrbagels/dossier/schema/packets/release.schema.json",
+  "$id": "https://github.com/kylebegeman/dossier/schema/packets/release.schema.json",
   "title": "Dossier Release Packet",
   "type": "object",
   "required": ["schema", "release"],

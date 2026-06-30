@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mrbagels/dossier",
+  "$id": "https://github.com/kylebegeman/dossier",
   "title": "Dossier Document Model",
   "description": "The single JSON contract an agent fills to generate a Dossier. The rendered HTML is a projection of this object, which is embedded back into the output as the source-of-truth data island (#dossier-model).",
   "type": "object",

@@ -29,7 +29,7 @@ One portable file, link it, email it, or `<iframe>` it anywhere.
 
 Sections nest other blocks; text fields take inline markdown.
 
-This is a **prose** block with `inline code`, a [link](https://github.com/mrbagels/dossier), and a footnote.[^island]
+This is a **prose** block with `inline code`, a [link](https://github.com/kylebegeman/dossier), and a footnote.[^island]
 
 - Bullet lists render as real lists.
 - Inline markdown still works inside list items.
@@ -63,7 +63,7 @@ A second paragraph to show vertical rhythm.
 ### Code
 
 ```ts
-import { renderDossier } from "@mrbagels/dossier-react";
+import { renderDossier } from "@kylebegeman/dossier-react";
 const { html, md } = await renderDossier(model); // one self-contained file
 ```
 
@@ -136,7 +136,7 @@ No, it's a companion: linkable, embeddable, exportable artifacts.
 
 ### Try it
 
-- [ ] Install: npm i -g github:mrbagels/dossier
+- [ ] Install: npm i -g github:kylebegeman/dossier
 - [ ] Run: dossier init demo && dossier build demo.dossier.json
 
 ### Assumptions & open questions
